@@ -44,7 +44,7 @@ export default function Nav({ currentPage, navigate }) {
             Stichting Zeilschipper
           </span>
           <span style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 400 }}>
-            Bruine Vloot · UNESCO
+            Bruine Vloot
           </span>
         </button>
 

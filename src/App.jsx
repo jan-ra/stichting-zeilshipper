@@ -8,6 +8,7 @@ import InformatiebPage from './pages/Informatieborden.jsx'
 import TeamPage from './pages/Team.jsx'
 import MediaPage from './pages/Media.jsx'
 import BlogPage from './pages/Blog.jsx'
+import BlogDetailPage from './pages/BlogDetail.jsx'
 
 const PAGES = {
   home: HomePage,
@@ -17,18 +18,23 @@ const PAGES = {
   team: TeamPage,
   media: MediaPage,
   blog: BlogPage,
+  'blog-detail': BlogDetailPage,
 }
 
 export default function App() {
   const [page, setPage] = useState(() => sessionStorage.getItem('sz_page') || 'home')
+  const [blogSlug, setBlogSlug] = useState(() => sessionStorage.getItem('sz_blog_slug') || null)
 
-  const navigate = (p) => {
+  const navigate = (p, slug = null) => {
     setPage(p)
     sessionStorage.setItem('sz_page', p)
+    if (slug !== null) {
+      setBlogSlug(slug)
+      sessionStorage.setItem('sz_blog_slug', slug)
+    }
     window.scrollTo({ top: 0, behavior: 'instant' })
   }
 
-  // Update document title per page
   useEffect(() => {
     const titles = {
       home: 'Stichting Zeilschipper — Bruine Vloot · UNESCO-erfgoed',
@@ -38,6 +44,7 @@ export default function App() {
       team: 'Team — Stichting Zeilschipper',
       media: 'Media & Bouwdozen — Stichting Zeilschipper',
       blog: 'Blog — Stichting Zeilschipper',
+      'blog-detail': 'Artikel — Stichting Zeilschipper',
     }
     document.title = titles[page] || titles.home
   }, [page])
@@ -47,7 +54,7 @@ export default function App() {
   return (
     <div style={{ fontFamily: "'Source Sans 3', sans-serif", background: '#f4ede1', color: '#0f2238', minHeight: '100vh' }}>
       <Nav currentPage={page} navigate={navigate} />
-      <PageComponent navigate={navigate} />
+      <PageComponent navigate={navigate} blogSlug={blogSlug} />
       <Footer navigate={navigate} />
     </div>
   )

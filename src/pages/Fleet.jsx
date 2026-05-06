@@ -4,6 +4,8 @@ import { SHIPS } from '../data/content.js'
 function FleetGlobe({ onShipClick, filter, selectedShip }) {
   const containerRef = useRef(null)
   const globeRef = useRef(null)
+  const filterRef = useRef(filter)
+  const updatePointsRef = useRef(null)
 
   const getFiltered = (f) => SHIPS.filter(s => {
     if (f.type !== 'all' && s.type !== f.type) return false
@@ -22,35 +24,70 @@ function FleetGlobe({ onShipClick, filter, selectedShip }) {
       globe.width(w).height(h)
 
       globe
-        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
+        .globeTileEngineUrl((x, y, l) => `https://a.basemaps.cartocdn.com/dark_nolabels/${l}/${x}/${y}.png`)
         .backgroundColor('rgba(0,0,0,0)')
         .showAtmosphere(true)
         .atmosphereColor('#1a3a5c')
         .atmosphereAltitude(0.15)
         .pointsData(SHIPS)
         .pointLat('lat').pointLng('lng')
-        .pointColor(d => getFiltered({ type: 'all', region: 'all' }).find(f => f.id === d.id) ? '#c19a52' : 'rgba(193,154,82,0.2)')
-        .pointRadius(0.22)
-        .pointAltitude(0.005)
+        .pointColor(() => '#c19a52')
+        .pointRadius(0.35)
+        .pointAltitude(0.001)
         .pointResolution(8)
-        .pointLabel(d => `<div style="background:rgba(15,34,56,0.95);border:1px solid rgba(193,154,82,0.5);padding:10px 14px;border-radius:3px;font-family:sans-serif;min-width:150px"><strong style="color:#f4ede1;font-size:14px">${d.name}</strong><br><span style="color:#c19a52;font-size:11px">${d.type}</span><br><span style="color:rgba(244,237,225,0.6);font-size:12px">${d.port}</span></div>`)
-        .onPointClick(onShipClick)
+        .ringsData(SHIPS)
+        .ringLat('lat').ringLng('lng')
+        .ringColor(() => t => `rgba(193,154,82,${Math.pow(1 - t, 1.5) * 0.9})`)
+        .ringMaxRadius(4)
+        .ringPropagationSpeed(1.5)
+        .ringRepeatPeriod(3000)
+        .htmlElementsData(SHIPS)
+        .htmlLat('lat').htmlLng('lng')
+        .htmlAltitude(0.001)
+        .htmlElement(d => {
+          const tip = document.createElement('div')
+          tip.className = '_ship-tip'
+          tip.style.cssText = 'position:fixed;pointer-events:none;display:none;z-index:9999;background:rgba(15,34,56,0.95);border:1px solid rgba(193,154,82,0.5);padding:10px 14px;border-radius:3px;font-family:sans-serif;min-width:150px;'
+          tip.innerHTML = `<strong style="color:#f4ede1;font-size:14px">${d.name}</strong><br><span style="color:#c19a52;font-size:11px">${d.type}</span><br><span style="color:rgba(244,237,225,0.6);font-size:12px">${d.port}</span>`
+          document.body.appendChild(tip)
 
-      fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson')
-        .then(r => r.json())
-        .then(countries => {
-          if (!globe) return
-          globe.polygonsData(countries.features)
-               .polygonCapColor(() => 'rgba(15,34,56,0)')
-               .polygonSideColor(() => 'transparent')
-               .polygonStrokeColor(() => 'rgba(193,154,82,0.35)')
-               .polygonAltitude(0.002)
+          const el = document.createElement('div')
+          el.style.cssText = 'width:52px;height:52px;border-radius:50%;cursor:pointer;transform:translate(-50%,-50%);background:rgba(0,0,0,0.001);pointer-events:auto;'
+          el.addEventListener('mouseenter', () => { tip.style.display = 'block' })
+          el.addEventListener('mousemove', e => {
+            tip.style.left = (e.clientX + 16) + 'px'
+            tip.style.top = (e.clientY - 10) + 'px'
+          })
+          el.addEventListener('mouseleave', () => { tip.style.display = 'none' })
+          el.addEventListener('click', () => onShipClick(d))
+          el._tip = tip
+          return el
         })
-        .catch(() => {})
+
+      const REF_ALT = 1.8
+      const updatePoints = () => {
+        const alt = globe.pointOfView().altitude
+        const scale = alt / REF_ALT
+        const filteredIds = new Set(getFiltered(filterRef.current).map(s => s.id))
+        globe
+          .pointColor(d => filteredIds.has(d.id) ? '#c19a52' : 'rgba(193,154,82,0.15)')
+          .pointRadius(d => (filteredIds.has(d.id) ? 0.35 : 0.18) * scale)
+          .ringColor(d => filteredIds.has(d.id)
+            ? t => `rgba(193,154,82,${Math.pow(1 - t, 1.5) * 0.9})`
+            : () => 'rgba(0,0,0,0)')
+          .ringMaxRadius(4 * scale)
+      }
+      updatePointsRef.current = updatePoints
+
+      let lastAlt = REF_ALT
+      globe.controls().addEventListener('change', () => {
+        const alt = globe.pointOfView().altitude
+        if (Math.abs(alt - lastAlt) > 0.001) { lastAlt = alt; updatePoints() }
+      })
 
       globe.controls().autoRotate = true
       globe.controls().autoRotateSpeed = 0.18
-      globe.controls().enableZoom = false
+      globe.controls().enableZoom = true
       globe.controls().enablePan = false
       globe.pointOfView({ lat: 52.5, lng: 5.0, altitude: 1.8 }, 0)
     }
@@ -64,16 +101,14 @@ function FleetGlobe({ onShipClick, filter, selectedShip }) {
 
     return () => {
       ro.disconnect()
+      document.querySelectorAll('._ship-tip').forEach(el => el.remove())
       try { globe?._destructor?.() } catch(e) {}
     }
   }, [])
 
   useEffect(() => {
-    if (!globeRef.current) return
-    const filtered = getFiltered(filter)
-    globeRef.current
-      .pointColor(d => filtered.find(f => f.id === d.id) ? '#c19a52' : 'rgba(193,154,82,0.15)')
-      .pointRadius(d => filtered.find(f => f.id === d.id) ? 0.22 : 0.12)
+    filterRef.current = filter
+    updatePointsRef.current?.()
   }, [filter])
 
   useEffect(() => {

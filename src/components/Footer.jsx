@@ -9,22 +9,11 @@ export default function Footer({ navigate }) {
               Stichting Zeilschipper
             </div>
             <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 20 }}>
-              Bruine Vloot · UNESCO-nominatie
+              Bruine Vloot
             </div>
             <p style={{ fontSize: 14, lineHeight: 1.8, color: 'rgba(244,237,225,0.6)', maxWidth: 280 }}>
               Wij werken aan UNESCO-erkenning van het ambacht van de schipper Bruine Vloot als immaterieel cultureel erfgoed van de mensheid.
             </p>
-            <div style={{ marginTop: 24, display: 'flex', gap: 12 }}>
-              {['ANBI', 'RCE'].map(badge => (
-                <span key={badge} style={{
-                  fontSize: 10, fontWeight: 600, letterSpacing: '0.12em',
-                  border: '1px solid rgba(193,154,82,0.4)', color: '#c19a52',
-                  padding: '4px 10px', borderRadius: 2,
-                }}>
-                  {badge}
-                </span>
-              ))}
-            </div>
           </div>
 
           <div>
@@ -55,42 +44,12 @@ export default function Footer({ navigate }) {
 
           <div>
             <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#c19a52', marginBottom: 20 }}>
-              Governance
-            </div>
-            {[
-              ['KvK', '87654321'],
-              ['RSIN/fiscaal', '865 432 109'],
-              ['ANBI-status', 'Verleend 2021'],
-              ['Bestuur', '6 leden'],
-              ['Beloningsbeleid', 'Onbezoldigd'],
-            ].map(([label, value]) => (
-              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: 13 }}>
-                <span style={{ color: 'rgba(244,237,225,0.45)' }}>{label}</span>
-                <span style={{ color: 'rgba(244,237,225,0.75)' }}>{value}</span>
-              </div>
-            ))}
-            <div style={{ marginTop: 16, fontSize: 13, color: 'rgba(244,237,225,0.45)', lineHeight: 1.7 }}>
-              Jaarrekening en beleidsplan beschikbaar op aanvraag.
-            </div>
-          </div>
-
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#c19a52', marginBottom: 20 }}>
               Contact
             </div>
             <div style={{ fontSize: 14, lineHeight: 2, color: 'rgba(244,237,225,0.6)' }}>
               <div>info@zeilschipper.nl</div>
-              <div>Postbus 114</div>
-              <div>8860 AA Harlingen</div>
-              <div style={{ marginTop: 12 }}>+31 (0)517 41 23 00</div>
-            </div>
-            <div style={{ marginTop: 24 }}>
-              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#c19a52', marginBottom: 12 }}>
-                Partners
-              </div>
-              {['Ministerie OCW', 'RCE', 'VBV', 'Waddenzee Werelderfgoed'].map(p => (
-                <div key={p} style={{ fontSize: 13, color: 'rgba(244,237,225,0.45)', padding: '3px 0' }}>{p}</div>
-              ))}
+              <div>Aambeeldstraat 20</div>
+              <div>1021 KB Amsterdam</div>
             </div>
           </div>
         </div>

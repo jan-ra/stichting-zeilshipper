@@ -27,31 +27,37 @@ export const ARCS = [
 export const TEAM = [
   {
     id: 1, name: "Sven Timmann", role: "Voorzitter", location: "Hamburg / Nederland", since: "2021",
+    photo: "/team/sven.jpg",
     bio: "Geboren in Hamburg aan de Elbe, duurde het niet lang voordat ik als tiener mijn liefde voor zeilen ontdekte. Eerst op rubberboten en later op jeugdkotters verkende ik met vrienden de meren en rivieren van Noord-Duitsland. In de zomer gingen deze reizen tot in Denemarken.",
     expertise: "Zeilvaart, bestuur, internationale netwerken",
   },
   {
     id: 2, name: "Jan Willem Zandstra", role: "Secretaris", location: "Nederland", since: "2021",
+    photo: "/team/jan-willem.jpg",
     bio: "Mijn naam is Jan Willem Zandstra en ik ben schipper en eigenaar van de zeilklipper 'Eenhoorn'. Zo'n 15 jaar geleden ben ik toevallig op een zeilschip terecht gekomen nadat het werken in de projectontwikkeling onmogelijk werd vanwege een wereldwijde financiële crisis.",
     expertise: "Scheepvaart, scheepsbeheer, Bruine Vloot",
   },
   {
     id: 3, name: "Sylvelin (Zippi) Rinnen", role: "Bestuurslid", location: "Nederland", since: "2021",
+    photo: "/team/zippi.jpg",
     bio: "Als bestuurslid van Stichting Zeilschipper zet Sylvelin zich in voor het behoud van het immaterieel erfgoed van de Schipper Bruine Vloot. Haar brede ervaring en betrokkenheid bij de maritieme gemeenschap vormen een waardevolle bijdrage aan het bestuur.",
     expertise: "Bestuur, maritiem erfgoed",
   },
   {
     id: 4, name: "Cockie Schilperoort", role: "Vrijwilliger", location: "Muiden", since: "2023",
+    photo: "/team/cockie.jpg",
     bio: "Ik ben, toen ik 20 was, in contact gekomen met de Bruine Vloot doordat ik een relatie kreeg met een schipper op een tjalk in Muiden. Wilde ik hem zien 's zomers dan 'moest' ik wel mee aan boord. Ik had helemaal geen zeilervaring en in het begin vond ik het erg spannend allemaal.",
     expertise: "Gemeenschapsopbouw, communicatie",
   },
   {
     id: 5, name: "Marja Goud", role: "Vrijwilliger", location: "Nederland", since: "2023",
+    photo: "/team/marja.jpg",
     bio: "Tijdens mijn studie museologie is mijn interesse gewekt voor historische schepen. Dat deze schepen zo zichtbaar zijn in het landschap en in het dagelijks leven in Nederland is iets om te koesteren. Heel anders dan erfgoed binnen de muren van een museum.",
     expertise: "Museologie, erfgoedbeheer",
   },
   {
     id: 6, name: "Maaike de Jong", role: "Vrijwilliger", location: "Nederland", since: "2023",
+    photo: "/team/maaike.jpg",
     bio: "Ik combineer een academische achtergrond in hoger onderwijs en duurzaamheid met een passie voor maritiem erfgoed. Als stuurman op traditionele zeilschepen tot 500 GT vaar ik wereldwijd en zet ik mij in voor het levend houden van de kennis en praktijk van de Bruine Vloot.",
     expertise: "Duurzaamheid, nautisch onderwijs, Bruine Vloot",
   },
@@ -82,7 +88,31 @@ export const HARBOURS = [
 ];
 
 export const BLOG_POSTS = [
-  { id: 1, title: "Bruine Vloot", date: "20 januari 2026", category: "Erfgoed", author: "Sven", excerpt: "De Bruine Vloot bestaat uit zo'n 400 historische zeilschepen die worden ingezet voor passagiersvervoer op binnenwater en zee. Deze vloot is uniek in omvang en vakmanschap, met een eigen cultuur gekenmerkt door hoge zeilvaardigheid.", readTime: "5 min", slug: "bruine-vloot" },
+  {
+    id: 1,
+    title: "Bruine Vloot",
+    date: "20 januari 2026",
+    category: "Erfgoed",
+    author: "Peter Fokkens",
+    authorPhoto: "/team/peter-fokkens.webp",
+    readTime: "5 min",
+    slug: "bruine-vloot",
+    coverImage: { src: "/blog/bruine-vloot/het_vloot_vertrekt.jpg", alt: "De vloot vertrekt" },
+    images: [
+      { src: "/blog/bruine-vloot/op_het_ijsselmeer.jpg", alt: "Op het IJsselmeer", after: 5 },
+    ],
+    excerpt: "Het IJsselmeer ligt er wat grijs bij, maar we zijn niet de enigen op het water. De zon schijnt wel, maar er dreigt een grote, donkere bui. Die geeft het IJsselmeer een bijzonder aanzien.",
+    body: [
+      "Het IJsselmeer ligt er wat grijs bij, maar we zijn niet de enigen op het water. De zon schijnt wel, maar er dreigt een grote, donkere bui. Die geeft het IJsselmeer een bijzonder aanzien. Gelukkig zijn er verderop weer wat blauwe plekken tussen de donderwolken. In het lage ochtendlicht is het water donkerder dan anders, en de korte golven lichten met een speciaal zilver op. Daarboven krijgen de zeilen van de charterschepen om ons heen een speciale kleur, bijna alsof ze doorschijnend zijn.",
+      "Er is geen jacht in de buurt, en we wanen ons honderd jaar terug in de tijd, onderweg van Holland naar Friesland, met lading in, in konvooi de Zuiderzee over. Ik sta op het achterdek, waar schipper Noor de koers verlegt naar het Noorden.",
+      "'Als ik in een of ander ver buitenland zou zijn, me afvragend met welke speciale tradities van dat land ik beslist kennis zou willen maken, en ik zou zoiets als dit vinden in de Lonely Planet, dan zou ik er dagen voor omreizen om het mee te maken,' zeg ik, 'Maar hier in Nederland hoor je eigenlijk zelden iets over de Bruine Vloot. Ja, in coronatijd, toen bleek hoe moeilijk jullie het kregen en iedereen besefte dat we dat varend erfgoed toch wel erg graag willen behouden. Maar verder doet iedereen alsof het de gewoonste zaak van de wereld is, of ze weten niet eens dat er zoiets als een bruine vloot bestaat.'",
+      "Noor knikt. 'Nou, vergeet niet dat er in de afgelopen jaren ook een paar ongelukken breed in het nieuws zijn geweest. Dat was, net als corona, voor ons ook geen feest, al heeft het de vloot er wel toe gebracht om qua veiligheid de puntjes weer eens op de 'i' te zetten. Er was in bijna dertig jaar praktisch nooit iets gebeurd, dan is het goed om weer even wakker geschud te worden.'",
+      "Ik kijk naar de bollende zeilen. 'Ja, dat zal ongetwijfeld. In dat opzicht is het goed dat er volop aandacht is voor de veiligheid. Maar heb jij nou het gevoel dat jullie zo bekend zijn in dit land? Terwijl, dit is toch net alsof je weer honderd jaar terug bent in de geschiedenis? En hoe mooi is het niet op het water, zelfs op een grijze dag als deze?'",
+      "Noor kijkt me aan. 'Je verwoordt precies wat ik altijd aan mijn gasten probeer over te brengen,' antwoordt ze. 'Als je nu goed om je heen kijkt, een klein beetje door je oogharen misschien, dan zie je wat dit land groot en bijzonder heeft gemaakt; zeilende vracht- en vissersschepen, het vervoer over water, met enkel natuurlijke hulpbronnen, de wind, en als je niet meer tegen de wind op kon, wachtte je op beter weer. Ik zeg niet dat het beter was dan nu, maar ik heb gemerkt dat ik mij aan boord veel bewuster ben van de elementen, en daardoor ook bewuster omga met mijn omgeving, niet alleen met het schip en het milieu, maar ook met de mensen.'",
+      "Ik blijf nog lang op het achterdek, en dat ligt niet alleen aan het feit dat onder de indruk ben van Noor. Ze is zelfverzekerd en straalt een kundigheid uit die haar natuurlijke autoriteit verleent, waardoor ze al haar energie kan steken in het uitstralen van iets anders, authenticiteit, warmte, maar zonder dat het klef wordt. Er komen meer mensen naar achteren, en de gesprekken gaan voort, vloeien naadloos over van schoonheid en traditie naar meer persoonlijke zaken, en dan blijkt dat daar weinig verschil tussen zit; wie bezig is met een vak dat zo verweven is met de elementen, en met de zorg voor zoiets kostbaars als een historisch schip, heeft bijna automatisch ook zorg voor het milieu, en voor mensen.",
+      "Aan het eind van de dag, na het hele IJsselmeer gezien te hebben, zeilen we Workum binnen. Noor heeft speciaal gekozen voor deze haven, omdat 't Soal bezeild is. Met alleen nog grootzeil en fok drijven we op de stad aan. Vlak voor het havenkommetje strijken we, en Robin zet de motor aan. Op haar gemak draait ze het schip, zodat we goed tien minuten later met de kop naar buiten liggen, samen met nog drie schepen van de bruine vloot. Aan de overkant van het water liggen een paar mooie jachten, maar alle foto's van voorbijkomende wandelaars worden van onze schepen gemaakt.",
+    ],
+  },
 ];
 
 export const MEDIA_ITEMS = [

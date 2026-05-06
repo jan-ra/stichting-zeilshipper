@@ -3,9 +3,8 @@ import { BLOG_POSTS } from '../data/content.js'
 
 const ALL_CATS = ['Alles', 'Erfgoed']
 
-export default function BlogPage() {
+export default function BlogPage({ navigate }) {
   const [cat, setCat] = useState('Alles')
-  const [expanded, setExpanded] = useState(null)
   const [email, setEmail] = useState('')
 
   const filtered = cat === 'Alles' ? BLOG_POSTS : BLOG_POSTS.filter(p => p.category === cat)
@@ -43,12 +42,11 @@ export default function BlogPage() {
         <div style={{ background: '#0a1a2e', borderBottom: '1px solid rgba(193,154,82,0.15)' }}>
           <div style={{ maxWidth: 1280, margin: '0 auto' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }} className="featured-grid">
-              <div style={{
-                background: '#0f2238', minHeight: 300,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                backgroundImage: 'repeating-linear-gradient(135deg, rgba(193,154,82,0.03) 0px, rgba(193,154,82,0.03) 1px, transparent 1px, transparent 14px)',
-              }}>
-                <div style={{ fontSize: 11, color: 'rgba(193,154,82,0.3)', fontFamily: 'monospace', letterSpacing: '0.05em' }}>[ headerafbeelding ]</div>
+              <div style={{ minHeight: 300, overflow: 'hidden', position: 'relative' }}>
+                {filtered[0].coverImage
+                  ? <img src={import.meta.env.BASE_URL + filtered[0].coverImage.src.replace(/^\//, '')} alt={filtered[0].coverImage.alt} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', position: 'absolute', inset: 0 }} />
+                  : <div style={{ width: '100%', height: '100%', background: '#0f2238', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: 'repeating-linear-gradient(135deg, rgba(193,154,82,0.03) 0px, rgba(193,154,82,0.03) 1px, transparent 1px, transparent 14px)' }}><div style={{ fontSize: 11, color: 'rgba(193,154,82,0.3)', fontFamily: 'monospace' }}>[ headerafbeelding ]</div></div>
+                }
               </div>
               <div style={{ padding: '52px 48px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 20, flexWrap: 'wrap' }}>
@@ -65,19 +63,14 @@ export default function BlogPage() {
                   {filtered[0].excerpt}
                 </p>
                 <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
-                  <button onClick={() => setExpanded(expanded === filtered[0].id ? null : filtered[0].id)} style={{
+                  <button onClick={() => navigate('blog-detail', filtered[0].slug)} style={{
                     background: 'none', border: '1px solid rgba(193,154,82,0.4)', cursor: 'pointer',
                     fontSize: 12, color: '#c19a52', padding: '10px 20px', borderRadius: 2, letterSpacing: '0.06em',
                   }}>
-                    {expanded === filtered[0].id ? 'Minder ↑' : 'Lees meer →'}
+                    Lees meer →
                   </button>
                   <span style={{ fontSize: 12, color: 'rgba(244,237,225,0.3)' }}>{filtered[0].readTime} leestijd</span>
                 </div>
-                {expanded === filtered[0].id && (
-                  <div style={{ marginTop: 20, fontSize: 14, color: 'rgba(244,237,225,0.6)', lineHeight: 1.8, borderTop: '1px solid rgba(193,154,82,0.2)', paddingTop: 20 }}>
-                    Dit artikel is beschikbaar in de volledige versie van de website. Abonneer u op onze nieuwsbrief voor directe updates.
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -92,7 +85,7 @@ export default function BlogPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '3rem' }}>
             {filtered.slice(1).map(post => (
-              <div key={post.id} style={{ cursor: 'pointer' }} onClick={() => setExpanded(expanded === post.id ? null : post.id)}>
+              <div key={post.id} style={{ cursor: 'pointer' }} onClick={() => navigate('blog-detail', post.slug)}>
                 <div style={{
                   aspectRatio: '16/9', background: '#0f2238', marginBottom: 20,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -111,11 +104,6 @@ export default function BlogPage() {
                     {post.title}
                   </h3>
                   <p style={{ fontSize: 14, color: '#3a4f65', lineHeight: 1.75 }}>{post.excerpt}</p>
-                  {expanded === post.id && (
-                    <div style={{ marginTop: 16, fontSize: 14, color: '#3a4f65', lineHeight: 1.8, borderTop: '1px solid rgba(15,34,56,0.08)', paddingTop: 16 }}>
-                      Dit artikel is beschikbaar in de volledige versie van de website. Neem contact op met de redactie voor vroege toegang of abonneert u op onze nieuwsbrief voor updates.
-                    </div>
-                  )}
                   <div style={{ marginTop: 14, fontSize: 12, color: 'rgba(15,34,56,0.35)' }}>{post.readTime} leestijd</div>
                 </div>
               </div>

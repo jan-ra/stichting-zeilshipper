@@ -23,23 +23,12 @@ export default function TeamPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '3rem' }}>
             {TEAM.map((member, i) => (
               <div key={member.id}>
-                <div style={{
-                  aspectRatio: '4/3', marginBottom: 24, background: '#0f2238',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  position: 'relative', overflow: 'hidden',
-                }}>
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    backgroundImage: 'repeating-linear-gradient(135deg, rgba(193,154,82,0.03) 0px, rgba(193,154,82,0.03) 1px, transparent 1px, transparent 12px)',
-                  }} />
-                  <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(193,154,82,0.15)', border: '1px solid rgba(193,154,82,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
-                    <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, color: '#c19a52' }}>
-                      {member.name.split(' ').at(-1)[0]}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 10, color: 'rgba(193,154,82,0.4)', fontFamily: 'monospace', letterSpacing: '0.05em', position: 'relative', zIndex: 1 }}>
-                    [ portretfoto ]
-                  </div>
+                <div style={{ aspectRatio: '3/4', marginBottom: 24, overflow: 'hidden' }}>
+                  <img
+                    src={import.meta.env.BASE_URL + member.photo.slice(1)}
+                    alt={member.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
+                  />
                 </div>
 
                 <div style={{ borderTop: '2px solid #c19a52', paddingTop: 20 }}>

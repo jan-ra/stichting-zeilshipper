@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from 'react'
 import { SHIPS, BLOG_POSTS } from '../data/content.js'
 
 const GLOBE_CHAPTERS = [
-  { lat: 53.0, lng: 5.0, altitude: 1.4, autoRotate: false, label: 'Nederland' },
+  { lat: 53.0, lng: 5.0, altitude: 0.6, autoRotate: false, label: 'Nederland' },
   { lat: 52.0, lng: 12.0, altitude: 2.0, autoRotate: false, label: 'Europa' },
   { lat: 20.0, lng: -5.0, altitude: 2.8, autoRotate: true, label: 'De wereld' },
-  { lat: 53.18, lng: 5.40, altitude: 1.2, autoRotate: false, label: 'Harlingen' },
+  { lat: 53.18, lng: 5.40, altitude: 0.6, autoRotate: false, label: 'Nederland' },
 ]
 
 const CHAPTERS_DATA = [
@@ -34,43 +34,54 @@ function StickyGlobe({ chapter, onShipClick }) {
       if (g) return
       g = window.Globe()(ref.current)
       globeRef.current = g
-
-      // Explicitly size the canvas to match the measured container so the
-      // globe is centred and sharp — without this, globe.gl can read 0×0 at
-      // mount time inside a CSS grid and produce an off-centre blurry result.
       g.width(w).height(h)
 
-      g.globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
-       .backgroundColor('rgba(0,0,0,0)')
-       .showAtmosphere(true)
-       .atmosphereColor('#1e4a7a')
-       .atmosphereAltitude(0.15)
-       .pointsData(SHIPS)
-       .pointLat('lat').pointLng('lng')
-       .pointColor(() => '#c19a52')
-       .pointRadius(0.22)
-       .pointAltitude(0.005)
-       .pointResolution(8)
-       .pointLabel(d => `
-         <div style="background:rgba(10,20,38,0.97);border:1px solid rgba(193,154,82,0.55);padding:12px 16px;border-radius:3px;font-family:'Source Sans 3',sans-serif;min-width:170px;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-           <div style="font-family:'Playfair Display',serif;font-size:16px;color:#f4ede1;margin-bottom:4px">${d.name}</div>
-           <div style="font-size:11px;color:#c19a52;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">${d.type} · ${d.year}</div>
-           <div style="font-size:12px;color:rgba(244,237,225,0.65);margin-bottom:2px">📍 ${d.port}</div>
-           <div style="font-size:12px;color:rgba(244,237,225,0.65)">⚡ ${d.speed} kn · 👥 ${d.passengers}</div>
-         </div>`)
-       .onPointClick(onShipClick)
+      g
+        .globeTileEngineUrl((x, y, l) => `https://a.basemaps.cartocdn.com/dark_nolabels/${l}/${x}/${y}.png`)
+        .backgroundColor('rgba(0,0,0,0)')
+        .showAtmosphere(true)
+        .atmosphereColor('#1a3a5c')
+        .atmosphereAltitude(0.15)
+        .pointsData(SHIPS)
+        .pointLat('lat').pointLng('lng')
+        .pointColor(() => '#c19a52')
+        .pointRadius(0.35)
+        .pointAltitude(0.001)
+        .pointResolution(8)
+        .ringsData(SHIPS)
+        .ringLat('lat').ringLng('lng')
+        .ringColor(() => t => `rgba(193,154,82,${Math.pow(1 - t, 1.5) * 0.9})`)
+        .ringMaxRadius(4)
+        .ringPropagationSpeed(1.5)
+        .ringRepeatPeriod(3000)
+        .htmlElementsData(SHIPS)
+        .htmlLat('lat').htmlLng('lng')
+        .htmlAltitude(0.001)
+        .htmlElement(d => {
+          const tip = document.createElement('div')
+          tip.className = '_ship-tip-home'
+          tip.style.cssText = 'position:fixed;pointer-events:none;display:none;z-index:9999;background:rgba(15,34,56,0.95);border:1px solid rgba(193,154,82,0.5);padding:10px 14px;border-radius:3px;font-family:sans-serif;min-width:150px;'
+          tip.innerHTML = `<strong style="color:#f4ede1;font-size:14px">${d.name}</strong><br><span style="color:#c19a52;font-size:11px">${d.type}</span><br><span style="color:rgba(244,237,225,0.6);font-size:12px">${d.port}</span>`
+          document.body.appendChild(tip)
 
-      fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson')
-        .then(r => r.json())
-        .then(countries => {
-          if (!g) return
-          g.polygonsData(countries.features)
-           .polygonCapColor(() => 'rgba(15,34,56,0)')
-           .polygonSideColor(() => 'transparent')
-           .polygonStrokeColor(() => 'rgba(193,154,82,0.35)')
-           .polygonAltitude(0.002)
+          const el = document.createElement('div')
+          el.style.cssText = 'width:52px;height:52px;border-radius:50%;cursor:pointer;transform:translate(-50%,-50%);background:rgba(0,0,0,0.001);pointer-events:auto;'
+          el.addEventListener('mouseenter', () => { tip.style.display = 'block' })
+          el.addEventListener('mousemove', e => {
+            tip.style.left = (e.clientX + 16) + 'px'
+            tip.style.top = (e.clientY - 10) + 'px'
+          })
+          el.addEventListener('mouseleave', () => { tip.style.display = 'none' })
+          el.addEventListener('click', () => onShipClick(d))
+          el._tip = tip
+          return el
         })
-        .catch(() => {})
+
+      const REF_ALT = 1.8
+      g.controls().addEventListener('change', () => {
+        const scale = g.pointOfView().altitude / REF_ALT
+        g.pointRadius(0.35 * scale).ringMaxRadius(4 * scale)
+      })
 
       g.controls().autoRotate = true
       g.controls().autoRotateSpeed = 0.3
@@ -79,20 +90,16 @@ function StickyGlobe({ chapter, onShipClick }) {
       g.pointOfView({ lat: 52.0, lng: 10.0, altitude: 1.8 }, 0)
     }
 
-    // Use ResizeObserver so we always get the real container dimensions,
-    // even when the element is inside a CSS grid that hasn't laid out yet.
     const ro = new ResizeObserver(entries => {
       const { width, height } = entries[0].contentRect
-      if (!g && width > 0 && height > 0) {
-        initGlobe(width, height)
-      } else if (g) {
-        g.width(width).height(height)
-      }
+      if (!g && width > 0 && height > 0) initGlobe(width, height)
+      else if (g) g.width(width).height(height)
     })
     ro.observe(ref.current)
 
     return () => {
       ro.disconnect()
+      document.querySelectorAll('._ship-tip-home').forEach(el => el.remove())
       try { g?._destructor?.() } catch(e) {}
     }
   }, [])
@@ -266,10 +273,10 @@ export default function HomePage({ navigate }) {
       <div style={{ background: '#0a1a2e', borderTop: '1px solid rgba(193,154,82,0.2)', borderBottom: '1px solid rgba(193,154,82,0.2)', padding: '60px 2rem' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem', alignItems: 'center' }} className="stats-grid">
-            <StatCounter value={5500} label="Schepen" prefix="~ " />
-            <StatCounter value={365} label="Bestaansjaren" prefix="~ " suffix="*" />
-            <StatCounter value={60} label="Vaardagen (2024)" prefix="> " />
-            <StatCounter value={47000} label="Passagiers per jaar" />
+            <StatCounter value={5500} label="Schippers & Matrozen" prefix="~ " suffix="*" />
+            <StatCounter value={365} label="Schepen" prefix="~ " />
+            <StatCounter value={60} label="Bestaansjaren" prefix="> " suffix="*" />
+            <StatCounter value={47000} label="Vaardagen (2024)" />
           </div>
           <div style={{ textAlign: 'center', marginTop: 28, fontSize: 12, color: 'rgba(244,237,225,0.3)', lineHeight: 1.7 }}>
             Het ecosysteem van het immaterieel erfgoed Schipper Bruine Vloot in cijfers.<br />
@@ -408,16 +415,18 @@ export default function HomePage({ navigate }) {
       {/* ── MEDIA SPOTLIGHT ── */}
       <div style={{ background: '#0f2238', padding: '100px 2rem' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }} className="grid-2">
-          <div style={{ aspectRatio: '16/9', background: '#0a1a2e', border: '1px solid rgba(193,154,82,0.2)', borderRadius: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, cursor: 'pointer' }}>
-            <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(193,154,82,0.12)', border: '1px solid rgba(193,154,82,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ width: 0, height: 0, borderLeft: '18px solid #c19a52', borderTop: '11px solid transparent', borderBottom: '11px solid transparent', marginLeft: 4 }} />
+          <div style={{ aspectRatio: '16/9', borderRadius: 2, cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
+            <img src={`${import.meta.env.BASE_URL}waterschatten-thumbnail.jpg`} alt="Waterschatten" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,26,46,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(193,154,82,0.18)', border: '1px solid rgba(193,154,82,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 0, height: 0, borderLeft: '18px solid #c19a52', borderTop: '11px solid transparent', borderBottom: '11px solid transparent', marginLeft: 4 }} />
+              </div>
             </div>
-            <div style={{ fontSize: 11, color: 'rgba(244,237,225,0.3)', fontFamily: 'monospace' }}>[ documentaire — 52 min ]</div>
           </div>
           <div>
             <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 16 }}>Media spotlight</div>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 32, color: '#f4ede1', fontWeight: 400, marginBottom: 18, lineHeight: 1.2 }}>Handen aan het Roer</h2>
-            <p style={{ fontSize: 15, color: 'rgba(244,237,225,0.55)', lineHeight: 1.85, marginBottom: 28 }}>Winnaar Gouden Anker 2024. Een intiem portret van drie schippers in vier seizoenen — van ijsbreken op de Waddenzee tot nightwatch op de Atlantische Oceaan. Regie: Ineke Smits.</p>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 32, color: '#f4ede1', fontWeight: 400, marginBottom: 18, lineHeight: 1.2 }}>Waterschatten</h2>
+            <p style={{ fontSize: 15, color: 'rgba(244,237,225,0.55)', lineHeight: 1.85, marginBottom: 28 }}>Een door de BBZ gemaakte promotiefilm die heel goed gebruikt kan worden om de Bruine Vloot, haar bemanning en de bijbehorende beroepsvelden voor te stellen.</p>
             <button onClick={() => navigate('media')} style={{ background: 'none', border: '1px solid rgba(193,154,82,0.4)', cursor: 'pointer', fontSize: 12, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#c19a52', padding: '10px 20px', borderRadius: 2 }}>
               Alle media →
             </button>

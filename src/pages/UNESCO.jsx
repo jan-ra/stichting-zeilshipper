@@ -39,21 +39,13 @@ const CRITERIA = [
 ]
 
 const TIMELINE = [
-  { year: 2020, q: 'Q1', event: 'Oprichting Stichting Zeilschipper', type: 'milestone' },
-  { year: 2020, q: 'Q3', event: 'Eerste bestuursvergadering; scope nominatie vastgesteld', type: 'intern' },
-  { year: 2021, q: 'Q1', event: 'Start kennisdocumentatie-project met Universiteit van Amsterdam', type: 'project' },
-  { year: 2021, q: 'Q4', event: 'ANBI-status verkregen', type: 'milestone' },
-  { year: 2022, q: 'Q2', event: 'Pilotfase informatieborden (3 havens)', type: 'project' },
-  { year: 2022, q: 'Q4', event: 'Documentaire "Handen aan het Roer" afgerond', type: 'project' },
-  { year: 2023, q: 'Q1', event: 'Eerste 4 informatieborden officieel onthuld', type: 'milestone' },
-  { year: 2023, q: 'Q3', event: 'Internationale partners aangesloten (NO, DK, DE)', type: 'intern' },
-  { year: 2024, q: 'Q1', event: 'Formele aanvraag bij Inventaris Immaterieel Erfgoed NL ingediend', type: 'project' },
-  { year: 2024, q: 'Q3', event: 'Documentaire wint Gouden Anker Rotterdam', type: 'milestone' },
-  { year: 2024, q: 'Q4', event: 'Opname Inventaris IEN — cruciaal vereiste vervuld', type: 'milestone' },
-  { year: 2025, q: 'Q1', event: 'Eerste hoorzitting Ministerie OCW', type: 'milestone', active: true },
-  { year: 2025, q: 'Q3', event: 'Indiening volledig nomineringsdossier bij OCW (gepland)', type: 'toekomst' },
-  { year: 2026, q: 'Q1', event: 'Nationale voordracht door Nederland bij UNESCO (gepland)', type: 'toekomst' },
-  { year: 2027, q: 'Q4', event: 'Besluit UNESCO IGC-comité (gepland)', type: 'toekomst' },
+  { year: '2020', label: 'Meer dan 150 schepen bijeen bij Pampus', done: true },
+  { year: '2021', label: 'Stichting Zeilschipper opgericht', done: true },
+  { year: '2022', label: 'Start kennisdocumentatie', done: true },
+  { year: '2023', label: 'Opname Inventaris Immaterieel Erfgoed', done: true },
+  { year: '2024', label: 'Eerste informatieborden geplaatst', done: true },
+  { year: '2025', label: 'Indiening bij Ministerie OCW', done: false, active: true },
+  { year: '2026–27', label: 'UNESCO-nominatie & besluit', done: false },
 ]
 
 const PARTNERS = [
@@ -85,14 +77,6 @@ export default function UNESCOPage() {
           <p style={{ fontSize: 17, color: 'rgba(244,237,225,0.65)', lineHeight: 1.85, maxWidth: 640, margin: '0 auto 40px' }}>
             UNESCO-erkenning als Immaterieel Cultureel Erfgoed van de Mensheid geeft het ambacht internationale bescherming, vergroot de financieringsmogelijkheden en verplicht Nederland tot actief beleid voor kennisbehoud.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', maxWidth: 600, margin: '0 auto', background: 'rgba(193,154,82,0.2)', border: '1px solid rgba(193,154,82,0.2)' }}>
-            {[['2027', 'Streefjaar besluit'], ['5/5', 'Criteria onderbouwd'], ['187', 'Steunverklaringen']].map(([v, l]) => (
-              <div key={l} style={{ background: 'rgba(15,34,56,0.8)', padding: '20px', textAlign: 'center' }}>
-                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 32, color: '#f4ede1' }}>{v}</div>
-                <div style={{ fontSize: 11, color: 'rgba(244,237,225,0.45)', letterSpacing: '0.1em', marginTop: 4 }}>{l}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 
@@ -142,23 +126,19 @@ export default function UNESCOPage() {
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 16 }}>Tijdlijn</div>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 38, color: '#f4ede1', marginBottom: 48, fontWeight: 400 }}>Van 2020 tot UNESCO-besluit</h2>
-          <div style={{ position: 'relative', paddingLeft: 40 }}>
-            <div style={{ position: 'absolute', left: 16, top: 0, bottom: 0, width: 1, background: 'rgba(193,154,82,0.25)' }} />
-            {TIMELINE.map((item, i) => (
-              <div key={i} style={{ position: 'relative', paddingBottom: 28 }}>
-                <div style={{
-                  position: 'absolute', left: -31, top: 5,
-                  width: 10, height: 10, borderRadius: '50%',
-                  background: item.active ? '#c19a52' : item.type === 'milestone' ? '#c19a52' : item.type === 'toekomst' ? 'transparent' : 'rgba(193,154,82,0.4)',
-                  border: item.type === 'toekomst' ? '1px solid rgba(193,154,82,0.3)' : '2px solid #c19a52',
-                  boxShadow: item.active ? '0 0 0 5px rgba(193,154,82,0.15)' : 'none',
-                }} />
-                <div style={{ display: 'flex', gap: 16, alignItems: 'baseline' }}>
-                  <span style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.1em', flexShrink: 0, width: 60 }}>{item.year} {item.q}</span>
-                  <span style={{ fontSize: 14, lineHeight: 1.6, color: item.type === 'toekomst' ? 'rgba(244,237,225,0.35)' : item.active ? '#f4ede1' : 'rgba(244,237,225,0.65)', fontStyle: item.type === 'toekomst' ? 'italic' : 'normal' }}>
-                    {item.event}
-                    {item.active && <span style={{ fontSize: 10, background: '#c19a52', color: '#0f2238', padding: '2px 6px', borderRadius: 2, marginLeft: 8, fontWeight: 700, fontStyle: 'normal' }}>Nu</span>}
-                  </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            {TIMELINE.map((step, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 20, paddingBottom: 20 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 4 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', flexShrink: 0, background: step.done ? '#c19a52' : 'none', border: step.done ? '2px solid #c19a52' : step.active ? '2px solid #c19a52' : '2px solid rgba(193,154,82,0.25)', boxShadow: step.active ? '0 0 0 4px rgba(193,154,82,0.12)' : 'none' }} />
+                  {i < TIMELINE.length - 1 && <div style={{ width: 1, height: 28, background: step.done ? 'rgba(193,154,82,0.4)' : 'rgba(193,154,82,0.12)', marginTop: 4 }} />}
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.1em', marginBottom: 3 }}>{step.year}</div>
+                  <div style={{ fontSize: 14, color: step.done ? '#f4ede1' : step.active ? '#f4ede1' : 'rgba(244,237,225,0.35)', fontStyle: step.done || step.active ? 'normal' : 'italic' }}>
+                    {step.label}
+                    {step.active && <span style={{ fontSize: 9, background: '#c19a52', color: '#0f2238', padding: '2px 6px', borderRadius: 2, marginLeft: 8, fontWeight: 700, letterSpacing: '0.08em' }}>NU</span>}
+                  </div>
                 </div>
               </div>
             ))}

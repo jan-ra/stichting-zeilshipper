@@ -48,11 +48,13 @@ export default function MediaPage() {
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 24 }}>Uitgelicht</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'center' }} className="grid-2">
-            <div style={{ aspectRatio: '16/9', background: '#0f2238', border: '1px solid rgba(193,154,82,0.2)', borderRadius: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, cursor: 'pointer' }}>
-              <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(193,154,82,0.12)', border: '1px solid rgba(193,154,82,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ width: 0, height: 0, borderLeft: '20px solid #c19a52', borderTop: '12px solid transparent', borderBottom: '12px solid transparent', marginLeft: 5 }} />
+            <div style={{ aspectRatio: '16/9', borderRadius: 2, cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
+              <img src={`${import.meta.env.BASE_URL}waterschatten-thumbnail.jpg`} alt="Waterschatten" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,26,46,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(193,154,82,0.18)', border: '1px solid rgba(193,154,82,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: 0, height: 0, borderLeft: '20px solid #c19a52', borderTop: '12px solid transparent', borderBottom: '12px solid transparent', marginLeft: 5 }} />
+                </div>
               </div>
-              <div style={{ fontSize: 11, color: 'rgba(244,237,225,0.3)', fontFamily: 'monospace' }}>[ promotiefilm ]</div>
             </div>
             <div>
               <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>Promotiefilm · Vloot</div>
