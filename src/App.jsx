@@ -39,7 +39,7 @@ export default function App() {
     const titles = {
       home: 'Stichting Zeilschipper — Bruine Vloot · UNESCO-erfgoed',
       unesco: 'Road to UNESCO — Stichting Zeilschipper',
-      vloot: 'De Vloot — Stichting Zeilschipper',
+      vloot: 'De schippers en de Vloot — Stichting Zeilschipper',
       informatieborden: 'Informatieborden — Stichting Zeilschipper',
       team: 'Team — Stichting Zeilschipper',
       media: 'Media & Bouwdozen — Stichting Zeilschipper',

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 const NAV_LINKS = [
-  { id: 'vloot', label: 'De Vloot' },
+  { id: 'vloot', label: 'De schippers en de Vloot' },
   { id: 'informatieborden', label: 'Informatieborden' },
   { id: 'unesco', label: 'Road to UNESCO' },
   { id: 'team', label: 'Team' },

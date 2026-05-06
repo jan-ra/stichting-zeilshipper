@@ -22,7 +22,7 @@ export default function Footer({ navigate }) {
             </div>
             {[
               { id: 'home', label: 'Home' },
-              { id: 'vloot', label: 'De Vloot' },
+              { id: 'vloot', label: 'De schippers en de Vloot' },
               { id: 'informatieborden', label: 'Informatieborden' },
               { id: 'unesco', label: 'Road to UNESCO' },
               { id: 'team', label: 'Team' },
