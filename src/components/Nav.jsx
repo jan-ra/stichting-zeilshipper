@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
-const NAV_LINKS = [
-  { id: 'vloot', label: 'De schippers en de Vloot' },
-  { id: 'informatieborden', label: 'Informatieborden' },
-  { id: 'unesco', label: 'Road to UNESCO' },
-  { id: 'team', label: 'Team' },
-  { id: 'media', label: 'Media' },
-  { id: 'blog', label: 'Blog' },
+const NAV_LINK_KEYS = [
+  { id: 'vloot', key: 'nav.fleet' },
+  { id: 'informatieborden', key: 'nav.infoBorden' },
+  { id: 'unesco', key: 'nav.unesco' },
+  { id: 'team', key: 'nav.team' },
+  { id: 'media', key: 'nav.media' },
+  { id: 'blog', key: 'nav.blog' },
 ]
 
 export default function Nav({ currentPage, navigate }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const { lang, toggle, t } = useLanguage()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -49,7 +51,7 @@ export default function Nav({ currentPage, navigate }) {
         </button>
 
         <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }} className="nav-desktop">
-          {NAV_LINKS.map(link => (
+          {NAV_LINK_KEYS.map(link => (
             <button key={link.id} onClick={() => navigate(link.id)} style={{
               background: 'none', border: 'none', cursor: 'pointer',
               fontSize: 13, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase',
@@ -60,9 +62,10 @@ export default function Nav({ currentPage, navigate }) {
             onMouseEnter={e => { if (currentPage !== link.id) e.target.style.color = '#f4ede1' }}
             onMouseLeave={e => { if (currentPage !== link.id) e.target.style.color = 'rgba(244,237,225,0.75)' }}
             >
-              {link.label}
+              {t(link.key)}
             </button>
           ))}
+
           {currentPage !== 'unesco' && (
             <button onClick={() => navigate('unesco')} style={{
               background: '#c19a52', border: 'none', cursor: 'pointer',
@@ -73,9 +76,25 @@ export default function Nav({ currentPage, navigate }) {
             onMouseEnter={e => e.target.style.opacity = '0.85'}
             onMouseLeave={e => e.target.style.opacity = '1'}
             >
-              Steun ons dossier
+              {t('nav.cta')}
             </button>
           )}
+
+          <button onClick={toggle} style={{
+            background: 'none',
+            border: '1px solid rgba(193,154,82,0.35)',
+            cursor: 'pointer',
+            fontSize: 12, fontWeight: 600, letterSpacing: '0.08em',
+            color: '#c19a52',
+            padding: '5px 12px', borderRadius: 2,
+            transition: 'border-color 0.2s',
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}
+          onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(193,154,82,0.7)'}
+          onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(193,154,82,0.35)'}
+          >
+            {lang === 'nl' ? '🇬🇧' : '🇳🇱'} {lang === 'nl' ? 'EN' : 'NL'}
+          </button>
         </div>
 
         <button onClick={() => setMenuOpen(!menuOpen)} className="nav-hamburger" style={{
@@ -99,16 +118,24 @@ export default function Nav({ currentPage, navigate }) {
           background: 'rgba(15,34,56,0.98)', borderTop: '1px solid rgba(193,154,82,0.2)',
           padding: '1rem 2rem 1.5rem',
         }}>
-          {[{ id: 'home', label: 'Home' }, ...NAV_LINKS].map(link => (
+          {[{ id: 'home', key: 'nav.home' }, ...NAV_LINK_KEYS].map(link => (
             <button key={link.id} onClick={() => { navigate(link.id); setMenuOpen(false) }} style={{
               display: 'block', width: '100%', textAlign: 'left',
               background: 'none', border: 'none', cursor: 'pointer',
               fontSize: 15, color: currentPage === link.id ? '#c19a52' : '#f4ede1',
               padding: '0.7rem 0', borderBottom: '1px solid rgba(255,255,255,0.06)',
             }}>
-              {link.label}
+              {t(link.key)}
             </button>
           ))}
+          <button onClick={() => { toggle(); setMenuOpen(false) }} style={{
+            display: 'block', width: '100%', textAlign: 'left',
+            background: 'none', border: 'none', cursor: 'pointer',
+            fontSize: 15, color: '#c19a52',
+            padding: '0.7rem 0', marginTop: 4,
+          }}>
+            {lang === 'nl' ? '🇬🇧 English' : '🇳🇱 Nederlands'}
+          </button>
         </div>
       )}
 

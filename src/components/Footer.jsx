@@ -1,4 +1,18 @@
+import { useLanguage } from '../context/LanguageContext.jsx'
+
 export default function Footer({ navigate }) {
+  const { t } = useLanguage()
+
+  const NAV_LINKS = [
+    { id: 'home', label: t('nav.home') },
+    { id: 'vloot', label: t('nav.fleet') },
+    { id: 'informatieborden', label: t('nav.infoBorden') },
+    { id: 'unesco', label: t('nav.unesco') },
+    { id: 'team', label: t('nav.team') },
+    { id: 'media', label: t('footer.mediaLabel') },
+    { id: 'blog', label: t('nav.blog') },
+  ]
+
   return (
     <footer style={{ background: '#0a1a2e', color: 'rgba(244,237,225,0.7)', paddingTop: 64, paddingBottom: 40 }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 2rem' }}>
@@ -12,23 +26,15 @@ export default function Footer({ navigate }) {
               Bruine Vloot
             </div>
             <p style={{ fontSize: 14, lineHeight: 1.8, color: 'rgba(244,237,225,0.6)', maxWidth: 280 }}>
-              Wij werken aan UNESCO-erkenning van het ambacht van de schipper Bruine Vloot als immaterieel cultureel erfgoed van de mensheid.
+              {t('footer.tagline')}
             </p>
           </div>
 
           <div>
             <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#c19a52', marginBottom: 20 }}>
-              Navigatie
+              {t('footer.navigation')}
             </div>
-            {[
-              { id: 'home', label: 'Home' },
-              { id: 'vloot', label: 'De schippers en de Vloot' },
-              { id: 'informatieborden', label: 'Informatieborden' },
-              { id: 'unesco', label: 'Road to UNESCO' },
-              { id: 'team', label: 'Team' },
-              { id: 'media', label: 'Media & Bouwdozen' },
-              { id: 'blog', label: 'Blog' },
-            ].map(link => (
+            {NAV_LINKS.map(link => (
               <button key={link.id} onClick={() => { navigate(link.id); window.scrollTo(0,0) }} style={{
                 display: 'block', background: 'none', border: 'none', cursor: 'pointer',
                 fontSize: 14, color: 'rgba(244,237,225,0.6)', padding: '4px 0', textAlign: 'left',
@@ -44,7 +50,7 @@ export default function Footer({ navigate }) {
 
           <div>
             <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#c19a52', marginBottom: 20 }}>
-              Contact
+              {t('footer.contact')}
             </div>
             <div style={{ fontSize: 14, lineHeight: 2, color: 'rgba(244,237,225,0.6)' }}>
               <div>info@zeilschipper.nl</div>
@@ -56,10 +62,10 @@ export default function Footer({ navigate }) {
 
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ fontSize: 12, color: 'rgba(244,237,225,0.35)' }}>
-            © 2025 Stichting Zeilschipper. Alle rechten voorbehouden.
+            {t('footer.copyright')}
           </div>
           <div style={{ fontSize: 12, color: 'rgba(244,237,225,0.35)', display: 'flex', gap: 20 }}>
-            {['Privacybeleid', 'Disclaimer', 'Toegankelijkheid'].map(l => (
+            {t('footer.legal').map(l => (
               <span key={l} style={{ cursor: 'pointer', transition: 'color 0.2s' }}
                 onMouseEnter={e => e.target.style.color = 'rgba(244,237,225,0.65)'}
                 onMouseLeave={e => e.target.style.color = 'rgba(244,237,225,0.35)'}

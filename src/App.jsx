@@ -9,6 +9,7 @@ import TeamPage from './pages/Team.jsx'
 import MediaPage from './pages/Media.jsx'
 import BlogPage from './pages/Blog.jsx'
 import BlogDetailPage from './pages/BlogDetail.jsx'
+import { useLanguage } from './context/LanguageContext.jsx'
 
 const PAGES = {
   home: HomePage,
@@ -24,6 +25,7 @@ const PAGES = {
 export default function App() {
   const [page, setPage] = useState(() => sessionStorage.getItem('sz_page') || 'home')
   const [blogSlug, setBlogSlug] = useState(() => sessionStorage.getItem('sz_blog_slug') || null)
+  const { t, lang } = useLanguage()
 
   const navigate = (p, slug = null) => {
     setPage(p)
@@ -36,18 +38,8 @@ export default function App() {
   }
 
   useEffect(() => {
-    const titles = {
-      home: 'Stichting Zeilschipper — Bruine Vloot · UNESCO-erfgoed',
-      unesco: 'Road to UNESCO — Stichting Zeilschipper',
-      vloot: 'De schippers en de Vloot — Stichting Zeilschipper',
-      informatieborden: 'Informatieborden — Stichting Zeilschipper',
-      team: 'Team — Stichting Zeilschipper',
-      media: 'Media & Bouwdozen — Stichting Zeilschipper',
-      blog: 'Blog — Stichting Zeilschipper',
-      'blog-detail': 'Artikel — Stichting Zeilschipper',
-    }
-    document.title = titles[page] || titles.home
-  }, [page])
+    document.title = t(`pageTitles.${page}`) || t('pageTitles.home')
+  }, [page, lang, t])
 
   const PageComponent = PAGES[page] || HomePage
 

@@ -1,17 +1,19 @@
 import { BLOG_POSTS } from '../data/content.js'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 const BASE = import.meta.env.BASE_URL
 
 export default function BlogDetailPage({ navigate, blogSlug }) {
+  const { t, tc } = useLanguage()
   const post = BLOG_POSTS.find(p => p.slug === blogSlug) || BLOG_POSTS[0]
 
   if (!post) {
     return (
       <div style={{ paddingTop: 68, minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 13, color: '#c19a52', marginBottom: 16 }}>Artikel niet gevonden</div>
+          <div style={{ fontSize: 13, color: '#c19a52', marginBottom: 16 }}>{t('blogDetail.notFound')}</div>
           <button onClick={() => navigate('blog')} style={{ background: 'none', border: '1px solid rgba(15,34,56,0.3)', cursor: 'pointer', padding: '10px 20px', fontSize: 13 }}>
-            Terug naar blog
+            {t('blogDetail.backToBlog')}
           </button>
         </div>
       </div>
@@ -20,9 +22,10 @@ export default function BlogDetailPage({ navigate, blogSlug }) {
 
   const img = (path) => BASE + path.replace(/^\//, '')
 
-  // Build a map of paragraph-index → image for inline rendering
   const imageAfter = {}
   post.images?.forEach(im => { imageAfter[im.after] = im })
+
+  const body = tc(post, 'body') || post.body
 
   return (
     <div style={{ paddingTop: 68 }}>
@@ -38,7 +41,7 @@ export default function BlogDetailPage({ navigate, blogSlug }) {
               textTransform: 'uppercase', marginBottom: 40, display: 'flex', alignItems: 'center', gap: 8,
             }}
           >
-            ← Blog
+            {t('blogDetail.back')}
           </button>
 
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 24, flexWrap: 'wrap' }}>
@@ -46,18 +49,18 @@ export default function BlogDetailPage({ navigate, blogSlug }) {
               fontSize: 10, color: '#c19a52', letterSpacing: '0.15em', textTransform: 'uppercase',
               border: '1px solid rgba(193,154,82,0.4)', padding: '3px 10px', borderRadius: 2,
             }}>
-              {post.category}
+              {tc(post, 'category')}
             </span>
             <span style={{ fontSize: 12, color: 'rgba(244,237,225,0.4)' }}>{post.date}</span>
             <span style={{ fontSize: 12, color: 'rgba(244,237,225,0.4)' }}>·</span>
-            <span style={{ fontSize: 12, color: 'rgba(244,237,225,0.4)' }}>{post.readTime} leestijd</span>
+            <span style={{ fontSize: 12, color: 'rgba(244,237,225,0.4)' }}>{post.readTime} {t('blogDetail.readTimeLabel')}</span>
           </div>
 
           <h1 style={{
             fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 56px)',
             color: '#f4ede1', fontWeight: 400, lineHeight: 1.12, marginBottom: 32,
           }}>
-            {post.title}
+            {tc(post, 'title')}
           </h1>
 
           {/* Author byline */}
@@ -76,7 +79,7 @@ export default function BlogDetailPage({ navigate, blogSlug }) {
             </div>
             <div>
               <div style={{ fontSize: 13, color: '#f4ede1' }}>{post.author}</div>
-              <div style={{ fontSize: 11, color: 'rgba(244,237,225,0.4)', letterSpacing: '0.05em' }}>Auteur</div>
+              <div style={{ fontSize: 11, color: 'rgba(244,237,225,0.4)', letterSpacing: '0.05em' }}>{t('blogDetail.authorLabel')}</div>
             </div>
           </div>
         </div>
@@ -101,18 +104,18 @@ export default function BlogDetailPage({ navigate, blogSlug }) {
         <div style={{ maxWidth: 680, margin: '0 auto' }}>
 
           {/* Lead paragraph */}
-          {post.body?.[0] && (
+          {body?.[0] && (
             <p style={{
               fontFamily: "'Playfair Display', serif", fontSize: 'clamp(17px, 2vw, 20px)',
               color: '#0f2238', lineHeight: 1.75, marginBottom: 36,
               borderLeft: '3px solid #c19a52', paddingLeft: 24,
             }}>
-              {post.body[0]}
+              {body[0]}
             </p>
           )}
 
           {/* Remaining paragraphs, with images interspersed */}
-          {post.body?.slice(1).map((paragraph, i) => {
+          {body?.slice(1).map((paragraph, i) => {
             const paragraphIndex = i + 1
             const inlineImage = imageAfter[paragraphIndex]
             return (
@@ -149,7 +152,7 @@ export default function BlogDetailPage({ navigate, blogSlug }) {
               letterSpacing: '0.08em', textTransform: 'uppercase',
             }}
           >
-            ← Alle artikelen
+            {t('blogDetail.allArticles')}
           </button>
           <div style={{ fontSize: 11, color: 'rgba(244,237,225,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             Stichting Zeilschipper

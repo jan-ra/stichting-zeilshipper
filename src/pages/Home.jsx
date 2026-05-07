@@ -1,24 +1,19 @@
 import { useState, useEffect, useRef } from 'react'
 import { SHIPS, BLOG_POSTS } from '../data/content.js'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 const GLOBE_CHAPTERS = [
-  { lat: 53.0, lng: 5.0, altitude: 0.6, autoRotate: false, label: 'Nederland' },
-  { lat: 52.0, lng: 12.0, altitude: 2.0, autoRotate: false, label: 'Europa' },
-  { lat: 20.0, lng: -5.0, altitude: 2.8, autoRotate: true, label: 'De wereld' },
-  { lat: 53.18, lng: 5.40, altitude: 0.6, autoRotate: false, label: 'Nederland' },
+  { lat: 53.0, lng: 5.0, altitude: 0.6, autoRotate: false, regionKey: 'thuiswateren' },
+  { lat: 52.0, lng: 12.0, altitude: 2.0, autoRotate: false, regionKey: 'europa' },
+  { lat: 20.0, lng: -5.0, altitude: 2.8, autoRotate: true, regionKey: 'wereld' },
+  { lat: 53.18, lng: 5.40, altitude: 0.6, autoRotate: false, regionKey: 'thuiswateren' },
 ]
 
-const CHAPTERS_DATA = [
-  { index: 0, roman: 'I', title: 'Nederland', sub: 'Nederlandse wateren', body: 'De Waddenzee, het IJsselmeer en de binnenwateren zijn de wieg van de Bruine Vloot. Hier leerden generaties schippers lezen: het tij, de wind, de bodem. Kennis die nergens anders verworven kan worden.' },
-  { index: 1, roman: 'II', title: 'Europa', sub: 'European Waters', body: 'Van de Baltische Zee tot de Middellandse Zee bevaren Bruine Vloot schippers routes die al eeuwen bestaan. De kennis zit niet op kaarten — die zit in handen en geheugen.' },
-  { index: 2, roman: 'III', title: 'De wereld', sub: 'Worldwide', body: 'Trans-Atlantisch. Kaap Hoorn. Antarctica. Schippers van de Bruine Vloot hebben de zwaarste wateren ter wereld bedwongen met schepen van hout en staal die soms meer dan een eeuw oud zijn.' },
-  { index: 3, roman: 'IV', title: 'Terug naar de haven', sub: 'Return to Port', body: 'En dan is er de thuiskomst — in een van de tientallen historische havens verspreid over Nederland. Plekken waar informatieborden staan, waar kennisoverdracht plaatsvindt, waar de volgende schipper zijn eerste les krijgt op de kade.' },
-]
-
-const PILLARS = [
-  { n: '01', title: 'De schipper als spil', body: 'De schipper van de Bruine Vloot stuurt niet alleen het schip — hij ontvangt gasten, instrueert de bemanning, draagt kennis over, onderhoudt het schip en bewaakt continu de veiligheid. Daarbij staat hij in verbinding met een compleet ecosysteem van bemanningsleden, werven en zeil- en mastenmakers, met de schipper als centrale schakel.' },
-  { n: '02', title: 'Veel kennis & vaardigheden', body: 'Van traditionele navigatie en zeiltrimmen tot meteorologie, scheepsonderhoud en crisismanagement op open water. Vrijwel elke schipper begon als maat of \'deckie\' — het vak wordt geleerd van dag één, in de praktijk. Via collega\'s, experts en zeilevenementen zoals de Strontrace en de Beurtveer worden kennis en vaardigheden steeds verder verdiept.' },
-  { n: '03', title: 'Kennisoverdracht', body: 'Een goede schipper investeert actief in de volgende generatie: hij legt uit, corrigeert en begeleidt. De tienduizenden passagiers die jaarlijks meevaren worden regelmatig betrokken bij het zeilen — ze hijsen zeilen, bedienen zwaarden, lopen wacht — altijd onder toezicht van de schipper. Zo groeit het begrip voor dit levende erfgoed.' },
+const CHAPTERS_STRUCT = [
+  { index: 0, roman: 'I' },
+  { index: 1, roman: 'II' },
+  { index: 2, roman: 'III' },
+  { index: 3, roman: 'IV' },
 ]
 
 // ── Globe ──────────────────────────────────────────────────────────────────────
@@ -48,12 +43,6 @@ function StickyGlobe({ chapter, onShipClick }) {
         .pointRadius(0.35)
         .pointAltitude(0.001)
         .pointResolution(8)
-        .ringsData(SHIPS)
-        .ringLat('lat').ringLng('lng')
-        .ringColor(() => t => `rgba(193,154,82,${Math.pow(1 - t, 1.5) * 0.9})`)
-        .ringMaxRadius(4)
-        .ringPropagationSpeed(1.5)
-        .ringRepeatPeriod(3000)
         .htmlElementsData(SHIPS)
         .htmlLat('lat').htmlLng('lng')
         .htmlAltitude(0.001)
@@ -80,7 +69,7 @@ function StickyGlobe({ chapter, onShipClick }) {
       const REF_ALT = 1.8
       g.controls().addEventListener('change', () => {
         const scale = g.pointOfView().altitude / REF_ALT
-        g.pointRadius(0.35 * scale).ringMaxRadius(4 * scale)
+        g.pointRadius(0.35 * scale)
       })
 
       g.controls().autoRotate = true
@@ -116,7 +105,7 @@ function StickyGlobe({ chapter, onShipClick }) {
 }
 
 // ── Ship panel ────────────────────────────────────────────────────────────────
-function ShipPanel({ ship, onClose }) {
+function ShipPanel({ ship, onClose, t }) {
   if (!ship) return null
   return (
     <div style={{
@@ -130,7 +119,13 @@ function ShipPanel({ ship, onClose }) {
       <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.15em', textTransform: 'uppercase' }}>{ship.type} · {ship.year}</div>
       <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, color: '#f4ede1', lineHeight: 1.2 }}>{ship.name}</h3>
       <div style={{ height: 1, background: 'rgba(193,154,82,0.2)' }} />
-      {[['Haven', ship.port], ['Snelheid', `${ship.speed} kn`], ['Bouwjaar', ship.year], ['Passagiers', ship.passengers], ['Regio', ship.region]].map(([k,v]) => (
+      {[
+        [t('home.shipPanel.port'), ship.port],
+        [t('home.shipPanel.speed'), `${ship.speed} kn`],
+        [t('home.shipPanel.yearBuilt'), ship.year],
+        [t('home.shipPanel.passengers'), ship.passengers],
+        [t('home.shipPanel.region'), ship.region],
+      ].map(([k, v]) => (
         <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
           <span style={{ color: 'rgba(244,237,225,0.4)' }}>{k}</span>
           <span style={{ color: '#f4ede1' }}>{v}</span>
@@ -171,8 +166,8 @@ function StatCounter({ value, label, suffix = '', prefix = '' }) {
   )
 }
 
-// ── Chapter panel (extracted to respect rules of hooks) ───────────────────────
-function ChapterPanel({ ch, index, onVisible }) {
+// ── Chapter panel ─────────────────────────────────────────────────────────────
+function ChapterPanel({ ch, index, onVisible, chapterLabel }) {
   const ref = useRef(null)
 
   useEffect(() => {
@@ -188,7 +183,7 @@ function ChapterPanel({ ch, index, onVisible }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
         <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, color: '#c19a52', fontStyle: 'italic' }}>{ch.roman}</span>
         <div style={{ height: 1, width: 40, background: 'rgba(193,154,82,0.5)' }} />
-        <span style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Hoofdstuk {index + 1}</span>
+        <span style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.2em', textTransform: 'uppercase' }}>{chapterLabel} {index + 1}</span>
       </div>
       <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(30px, 3vw, 48px)', color: '#0f2238', lineHeight: 1.1, marginBottom: 10, fontWeight: 400 }}>
         {ch.title}
@@ -208,6 +203,14 @@ function ChapterPanel({ ch, index, onVisible }) {
 export default function HomePage({ navigate }) {
   const [selectedShip, setSelectedShip] = useState(null)
   const [chapter, setChapter] = useState(null)
+  const { t, tc } = useLanguage()
+
+  const chapters = t('home.chapters').map((ch, i) => ({ ...CHAPTERS_STRUCT[i], ...ch }))
+  const pillars = t('home.pillars')
+  const timeline = t('home.timeline')
+  const projects = t('home.projects')
+  const oralItems = t('home.oralItems')
+  const statLabels = t('home.statLabels')
 
   return (
     <div>
@@ -219,33 +222,35 @@ export default function HomePage({ navigate }) {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '120px 64px 80px 4rem', position: 'relative', background: '#0b1d30' }}>
               <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.28em', textTransform: 'uppercase', marginBottom: 24 }}>
-                Stichting Zeilschipper — UNESCO-nominatie
+                {t('home.badge')}
               </div>
               <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 3.2vw, 52px)', color: '#f4ede1', lineHeight: 1.1, marginBottom: 20, fontWeight: 400 }}>
-                Voor velen meer dan een beroep —<br />het is een levensstijl
+                {t('home.heroTitle').split('\n').map((line, i) => (
+                  <span key={i}>{line}{i === 0 && <br />}</span>
+                ))}
               </h1>
               <p style={{ fontSize: 16, color: 'rgba(244,237,225,0.65)', lineHeight: 1.85, maxWidth: 460, marginBottom: 16 }}>
-                Deze website is een initiatief van een groep mensen die zich inzet voor het behoud van het beroep <em>zeilschipper</em>, ook wel Schipper Bruine Vloot genoemd.
+                {t('home.heroPara1')}
               </p>
               <p style={{ fontSize: 15, color: 'rgba(244,237,225,0.45)', lineHeight: 1.8, maxWidth: 460, marginBottom: 48 }}>
-                Een zeilschipper vaart samen met passagiers op traditionele zeilschepen voor recreatieve en educatieve doeleinden — op de Nederlandse binnenwateren, de Waddenzee en wereldwijd op zee. Schippers kiezen het vak uit liefde voor het varen, voor de traditionele schepen en voor de omgang met mensen.
+                {t('home.heroPara2')}
               </p>
               <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
                 <button onClick={() => navigate('unesco')} style={{ background: '#c19a52', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0f2238', padding: '14px 28px', borderRadius: 2 }}>
-                  Steun het dossier
+                  {t('home.ctaPrimary')}
                 </button>
                 <button onClick={() => navigate('vloot')} style={{ background: 'none', border: '1px solid rgba(244,237,225,0.25)', cursor: 'pointer', fontSize: 12, fontWeight: 400, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(244,237,225,0.8)', padding: '14px 28px', borderRadius: 2 }}>
-                  Bekijk de vloot
+                  {t('home.ctaSecondary')}
                 </button>
               </div>
               <div style={{ position: 'absolute', bottom: 36, left: '4rem', display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ width: 32, height: 1, background: 'rgba(193,154,82,0.4)' }} />
-                <span style={{ fontSize: 10, color: 'rgba(244,237,225,0.3)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>Scroll voor de reis</span>
+                <span style={{ fontSize: 10, color: 'rgba(244,237,225,0.3)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>{t('home.scrollHint')}</span>
               </div>
             </div>
 
-            {CHAPTERS_DATA.map((ch, i) => (
-              <ChapterPanel key={i} ch={ch} index={i} onVisible={setChapter} />
+            {chapters.map((ch, i) => (
+              <ChapterPanel key={i} ch={ch} index={i} onVisible={setChapter} chapterLabel={t('home.chapterLabel')} />
             ))}
           </div>
 
@@ -254,15 +259,15 @@ export default function HomePage({ navigate }) {
             <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 50%, rgba(30,74,122,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
             <div style={{ position: 'absolute', bottom: 40, left: '50%', transform: 'translateX(-50%)', textAlign: 'center', zIndex: 10, pointerEvents: 'none' }}>
               <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.25em', textTransform: 'uppercase', opacity: 0.8 }}>
-                {GLOBE_CHAPTERS[chapter]?.label}
+                {chapter !== null && t(`regions.${GLOBE_CHAPTERS[chapter]?.regionKey}`)}
               </div>
             </div>
             <div style={{ position: 'absolute', top: 90, right: 24, zIndex: 10, background: 'rgba(10,22,40,0.75)', border: '1px solid rgba(193,154,82,0.3)', padding: '12px 16px', borderRadius: 3, backdropFilter: 'blur(8px)', textAlign: 'center' }}>
               <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, color: '#f4ede1', lineHeight: 1 }}>{SHIPS.length}</div>
-              <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 4 }}>schepen</div>
+              <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 4 }}>{t('home.shipCount')}</div>
             </div>
             <div style={{ position: 'absolute', bottom: 64, right: 24, zIndex: 10, fontSize: 10, color: 'rgba(244,237,225,0.25)', letterSpacing: '0.1em', textTransform: 'uppercase', writingMode: 'vertical-rl' }}>
-              Klik een schip
+              {t('home.clickShip')}
             </div>
             <StickyGlobe chapter={chapter} onShipClick={setSelectedShip} />
           </div>
@@ -273,14 +278,14 @@ export default function HomePage({ navigate }) {
       <div style={{ background: '#0a1a2e', borderTop: '1px solid rgba(193,154,82,0.2)', borderBottom: '1px solid rgba(193,154,82,0.2)', padding: '60px 2rem' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem', alignItems: 'center' }} className="stats-grid">
-            <StatCounter value={5500} label="Schippers & Matrozen" prefix="~ " suffix="*" />
-            <StatCounter value={365} label="Schepen" prefix="~ " />
-            <StatCounter value={60} label="Bestaansjaren" prefix="> " suffix="*" />
-            <StatCounter value={47000} label="Vaardagen (2024)" />
+            <StatCounter value={5500} label={statLabels[0]} prefix="~ " suffix="*" />
+            <StatCounter value={365} label={statLabels[1]} prefix="~ " />
+            <StatCounter value={60} label={statLabels[2]} prefix="> " suffix="*" />
+            <StatCounter value={47000} label={statLabels[3]} />
           </div>
           <div style={{ textAlign: 'center', marginTop: 28, fontSize: 12, color: 'rgba(244,237,225,0.3)', lineHeight: 1.7 }}>
-            Het ecosysteem van het immaterieel erfgoed Schipper Bruine Vloot in cijfers.<br />
-            <span style={{ fontSize: 11 }}>* schatting</span>
+            {t('home.statsCaption')}<br />
+            <span style={{ fontSize: 11 }}>{t('home.statsEstimate')}</span>
           </div>
         </div>
       </div>
@@ -289,13 +294,15 @@ export default function HomePage({ navigate }) {
       <div style={{ background: '#f4ede1', padding: '100px 2rem' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 16 }}>Het ambacht</div>
+            <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 16 }}>{t('home.craftBadge')}</div>
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(26px, 3.5vw, 44px)', color: '#0f2238', fontWeight: 400 }}>
-              Wat maakt de schipper<br />tot immaterieel erfgoed?
+              {t('home.pillarsTitle').split('\n').map((line, i) => (
+                <span key={i}>{line}{i === 0 && <br />}</span>
+              ))}
             </h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '3rem' }}>
-            {PILLARS.map((p, i) => (
+            {pillars.map((p, i) => (
               <div key={i} style={{ borderTop: '2px solid #c19a52', paddingTop: 28 }}>
                 <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 18 }}>{p.n}</div>
                 <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: '#0f2238', marginBottom: 16, lineHeight: 1.3 }}>{p.title}</h3>
@@ -310,39 +317,31 @@ export default function HomePage({ navigate }) {
       <div style={{ background: '#0f2238', padding: '80px 2rem' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }} className="grid-2">
           <div>
-            <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 18 }}>Road to UNESCO</div>
+            <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 18 }}>{t('home.unescoSectionBadge')}</div>
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(24px, 3vw, 40px)', color: '#f4ede1', fontWeight: 400, marginBottom: 20, lineHeight: 1.2 }}>
-              Wij bouwen het sterkste dossier dat de Bruine Vloot ooit heeft gehad
+              {t('home.unescoSectionTitle')}
             </h2>
             <p style={{ fontSize: 15, color: 'rgba(244,237,225,0.6)', lineHeight: 1.85, marginBottom: 32 }}>
-              Tijdens de Corona-epidemie bleek hoe kwetsbaar de situatie was. In juni 2020 kwamen meer dan 150 schepen samen bij Pampus — de steun die volgde maakte duidelijk dat dit erfgoed ertoe doet. In 2023 werd het ambacht opgenomen in de Inventaris Immaterieel Erfgoed Nederland. Ons ultieme doel is erkenning door UNESCO.
+              {t('home.unescoSectionBody')}
             </p>
             <button onClick={() => navigate('unesco')} style={{ background: 'none', border: '1px solid #c19a52', cursor: 'pointer', fontSize: 12, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#c19a52', padding: '12px 24px', borderRadius: 2, transition: 'all 0.2s' }}
               onMouseEnter={e => { e.target.style.background = '#c19a52'; e.target.style.color = '#0f2238' }}
               onMouseLeave={e => { e.target.style.background = 'none'; e.target.style.color = '#c19a52' }}>
-              Bekijk het traject →
+              {t('home.unescoSectionCta')}
             </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-            {[
-              { year: '2020', label: 'Meer dan 150 schepen bijeen bij Pampus', done: true },
-              { year: '2021', label: 'Stichting Zeilschipper opgericht', done: true },
-              { year: '2022', label: 'Start kennisdocumentatie', done: true },
-              { year: '2023', label: 'Opname Inventaris Immaterieel Erfgoed', done: true },
-              { year: '2024', label: 'Eerste informatieborden geplaatst', done: true },
-              { year: '2025', label: 'Indiening bij Ministerie OCW', done: false, active: true },
-              { year: '2026–27', label: 'UNESCO-nominatie & besluit', done: false },
-            ].map((step, i) => (
+            {timeline.map((step, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 20, paddingBottom: 20 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 4 }}>
                   <div style={{ width: 10, height: 10, borderRadius: '50%', flexShrink: 0, background: step.done ? '#c19a52' : 'none', border: step.done ? '2px solid #c19a52' : step.active ? '2px solid #c19a52' : '2px solid rgba(193,154,82,0.25)', boxShadow: step.active ? '0 0 0 4px rgba(193,154,82,0.12)' : 'none' }} />
-                  {i < 6 && <div style={{ width: 1, height: 28, background: step.done ? 'rgba(193,154,82,0.4)' : 'rgba(193,154,82,0.12)', marginTop: 4 }} />}
+                  {i < timeline.length - 1 && <div style={{ width: 1, height: 28, background: step.done ? 'rgba(193,154,82,0.4)' : 'rgba(193,154,82,0.12)', marginTop: 4 }} />}
                 </div>
                 <div>
                   <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.1em', marginBottom: 3 }}>{step.year}</div>
                   <div style={{ fontSize: 14, color: step.done ? '#f4ede1' : step.active ? '#f4ede1' : 'rgba(244,237,225,0.35)', fontStyle: step.done || step.active ? 'normal' : 'italic' }}>
                     {step.label}
-                    {step.active && <span style={{ fontSize: 9, background: '#c19a52', color: '#0f2238', padding: '2px 6px', borderRadius: 2, marginLeft: 8, fontWeight: 700, letterSpacing: '0.08em' }}>NU</span>}
+                    {step.active && <span style={{ fontSize: 9, background: '#c19a52', color: '#0f2238', padding: '2px 6px', borderRadius: 2, marginLeft: 8, fontWeight: 700, letterSpacing: '0.08em' }}>{t('home.timelineNow')}</span>}
                   </div>
                 </div>
               </div>
@@ -354,21 +353,17 @@ export default function HomePage({ navigate }) {
       {/* ── PROJECT CARDS ── */}
       <div style={{ background: '#f4ede1', padding: '100px 2rem' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 16 }}>Projecten</div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 38, color: '#0f2238', marginBottom: 52, fontWeight: 400 }}>Wat wij doen</h2>
+          <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 16 }}>{t('home.projectsBadge')}</div>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 38, color: '#0f2238', marginBottom: 52, fontWeight: 400 }}>{t('home.projectsTitle')}</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2px' }}>
-            {[
-              { n: '01', title: 'UNESCO-nomineringsdossier', body: 'Documentatie, wetenschappelijke onderbouwing en internationale lobby voor opname op de Representatieve Lijst van Immaterieel Cultureel Erfgoed.', action: 'unesco' },
-              { n: '02', title: 'Informatieborden-netwerk', body: 'In twintig Nederlandse havens plaatsen wij borden die het verhaal van de schipper Bruine Vloot vertellen aan omwonenden en bezoekers.', action: 'informatieborden' },
-              { n: '03', title: 'Kennisoverdracht & opleiding', body: 'Via het meester-gezel-systeem koppelen wij aspirant-schippers aan ervaren mentors. Jaarlijks vijftien nieuwe deelnemers in een intensief programma.', action: 'team' },
-            ].map((c, i) => (
+            {projects.map((c, i) => (
               <div key={i} onClick={() => navigate(c.action)} style={{ background: '#0f2238', padding: '40px 36px', cursor: 'pointer', transition: 'background 0.3s' }}
                 onMouseEnter={e => e.currentTarget.style.background = '#162e4a'}
                 onMouseLeave={e => e.currentTarget.style.background = '#0f2238'}>
                 <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.22em', marginBottom: 20 }}>{c.n}</div>
                 <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 21, color: '#f4ede1', marginBottom: 16, lineHeight: 1.3 }}>{c.title}</h3>
                 <p style={{ fontSize: 14, color: 'rgba(244,237,225,0.5)', lineHeight: 1.8 }}>{c.body}</p>
-                <div style={{ marginTop: 24, fontSize: 12, color: '#c19a52', letterSpacing: '0.06em' }}>Lees meer →</div>
+                <div style={{ marginTop: 24, fontSize: 12, color: '#c19a52', letterSpacing: '0.06em' }}>{t('home.projectsReadMore')}</div>
               </div>
             ))}
           </div>
@@ -379,29 +374,19 @@ export default function HomePage({ navigate }) {
       <div style={{ background: '#0a1a2e', padding: '100px 2rem' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'start' }} className="grid-2">
           <div>
-            <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 18 }}>Project</div>
+            <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 18 }}>{t('home.oralBadge')}</div>
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(24px, 3vw, 40px)', color: '#f4ede1', fontWeight: 400, marginBottom: 20, lineHeight: 1.2 }}>
-              Oral History
+              {t('home.oralTitle')}
             </h2>
-            <p style={{ fontSize: 15, color: 'rgba(244,237,225,0.6)', lineHeight: 1.85, marginBottom: 20 }}>
-              Stichting Zeilschipper wil een aantal eerste generatie Bruine Vloot schippers interviewen en deze interviews laten opnemen in een museumcollectie.
-            </p>
-            <p style={{ fontSize: 15, color: 'rgba(244,237,225,0.6)', lineHeight: 1.85, marginBottom: 20 }}>
-              Er heeft nooit historisch onderzoek plaatsgevonden naar deze beroepsgroep die al ruim vijftig jaar bestaat. Hoe is de sector ontstaan? Hoe zag de dagelijkse praktijk eruit? Wat bewoog schippers om dit vak te kiezen?
-            </p>
-            <p style={{ fontSize: 15, color: 'rgba(244,237,225,0.6)', lineHeight: 1.85, marginBottom: 32 }}>
-              Aangezien veel schippers die in de jaren 1960 en 1970 begonnen nu al op hoge leeftijd zijn, is het vastleggen van hun verhalen en ervaring urgent.
-            </p>
+            <p style={{ fontSize: 15, color: 'rgba(244,237,225,0.6)', lineHeight: 1.85, marginBottom: 20 }}>{t('home.oralPara1')}</p>
+            <p style={{ fontSize: 15, color: 'rgba(244,237,225,0.6)', lineHeight: 1.85, marginBottom: 20 }}>{t('home.oralPara2')}</p>
+            <p style={{ fontSize: 15, color: 'rgba(244,237,225,0.6)', lineHeight: 1.85, marginBottom: 32 }}>{t('home.oralPara3')}</p>
             <div style={{ fontSize: 12, color: 'rgba(193,154,82,0.55)', fontStyle: 'italic', borderLeft: '2px solid rgba(193,154,82,0.3)', paddingLeft: 16 }}>
-              Samenwerkingspartners en mogelijkheden worden momenteel onderzocht.
+              {t('home.oralNote')}
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-            {[
-              { n: '01', title: 'Interviews eerste generatie', body: 'Diepte-interviews met schippers die begonnen in de jaren 1960 en 1970 — over het ontstaan van de sector, de dagelijkse praktijk en de persoonlijke drijfveren om dit vak uit te oefenen.' },
-              { n: '02', title: 'Onderzoekspotentie', body: 'Er zijn wel publieksboeken over de Bruine Vloot verschenen, maar wetenschappelijk onderzoek naar deze beroepsgroep ontbreekt. De oral history vormt een unieke primaire bron voor toekomstig onderzoek.' },
-              { n: '03', title: 'Museumcollectie', body: 'De interviews worden opgenomen in een erkende museumcollectie voor duurzame bewaring en toegankelijkheid voor onderzoekers, schippers en geïnteresseerden.' },
-            ].map((item, i) => (
+            {oralItems.map((item, i) => (
               <div key={i} style={{ paddingBottom: 28, borderBottom: i < 2 ? '1px solid rgba(193,154,82,0.12)' : 'none', marginBottom: i < 2 ? 28 : 0 }}>
                 <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.2em', marginBottom: 10 }}>{item.n}</div>
                 <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, color: '#f4ede1', marginBottom: 10 }}>{item.title}</div>
@@ -424,11 +409,11 @@ export default function HomePage({ navigate }) {
             </div>
           </div>
           <div>
-            <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 16 }}>Media spotlight</div>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 32, color: '#f4ede1', fontWeight: 400, marginBottom: 18, lineHeight: 1.2 }}>Waterschatten</h2>
-            <p style={{ fontSize: 15, color: 'rgba(244,237,225,0.55)', lineHeight: 1.85, marginBottom: 28 }}>Een door de BBZ gemaakte promotiefilm die heel goed gebruikt kan worden om de Bruine Vloot, haar bemanning en de bijbehorende beroepsvelden voor te stellen.</p>
+            <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 16 }}>{t('home.mediaSpotlightBadge')}</div>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 32, color: '#f4ede1', fontWeight: 400, marginBottom: 18, lineHeight: 1.2 }}>{t('home.mediaSpotlightTitle')}</h2>
+            <p style={{ fontSize: 15, color: 'rgba(244,237,225,0.55)', lineHeight: 1.85, marginBottom: 28 }}>{t('home.mediaSpotlightBody')}</p>
             <button onClick={() => navigate('media')} style={{ background: 'none', border: '1px solid rgba(193,154,82,0.4)', cursor: 'pointer', fontSize: 12, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#c19a52', padding: '10px 20px', borderRadius: 2 }}>
-              Alle media →
+              {t('home.mediaSpotlightCta')}
             </button>
           </div>
         </div>
@@ -439,18 +424,18 @@ export default function HomePage({ navigate }) {
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 52 }}>
             <div>
-              <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 12 }}>Nieuws</div>
-              <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 38, color: '#0f2238', fontWeight: 400 }}>Laatste berichten</h2>
+              <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 12 }}>{t('home.newsBadge')}</div>
+              <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 38, color: '#0f2238', fontWeight: 400 }}>{t('home.newsTitle')}</h2>
             </div>
-            <button onClick={() => navigate('blog')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#c19a52', letterSpacing: '0.06em' }}>Alle berichten →</button>
+            <button onClick={() => navigate('blog')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#c19a52', letterSpacing: '0.06em' }}>{t('home.newsAllCta')}</button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '3rem' }}>
             {BLOG_POSTS.slice(0, 3).map(post => (
               <div key={post.id} style={{ borderTop: '1px solid rgba(15,34,56,0.15)', paddingTop: 28, cursor: 'pointer' }} onClick={() => navigate('blog')}>
-                <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 12 }}>{post.category} · {post.date}</div>
-                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: '#0f2238', marginBottom: 12, lineHeight: 1.35 }}>{post.title}</h3>
-                <p style={{ fontSize: 14, color: '#3a4f65', lineHeight: 1.75 }}>{post.excerpt}</p>
-                <div style={{ marginTop: 14, fontSize: 12, color: 'rgba(15,34,56,0.35)' }}>{post.readTime} leestijd</div>
+                <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 12 }}>{tc(post, 'category')} · {post.date}</div>
+                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: '#0f2238', marginBottom: 12, lineHeight: 1.35 }}>{tc(post, 'title')}</h3>
+                <p style={{ fontSize: 14, color: '#3a4f65', lineHeight: 1.75 }}>{tc(post, 'excerpt')}</p>
+                <div style={{ marginTop: 14, fontSize: 12, color: 'rgba(15,34,56,0.35)' }}>{post.readTime} {t('home.readTimeLabel')}</div>
               </div>
             ))}
           </div>
@@ -460,26 +445,26 @@ export default function HomePage({ navigate }) {
       {/* ── HOW TO HELP ── */}
       <div style={{ background: '#6b4a2b', padding: '80px 2rem', textAlign: 'center' }}>
         <div style={{ maxWidth: 640, margin: '0 auto' }}>
-          <div style={{ fontSize: 10, color: 'rgba(244,237,225,0.45)', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 20 }}>Doe mee</div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(24px, 3.5vw, 42px)', color: '#f4ede1', fontWeight: 400, marginBottom: 20, lineHeight: 1.2 }}>Hoe u kunt bijdragen</h2>
+          <div style={{ fontSize: 10, color: 'rgba(244,237,225,0.45)', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 20 }}>{t('home.helpBadge')}</div>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(24px, 3.5vw, 42px)', color: '#f4ede1', fontWeight: 400, marginBottom: 20, lineHeight: 1.2 }}>{t('home.helpTitle')}</h2>
           <p style={{ fontSize: 16, color: 'rgba(244,237,225,0.65)', lineHeight: 1.8, marginBottom: 44 }}>
-            UNESCO-erkenning vereist brede maatschappelijke steun. Elke bijdrage telt — of het nu een steunbrief is, een donatie, of het delen van dit verhaal.
+            {t('home.helpBody')}
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             {[
-              { label: 'Schrijf een steunbrief', primary: true, action: 'unesco' },
-              { label: 'Word donateur', primary: false, action: 'media' },
-              { label: 'Deel het verhaal', primary: false, action: 'media' },
+              { primary: true, action: 'unesco' },
+              { primary: false, action: 'media' },
+              { primary: false, action: 'media' },
             ].map((b, i) => (
               <button key={i} onClick={() => navigate(b.action)} style={{ background: b.primary ? '#f4ede1' : 'none', border: b.primary ? 'none' : '1px solid rgba(244,237,225,0.35)', cursor: 'pointer', fontSize: 13, fontWeight: b.primary ? 600 : 400, letterSpacing: '0.06em', color: b.primary ? '#6b4a2b' : '#f4ede1', padding: '13px 26px', borderRadius: 2 }}>
-                {b.label}
+                {t('home.helpButtons')[i]}
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      <ShipPanel ship={selectedShip} onClose={() => setSelectedShip(null)} />
+      <ShipPanel ship={selectedShip} onClose={() => setSelectedShip(null)} t={t} />
 
       <style>{`
         @media (max-width: 900px) {
