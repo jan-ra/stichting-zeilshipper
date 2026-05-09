@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Fragment } from 'react'
 import { SHIPS, BLOG_POSTS } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 
@@ -14,6 +14,16 @@ const CHAPTERS_STRUCT = [
   { index: 1, roman: 'II' },
   { index: 2, roman: 'III' },
   { index: 3, roman: 'IV' },
+]
+
+// Photos shown between chapter panels as the user scrolls (null = no photo after that chapter)
+const CHAPTER_PHOTOS = ['jordie-2.webp', 'jordie-4.webp', 'sven-6.webp', null]
+
+// All unused pics, combined with the two hero statics, for the scrolling strip
+const SCROLL_PHOTOS = [
+  'sven-homepage.webp', 'jordie-1.webp', 'sven-2.webp', 'jordie-6.webp',
+  'sven-4.webp', 'jordi-morales.webp', 'sven-7.webp', 'jordie-5.jpg',
+  'sven-5.webp', 'jordie-3.jpg', 'sven-1.webp', 'sven-3.webp',
 ]
 
 // ── Globe ──────────────────────────────────────────────────────────────────────
@@ -179,18 +189,18 @@ function ChapterPanel({ ch, index, onVisible, chapterLabel }) {
   }, [ch.index, onVisible])
 
   return (
-    <div ref={ref} style={{ minHeight: '85vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '80px 64px 80px 4rem', borderTop: '2px solid rgba(193,154,82,0.25)', background: '#f4ede1' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
+    <div ref={ref} style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '48px 64px 48px 4rem', borderTop: '2px solid rgba(193,154,82,0.25)', background: '#f4ede1' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
         <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, color: '#c19a52', fontStyle: 'italic' }}>{ch.roman}</span>
         <div style={{ height: 1, width: 40, background: 'rgba(193,154,82,0.5)' }} />
         <span style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.2em', textTransform: 'uppercase' }}>{chapterLabel} {index + 1}</span>
       </div>
-      <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(30px, 3vw, 48px)', color: '#0f2238', lineHeight: 1.1, marginBottom: 10, fontWeight: 400 }}>
+      <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(30px, 3vw, 48px)', color: '#0f2238', lineHeight: 1.1, marginBottom: 8, fontWeight: 400 }}>
         {ch.title}
       </h2>
-      <div style={{ fontSize: 13, color: 'rgba(15,34,56,0.4)', fontStyle: 'italic', marginBottom: 24 }}>{ch.sub}</div>
+      <div style={{ fontSize: 13, color: 'rgba(15,34,56,0.4)', fontStyle: 'italic', marginBottom: 18 }}>{ch.sub}</div>
       <p style={{ fontSize: 16, color: '#3a4f65', lineHeight: 1.9, maxWidth: 420 }}>{ch.body}</p>
-      <div style={{ display: 'flex', gap: 8, marginTop: 40 }}>
+      <div style={{ display: 'flex', gap: 8, marginTop: 28 }}>
         {GLOBE_CHAPTERS.map((_, di) => (
           <div key={di} style={{ width: di === index ? 24 : 6, height: 6, borderRadius: 3, background: di === index ? '#c19a52' : 'rgba(193,154,82,0.3)', transition: 'width 0.4s, background 0.4s' }} />
         ))}
@@ -216,11 +226,25 @@ export default function HomePage({ navigate }) {
     <div>
       {/* ── STICKY SPLIT HERO ── */}
       <div style={{ position: 'relative', background: '#0b1d30' }}>
+
+          {/* Scrolling photo strip — absolutely positioned, full-width, behind the globe */}
+          <div style={{ position: 'absolute', top: 68, left: 0, right: 0, height: 220, overflow: 'hidden', zIndex: 1 }}>
+            <div className="photo-scroll-track" style={{ display: 'flex', height: '100%', gap: 3 }}>
+              {[...SCROLL_PHOTOS, ...SCROLL_PHOTOS].map((photo, i) => (
+                <div key={i} style={{ flexShrink: 0, width: 260, height: '100%', overflow: 'hidden' }}>
+                  <img src={`${import.meta.env.BASE_URL}pics/${photo}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'brightness(0.82) saturate(0.88)' }} />
+                </div>
+              ))}
+            </div>
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 64, background: 'linear-gradient(to bottom, transparent, #0b1d30)', pointerEvents: 'none' }} />
+          </div>
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '100vh' }} className="hero-grid">
 
           {/* LEFT: scrollable text */}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '120px 64px 80px 4rem', position: 'relative', background: '#0b1d30' }}>
+            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', padding: '312px 64px 80px 4rem', position: 'relative' }}>
+
               <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.28em', textTransform: 'uppercase', marginBottom: 24 }}>
                 {t('home.badge')}
               </div>
@@ -243,6 +267,7 @@ export default function HomePage({ navigate }) {
                   {t('home.ctaSecondary')}
                 </button>
               </div>
+
               <div style={{ position: 'absolute', bottom: 36, left: '4rem', display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ width: 32, height: 1, background: 'rgba(193,154,82,0.4)' }} />
                 <span style={{ fontSize: 10, color: 'rgba(244,237,225,0.3)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>{t('home.scrollHint')}</span>
@@ -250,12 +275,21 @@ export default function HomePage({ navigate }) {
             </div>
 
             {chapters.map((ch, i) => (
-              <ChapterPanel key={i} ch={ch} index={i} onVisible={setChapter} chapterLabel={t('home.chapterLabel')} />
+              <Fragment key={i}>
+                <ChapterPanel ch={ch} index={i} onVisible={setChapter} chapterLabel={t('home.chapterLabel')} />
+                {CHAPTER_PHOTOS[i] && (
+                  <div style={{ height: 220, overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
+                    <img src={`${import.meta.env.BASE_URL}pics/${CHAPTER_PHOTOS[i]}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'brightness(0.82) saturate(0.88)' }} />
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, #f4ede1 0%, transparent 22%, transparent 78%, #f4ede1 100%)' }} />
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(193,154,82,0.08) 0%, transparent 100%)' }} />
+                  </div>
+                )}
+              </Fragment>
             ))}
           </div>
 
-          {/* RIGHT: sticky globe */}
-          <div style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+          {/* RIGHT: sticky globe — zIndex: 2 renders it in front of the photo strip (zIndex: 1) */}
+          <div style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', zIndex: 2 }}>
             <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 50%, rgba(30,74,122,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
             <div style={{ position: 'absolute', bottom: 40, left: '50%', transform: 'translateX(-50%)', textAlign: 'center', zIndex: 10, pointerEvents: 'none' }}>
               <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.25em', textTransform: 'uppercase', opacity: 0.8 }}>
@@ -467,6 +501,16 @@ export default function HomePage({ navigate }) {
       <ShipPanel ship={selectedShip} onClose={() => setSelectedShip(null)} t={t} />
 
       <style>{`
+        @keyframes photoScroll {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
+        .photo-scroll-track {
+          animation: photoScroll 90s linear infinite;
+        }
+        .photo-scroll-track:hover {
+          animation-play-state: paused;
+        }
         @media (max-width: 900px) {
           .hero-grid { grid-template-columns: 1fr !important; }
           .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
