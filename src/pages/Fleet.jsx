@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { SHIPS } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
+import { asset } from '../utils/asset.js'
 
 const EASTER_EGGS = [
   { id: 'bbz', name: 'BBZ', type: 'Organisatie', year: 1995, port: 'Amsterdam', address: 'Aambeeldstraat 20, Amsterdam', region: 'thuiswateren', lat: 52.399, lng: 4.895, isEasterEgg: true },
@@ -62,7 +63,7 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted }) {
           const tip = document.createElement('div')
           tip.className = '_ship-tip'
           tip.style.cssText = 'position:fixed;pointer-events:none;display:none;z-index:9999;background:rgba(15,34,56,0.95);border:1px solid rgba(193,154,82,0.5);padding:10px 14px;border-radius:3px;font-family:sans-serif;min-width:150px;'
-          tip.innerHTML = `<strong style="color:#f4ede1;font-size:14px">${d.name}</strong><br><span style="color:#c19a52;font-size:11px">${d.type}</span><br><span style="color:rgba(244,237,225,0.6);font-size:12px">${d.port}</span>`
+          tip.innerHTML = `${d.image ? `<img src="${asset(d.image)}" style="width:160px;height:100px;object-fit:cover;display:block;margin-bottom:8px;border-radius:2px;" />` : ''}<strong style="color:#f4ede1;font-size:14px">${d.name}</strong><br><span style="color:#c19a52;font-size:11px">${d.type}</span><br><span style="color:rgba(244,237,225,0.6);font-size:12px">${d.port}</span>`
           document.body.appendChild(tip)
 
           const el = document.createElement('div')
@@ -138,6 +139,13 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted }) {
 
   useEffect(() => {
     if (!globeRef.current) return
+    if (filter.region === 'thuiswateren') {
+      globeRef.current.pointOfView({ lat: 52.9, lng: 5.2, altitude: 0.2 }, 1800)
+    }
+  }, [filter.region])
+
+  useEffect(() => {
+    if (!globeRef.current) return
     globeRef.current.controls().autoRotate = false
   }, [userInteracted])
 
@@ -178,7 +186,21 @@ export default function FleetPage() {
 
   return (
     <div style={{ paddingTop: 68, height: '100vh', overflow: 'hidden', background: '#0f2238' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '420px 1fr', height: 'calc(100vh - 68px)' }} className="fleet-grid">
+
+      {/* ── Crew notice banner ── */}
+      <div style={{ background: 'linear-gradient(90deg, rgba(193,154,82,0.18) 0%, rgba(193,154,82,0.06) 60%, transparent 100%)', borderBottom: '1px solid rgba(193,154,82,0.25)', padding: '18px 40px', display: 'flex', alignItems: 'center', gap: 24 }}>
+        <div style={{ width: 1, height: 44, background: 'linear-gradient(to bottom, transparent, #c19a52, transparent)', flexShrink: 0 }} />
+        <div>
+          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, color: '#f4ede1', fontWeight: 400, letterSpacing: '0.01em', marginBottom: 5 }}>
+            Een schip is meer dan hout en zeil — het zijn de mensen die het dragen.
+          </div>
+          <div style={{ fontSize: 12, color: 'rgba(244,237,225,0.45)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            De posities op deze kaart tonen waar de bemanning zich bevindt &mdash; niet alleen het schip zelf.
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '420px 1fr', height: 'calc(100vh - 68px - 59px)' }} className="fleet-grid">
 
         {/* ── Left: scrollable ship panel ── */}
         <div style={{ overflowY: 'auto', background: '#0a1a2e', display: 'flex', flexDirection: 'column' }}>
@@ -219,7 +241,11 @@ export default function FleetPage() {
 
           {/* Selected detail card */}
           {selected && (
-            <div style={{ margin: '12px 16px 0', padding: '16px 20px', background: 'rgba(193,154,82,0.1)', border: '1px solid rgba(193,154,82,0.4)', borderRadius: 3 }}>
+            <div style={{ margin: '12px 16px 0', background: 'rgba(193,154,82,0.1)', border: '1px solid rgba(193,154,82,0.4)', borderRadius: 3, overflow: 'hidden' }}>
+              {selected.image && (
+                <img src={asset(selected.image)} alt={selected.name} style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }} />
+              )}
+              <div style={{ padding: '16px 20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                 <div>
                   <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>{selected.type} · {selected.year}</div>
@@ -245,6 +271,7 @@ export default function FleetPage() {
                   ))}
                 </div>
               )}
+              </div>
             </div>
           )}
 
@@ -262,23 +289,30 @@ export default function FleetPage() {
                 onMouseEnter={e => { if (selected?.id !== item.id) e.currentTarget.style.background = 'rgba(193,154,82,0.07)' }}
                 onMouseLeave={e => { if (selected?.id !== item.id) e.currentTarget.style.background = 'rgba(15,34,56,0.5)' }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>{item.type} · {item.year}</div>
-                    <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 15, color: '#f4ede1' }}>{item.name}</div>
-                  </div>
-                  <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#c19a52', boxShadow: '0 0 5px rgba(193,154,82,0.6)', flexShrink: 0, animation: 'pulse 2.5s ease-in-out infinite' }} />
-                </div>
-                <div style={{ marginTop: 6, fontSize: 11, color: 'rgba(244,237,225,0.38)', display: 'flex', gap: 14 }}>
-                  {item.isEasterEgg ? (
-                    <span>📍 {item.address}</span>
-                  ) : (
-                    <>
-                      <span>📍 {item.port}</span>
-                      <span>⚡ {item.speed} kn</span>
-                      <span>👥 {item.passengers}</span>
-                    </>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  {item.image && (
+                    <img src={asset(item.image)} alt={item.name} style={{ width: 52, height: 52, objectFit: 'cover', borderRadius: 2, flexShrink: 0 }} />
                   )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>{item.type} · {item.year}</div>
+                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 15, color: '#f4ede1' }}>{item.name}</div>
+                      </div>
+                      <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#c19a52', boxShadow: '0 0 5px rgba(193,154,82,0.6)', flexShrink: 0, animation: 'pulse 2.5s ease-in-out infinite' }} />
+                    </div>
+                    <div style={{ marginTop: 6, fontSize: 11, color: 'rgba(244,237,225,0.38)', display: 'flex', gap: 14 }}>
+                      {item.isEasterEgg ? (
+                        <span>📍 {item.address}</span>
+                      ) : (
+                        <>
+                          <span>📍 {item.port}</span>
+                          <span>⚡ {item.speed} kn</span>
+                          <span>👥 {item.passengers}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}

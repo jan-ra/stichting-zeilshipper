@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef, Fragment } from 'react'
 import { SHIPS, BLOG_POSTS } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
+import { asset } from '../utils/asset.js'
 
 const GLOBE_CHAPTERS = [
-  { lat: 53.0, lng: 5.0, altitude: 0.6, autoRotate: false, regionKey: 'thuiswateren' },
+  { lat: 53.0, lng: 5.0, altitude: 0.2, autoRotate: false, regionKey: 'thuiswateren' },
   { lat: 52.0, lng: 12.0, altitude: 2.0, autoRotate: false, regionKey: 'europa' },
   { lat: 20.0, lng: -5.0, altitude: 2.8, autoRotate: true, regionKey: 'wereld' },
-  { lat: 53.18, lng: 5.40, altitude: 0.6, autoRotate: false, regionKey: 'thuiswateren' },
+  { lat: 53.18, lng: 5.40, altitude: 0.2, autoRotate: false, regionKey: 'thuiswateren' },
 ]
 
 const CHAPTERS_STRUCT = [
@@ -65,7 +66,7 @@ function StickyGlobe({ chapter, onShipClick }) {
           const tip = document.createElement('div')
           tip.className = '_ship-tip-home'
           tip.style.cssText = 'position:fixed;pointer-events:none;display:none;z-index:9999;background:rgba(15,34,56,0.95);border:1px solid rgba(193,154,82,0.5);padding:10px 14px;border-radius:3px;font-family:sans-serif;min-width:150px;'
-          tip.innerHTML = `<strong style="color:#f4ede1;font-size:14px">${d.name}</strong><br><span style="color:#c19a52;font-size:11px">${d.type}</span><br><span style="color:rgba(244,237,225,0.6);font-size:12px">${d.port}</span>`
+          tip.innerHTML = `${d.image ? `<img src="${asset(d.image)}" style="width:160px;height:100px;object-fit:cover;display:block;margin-bottom:8px;border-radius:2px;" />` : ''}<strong style="color:#f4ede1;font-size:14px">${d.name}</strong><br><span style="color:#c19a52;font-size:11px">${d.type}</span><br><span style="color:rgba(244,237,225,0.6);font-size:12px">${d.port}</span>`
           document.body.appendChild(tip)
 
           const el = document.createElement('div')
@@ -131,6 +132,9 @@ function ShipPanel({ ship, onClose, t }) {
     }}>
       <style>{`@keyframes slideInRight { from { transform: translateX(60px); opacity: 0; } to { transform: none; opacity: 1; } }`}</style>
       <button onClick={onClose} style={{ position: 'absolute', top: 80, right: 20, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(244,237,225,0.4)', fontSize: 20 }}>✕</button>
+      {ship.image && (
+        <img src={asset(ship.image)} alt={ship.name} style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 2, display: 'block' }} />
+      )}
       <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.15em', textTransform: 'uppercase' }}>{ship.type} · {ship.year}</div>
       <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, color: '#f4ede1', lineHeight: 1.2 }}>{ship.name}</h3>
       <div style={{ height: 1, background: 'rgba(193,154,82,0.2)' }} />
