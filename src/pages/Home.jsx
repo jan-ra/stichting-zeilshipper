@@ -260,7 +260,7 @@ export default function HomePage({ navigate }) {
                 {t('home.heroPara2')}
               </p>
               <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-                <button onClick={() => navigate('unesco')} style={{ background: '#c19a52', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0f2238', padding: '14px 28px', borderRadius: 2 }}>
+                <button onClick={() => navigate('support')} style={{ background: '#c19a52', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0f2238', padding: '14px 28px', borderRadius: 2 }}>
                   {t('home.ctaPrimary')}
                 </button>
                 <button onClick={() => navigate('vloot')} style={{ background: 'none', border: '1px solid rgba(244,237,225,0.25)', cursor: 'pointer', fontSize: 12, fontWeight: 400, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(244,237,225,0.8)', padding: '14px 28px', borderRadius: 2 }}>
@@ -486,7 +486,7 @@ export default function HomePage({ navigate }) {
           </p>
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             {[
-              { primary: true, action: 'unesco' },
+              { primary: true, action: 'support' },
               { primary: false, action: 'media' },
               { primary: false, action: 'media' },
             ].map((b, i) => (

@@ -30,6 +30,7 @@ export const strings = {
       blog: 'Blog — Stichting Zeilschipper',
       'blog-detail': 'Artikel — Stichting Zeilschipper',
       'media-detail': 'Media — Stichting Zeilschipper',
+      support: 'Steunbrief — Stichting Zeilschipper',
     },
 
     regions: {
@@ -309,6 +310,34 @@ export const strings = {
       openLink: 'Open link',
       typeLabels: { video: 'Video', photo: "Foto's", text: 'Tekst', podcast: 'Podcast', project: 'Project' },
     },
+
+    supportLetter: {
+      back: 'Terug',
+      badge: 'Steun het UNESCO-dossier',
+      title: 'Schrijf een steunbrief',
+      intro: 'UNESCO-erkenning vereist brede maatschappelijke steun. Organisaties, gemeenten, schippers en individuen kunnen via dit formulier een steunverklaring indienen. Elke verklaring versterkt het dossier dat wij in 2025 indienen bij het Ministerie van OCW.',
+      pillars: [
+        { n: '01', title: 'Breed draagvlak', body: 'Het ministerie toetst of de nominatie gedragen wordt door de gemeenschap. Uw verklaring telt.' },
+        { n: '02', title: 'Direct effect', body: 'Ingediende steunbrieven worden gebundeld en als bijlage toegevoegd aan het UNESCO-nominatiedossier.' },
+        { n: '03', title: 'Gratis & vrijblijvend', body: 'Het indienen van een steunbrief kost niets en legt u geen verdere verplichtingen op.' },
+      ],
+      fields: { name: 'Naam', org: 'Organisatie / gemeente', role: 'Functie', email: 'E-mailadres', type: 'Type indiener', message: 'Steunverklaring' },
+      placeholders: { name: 'Uw volledige naam', org: 'Optioneel', role: 'Optioneel', email: 'uw@email.nl', message: 'Beschrijf waarom u de UNESCO-nominatie van het ambacht Schipper Bruine Vloot steunt…' },
+      types: [
+        { value: 'individual', label: 'Particulier' },
+        { value: 'org', label: 'Organisatie' },
+        { value: 'municipality', label: 'Gemeente' },
+        { value: 'skipper', label: 'Schipper / bemanning' },
+      ],
+      messageHint: 'Minimaal twee zinnen. Uw verklaring wordt opgenomen in het officiële dossier.',
+      submit: 'Steunbrief versturen',
+      privacy: 'Uw gegevens worden uitsluitend gebruikt voor het UNESCO-dossier.',
+      thankYouTitle: 'Bedankt voor uw steun',
+      thankYouBody: 'Uw e-mailprogramma opent nu zodat u de steunbrief kunt versturen. Heeft u vragen? Neem contact op via info@zeilschipper.nl.',
+      backHome: 'Terug naar home',
+      emailSubject: 'Steunbrief UNESCO-dossier Schipper Bruine Vloot',
+      emailFields: { name: 'Naam', org: 'Organisatie', role: 'Functie', type: 'Type indiener', message: 'Steunverklaring' },
+    },
   },
 
   // ─────────────────────────────────────────────────────────────── ENGLISH ──
@@ -344,6 +373,7 @@ export const strings = {
       blog: 'Blog — Stichting Zeilschipper',
       'blog-detail': 'Article — Stichting Zeilschipper',
       'media-detail': 'Media — Stichting Zeilschipper',
+      support: 'Support Letter — Stichting Zeilschipper',
     },
 
     regions: {
@@ -622,6 +652,34 @@ export const strings = {
       listenNow: 'Listen now',
       openLink: 'Open link',
       typeLabels: { video: 'Video', photo: 'Photos', text: 'Text', podcast: 'Podcast', project: 'Project' },
+    },
+
+    supportLetter: {
+      back: 'Back',
+      badge: 'Support the UNESCO dossier',
+      title: 'Write a support letter',
+      intro: 'UNESCO recognition requires broad societal support. Organisations, municipalities, skippers and individuals can submit a support declaration through this form. Every declaration strengthens the dossier we will submit to the Ministry of Education, Culture and Science in 2025.',
+      pillars: [
+        { n: '01', title: 'Broad support', body: 'The ministry checks whether the nomination is supported by the community. Your declaration counts.' },
+        { n: '02', title: 'Direct impact', body: 'Submitted support letters are bundled and added as an annex to the UNESCO nomination dossier.' },
+        { n: '03', title: 'Free & non-binding', body: 'Submitting a support letter is free of charge and places no further obligations on you.' },
+      ],
+      fields: { name: 'Name', org: 'Organisation / municipality', role: 'Position', email: 'Email address', type: 'Type of submitter', message: 'Support declaration' },
+      placeholders: { name: 'Your full name', org: 'Optional', role: 'Optional', email: 'your@email.com', message: 'Describe why you support the UNESCO nomination of the Bruine Vloot skipper craft…' },
+      types: [
+        { value: 'individual', label: 'Individual' },
+        { value: 'org', label: 'Organisation' },
+        { value: 'municipality', label: 'Municipality' },
+        { value: 'skipper', label: 'Skipper / crew' },
+      ],
+      messageHint: 'Minimum two sentences. Your declaration will be included in the official dossier.',
+      submit: 'Send support letter',
+      privacy: 'Your details will only be used for the UNESCO dossier.',
+      thankYouTitle: 'Thank you for your support',
+      thankYouBody: 'Your email client will now open so you can send the support letter. Questions? Contact us at info@zeilschipper.nl.',
+      backHome: 'Back to home',
+      emailSubject: 'Support letter UNESCO dossier Bruine Vloot skipper',
+      emailFields: { name: 'Name', org: 'Organisation', role: 'Position', type: 'Type', message: 'Support declaration' },
     },
   },
 }

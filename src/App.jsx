@@ -10,6 +10,7 @@ import MediaPage from './pages/Media.jsx'
 import MediaDetailPage from './pages/MediaDetail.jsx'
 import BlogPage from './pages/Blog.jsx'
 import BlogDetailPage from './pages/BlogDetail.jsx'
+import SupportLetterPage from './pages/SupportLetter.jsx'
 import { useLanguage } from './context/LanguageContext.jsx'
 
 const PAGES = {
@@ -22,6 +23,7 @@ const PAGES = {
   'media-detail': MediaDetailPage,
   blog: BlogPage,
   'blog-detail': BlogDetailPage,
+  support: SupportLetterPage,
 }
 
 export default function App() {

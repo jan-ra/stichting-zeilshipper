@@ -66,8 +66,8 @@ export default function Nav({ currentPage, navigate }) {
             </button>
           ))}
 
-          {currentPage !== 'unesco' && (
-            <button onClick={() => navigate('unesco')} style={{
+          {currentPage !== 'support' && (
+            <button onClick={() => navigate('support')} style={{
               background: '#c19a52', border: 'none', cursor: 'pointer',
               fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase',
               color: '#0f2238', padding: '8px 18px', borderRadius: 2, marginLeft: '0.5rem',
