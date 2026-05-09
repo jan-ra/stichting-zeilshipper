@@ -17,7 +17,12 @@ const CHAPTERS_STRUCT = [
 ]
 
 // Photos shown between chapter panels as the user scrolls (null = no photo after that chapter)
-const CHAPTER_PHOTOS = ['jordie-2.webp', 'jordie-4.webp', 'sven-6.webp', null]
+const CHAPTER_PHOTOS = [
+  { src: 'jordie-2.webp', position: 'center 70%' },
+  { src: 'jordie-4.webp', position: 'center center' },
+  { src: 'sven-6.webp',  position: 'center center' },
+  null,
+]
 
 // All unused pics, combined with the two hero statics, for the scrolling strip
 const SCROLL_PHOTOS = [
@@ -279,7 +284,7 @@ export default function HomePage({ navigate }) {
                 <ChapterPanel ch={ch} index={i} onVisible={setChapter} chapterLabel={t('home.chapterLabel')} />
                 {CHAPTER_PHOTOS[i] && (
                   <div style={{ height: 220, overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
-                    <img src={`${import.meta.env.BASE_URL}pics/${CHAPTER_PHOTOS[i]}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'brightness(0.82) saturate(0.88)' }} />
+                    <img src={`${import.meta.env.BASE_URL}pics/${CHAPTER_PHOTOS[i].src}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: CHAPTER_PHOTOS[i].position, display: 'block', filter: 'brightness(0.82) saturate(0.88)' }} />
                     <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, #f4ede1 0%, transparent 22%, transparent 78%, #f4ede1 100%)' }} />
                     <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(193,154,82,0.08) 0%, transparent 100%)' }} />
                   </div>
