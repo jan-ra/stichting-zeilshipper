@@ -1,0 +1,40 @@
+{
+  "name": "stichting-zeilshipper-cms",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "mkdir -p data",
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "prestart": "mkdir -p data",
+    "start": "next start -p 3001",
+    "generate:types": "payload generate:types",
+    "generate:importmap": "payload generate:importmap",
+    "seed": "tsx --env-file=.env src/seed.ts",
+    "minio:up": "docker compose -f docker-compose.minio.yml up -d",
+    "minio:down": "docker compose -f docker-compose.minio.yml down"
+  },
+  "dependencies": {
+    "@payloadcms/db-sqlite": "3.84.1",
+    "@payloadcms/next": "3.84.1",
+    "@payloadcms/richtext-lexical": "3.84.1",
+    "@payloadcms/storage-s3": "^3.84.1",
+    "@payloadcms/ui": "3.84.1",
+    "graphql": "^16.8.1",
+    "next": "^16.2.6",
+    "payload": "3.84.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

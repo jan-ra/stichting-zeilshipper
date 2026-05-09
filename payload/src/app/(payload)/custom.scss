@@ -1,0 +1,372 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Source+Sans+3:wght@300;400;600&display=swap');
+
+// ─── Force dark theme ─────────────────────────────────────────────────────────
+:root,
+html,
+html[data-theme='light'],
+html[data-theme='dark'] {
+  // Backgrounds — navy depth scale
+  --theme-bg:           #0f2238;
+  --theme-input-bg:     #112640;
+  --theme-border-color: rgba(193, 154, 82, 0.2);
+  --theme-text:         #f4ede1;
+
+  --theme-elevation-0:    #0a1a2e;
+  --theme-elevation-50:   #0f2238;
+  --theme-elevation-100:  #112640;
+  --theme-elevation-150:  #132944;
+  --theme-elevation-200:  #162d4a;
+  --theme-elevation-250:  #1a3252;
+  --theme-elevation-300:  #1e3759;
+  --theme-elevation-350:  #223c61;
+  --theme-elevation-400:  #26416a;
+  --theme-elevation-500:  #2e4d7a;
+  --theme-elevation-800:  #3d6193;
+  --theme-elevation-1000: #4d74a8;
+
+  // Gold accent — replaces Payload's default blue
+  --theme-success-50:  rgba(193, 154, 82, 0.08);
+  --theme-success-100: rgba(193, 154, 82, 0.15);
+  --theme-success-250: rgba(193, 154, 82, 0.3);
+  --theme-success-500: #c19a52;
+  --theme-success-600: #a8843e;
+  --theme-success-750: #8c6e30;
+  --theme-success-850: #755b24;
+
+  // Keep error red, soften warning
+  --theme-error-50:    rgba(220, 80, 80, 0.08);
+  --theme-error-100:   rgba(220, 80, 80, 0.15);
+  --theme-error-500:   #dc5050;
+  --theme-error-600:   #c23c3c;
+
+  --theme-warning-50:  rgba(193, 154, 82, 0.08);
+  --theme-warning-500: #c19a52;
+
+  // Typography
+  --font-body:    'Source Sans 3', sans-serif;
+  --font-mono:    'Source Code Pro', 'Fira Mono', monospace;
+
+  color-scheme: dark;
+}
+
+// ─── Global base ──────────────────────────────────────────────────────────────
+html,
+body {
+  background-color: #0a1a2e !important;
+  color: #f4ede1 !important;
+  font-family: 'Source Sans 3', sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+// ─── Headings — serif ─────────────────────────────────────────────────────────
+h1, h2, h3, h4, h5,
+.payload-heading,
+.collection-label,
+.document-header__content h1,
+.list-header__wrap h1 {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.01em;
+}
+
+// ─── Nav / sidebar ────────────────────────────────────────────────────────────
+.nav {
+  background: #0a1a2e !important;
+  border-right: 1px solid rgba(193, 154, 82, 0.15) !important;
+}
+
+.nav__header {
+  border-bottom: 1px solid rgba(193, 154, 82, 0.15) !important;
+}
+
+.nav__label {
+  font-family: 'Source Sans 3', sans-serif !important;
+  font-size: 10px !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: rgba(244, 237, 225, 0.4) !important;
+}
+
+.nav__link {
+  color: rgba(244, 237, 225, 0.75) !important;
+  border-radius: 2px !important;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover,
+  &:focus {
+    background: rgba(193, 154, 82, 0.1) !important;
+    color: #c19a52 !important;
+  }
+
+  &.active,
+  &[aria-current] {
+    background: rgba(193, 154, 82, 0.12) !important;
+    color: #c19a52 !important;
+    border-left: 2px solid #c19a52 !important;
+  }
+}
+
+// ─── Top toolbar / app header ─────────────────────────────────────────────────
+.app-header {
+  background: #0a1a2e !important;
+  border-bottom: 1px solid rgba(193, 154, 82, 0.15) !important;
+}
+
+// ─── Cards / panels ───────────────────────────────────────────────────────────
+.render-fields,
+.field-type,
+.document-fields,
+.list-container,
+.dashboard__card-list > li {
+  border-radius: 2px !important;
+}
+
+.dashboard__card {
+  background: #112640 !important;
+  border: 1px solid rgba(193, 154, 82, 0.15) !important;
+  border-radius: 2px !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    border-color: rgba(193, 154, 82, 0.4) !important;
+    box-shadow: 0 0 0 1px rgba(193, 154, 82, 0.15) !important;
+  }
+}
+
+// ─── Inputs & textareas ───────────────────────────────────────────────────────
+input,
+textarea,
+select,
+.rs__control,
+.field-type--text input,
+.field-type--textarea textarea {
+  background: #112640 !important;
+  border-color: rgba(193, 154, 82, 0.25) !important;
+  color: #f4ede1 !important;
+  border-radius: 2px !important;
+
+  &:focus,
+  &:focus-within {
+    border-color: #c19a52 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(193, 154, 82, 0.15) !important;
+  }
+
+  &::placeholder {
+    color: rgba(244, 237, 225, 0.35) !important;
+  }
+}
+
+// ─── Buttons ──────────────────────────────────────────────────────────────────
+.btn,
+button.btn {
+  border-radius: 2px !important;
+  font-family: 'Source Sans 3', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+
+  &.btn--style-primary {
+    background: #c19a52 !important;
+    color: #0a1a2e !important;
+    border-color: #c19a52 !important;
+
+    &:hover {
+      background: #a8843e !important;
+      border-color: #a8843e !important;
+    }
+  }
+
+  &.btn--style-secondary {
+    background: transparent !important;
+    color: #c19a52 !important;
+    border-color: rgba(193, 154, 82, 0.4) !important;
+
+    &:hover {
+      background: rgba(193, 154, 82, 0.1) !important;
+      border-color: #c19a52 !important;
+    }
+  }
+}
+
+// ─── Table / list view ────────────────────────────────────────────────────────
+.table {
+  background: #0f2238 !important;
+
+  th {
+    background: #0a1a2e !important;
+    color: rgba(244, 237, 225, 0.5) !important;
+    font-family: 'Source Sans 3', sans-serif !important;
+    font-size: 10px !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    border-bottom: 1px solid rgba(193, 154, 82, 0.15) !important;
+  }
+
+  tr {
+    border-bottom: 1px solid rgba(193, 154, 82, 0.08) !important;
+
+    &:hover td {
+      background: rgba(193, 154, 82, 0.05) !important;
+    }
+  }
+
+  td {
+    color: #f4ede1 !important;
+  }
+
+  .cell-action a,
+  .row-actions a {
+    color: #c19a52 !important;
+  }
+}
+
+// ─── Pagination ───────────────────────────────────────────────────────────────
+.pagination {
+  .btn--active,
+  .btn--selected {
+    background: #c19a52 !important;
+    color: #0a1a2e !important;
+    border-color: #c19a52 !important;
+  }
+}
+
+// ─── Pill / badge ─────────────────────────────────────────────────────────────
+.pill {
+  border-radius: 2px !important;
+
+  &.pill--style-light {
+    background: rgba(193, 154, 82, 0.12) !important;
+    color: #c19a52 !important;
+  }
+}
+
+// ─── Status indicator (published / draft) ─────────────────────────────────────
+.status-indicator--published,
+.doc-controls__status .pill--has-background {
+  background: rgba(193, 154, 82, 0.15) !important;
+  color: #c19a52 !important;
+}
+
+// ─── Tooltip ──────────────────────────────────────────────────────────────────
+.tooltip {
+  background: #0a1a2e !important;
+  border: 1px solid rgba(193, 154, 82, 0.3) !important;
+  color: #f4ede1 !important;
+  border-radius: 2px !important;
+}
+
+// ─── Modal / drawer ───────────────────────────────────────────────────────────
+.modal-item,
+.drawer__content {
+  background: #112640 !important;
+  border: 1px solid rgba(193, 154, 82, 0.2) !important;
+  border-radius: 2px !important;
+}
+
+.drawer__header {
+  border-bottom: 1px solid rgba(193, 154, 82, 0.15) !important;
+
+  h2 {
+    font-family: 'Playfair Display', Georgia, serif !important;
+  }
+}
+
+// ─── Rich text / Lexical editor ───────────────────────────────────────────────
+.rich-text--read-only,
+.rich-text .ContentEditable__root {
+  font-family: 'Source Sans 3', sans-serif !important;
+  color: #f4ede1 !important;
+}
+
+.lexical-editor-theme__code {
+  background: #0a1a2e !important;
+  border: 1px solid rgba(193, 154, 82, 0.2) !important;
+  border-radius: 2px !important;
+}
+
+// ─── Upload / drop zone ───────────────────────────────────────────────────────
+.file-details,
+.upload__dropzone {
+  background: #112640 !important;
+  border: 2px dashed rgba(193, 154, 82, 0.3) !important;
+  border-radius: 2px !important;
+
+  &:hover {
+    border-color: #c19a52 !important;
+    background: rgba(193, 154, 82, 0.05) !important;
+  }
+}
+
+// ─── Scrollbar ────────────────────────────────────────────────────────────────
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c19a52 #0a1a2e;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #0a1a2e; }
+::-webkit-scrollbar-thumb { background: #c19a52; border-radius: 3px; }
+
+// ─── Logo placeholder text ────────────────────────────────────────────────────
+.nav__brand,
+.payload-branding {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  color: #c19a52 !important;
+  letter-spacing: 0.05em;
+}
+
+// ─── Focus ring ───────────────────────────────────────────────────────────────
+:focus-visible {
+  outline: 2px solid rgba(193, 154, 82, 0.6) !important;
+  outline-offset: 2px !important;
+}
+
+// ─── Checkbox & radio ─────────────────────────────────────────────────────────
+.checkbox-input input[type='checkbox']:checked + .checkbox-input__indicator,
+.radio-input input[type='radio']:checked + .radio-input__indicator {
+  background: #c19a52 !important;
+  border-color: #c19a52 !important;
+}
+
+.checkbox-input__indicator,
+.radio-input__indicator {
+  border-color: rgba(193, 154, 82, 0.35) !important;
+  background: #112640 !important;
+  border-radius: 2px !important;
+}
+
+// ─── Select / react-select ────────────────────────────────────────────────────
+.rs__menu {
+  background: #112640 !important;
+  border: 1px solid rgba(193, 154, 82, 0.25) !important;
+  border-radius: 2px !important;
+}
+
+.rs__option {
+  color: #f4ede1 !important;
+
+  &.rs__option--is-focused {
+    background: rgba(193, 154, 82, 0.1) !important;
+  }
+
+  &.rs__option--is-selected {
+    background: rgba(193, 154, 82, 0.2) !important;
+    color: #c19a52 !important;
+  }
+}
+
+.rs__single-value {
+  color: #f4ede1 !important;
+}
+
+.rs__placeholder {
+  color: rgba(244, 237, 225, 0.35) !important;
+}
+
+.rs__indicator {
+  color: rgba(193, 154, 82, 0.6) !important;
+
+  &:hover {
+    color: #c19a52 !important;
+  }
+}

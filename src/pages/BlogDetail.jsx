@@ -1,7 +1,6 @@
 import { BLOG_POSTS } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
-
-const BASE = import.meta.env.BASE_URL
+import { asset } from '../utils/asset.js'
 
 export default function BlogDetailPage({ navigate, blogSlug }) {
   const { t, tc } = useLanguage()
@@ -19,8 +18,6 @@ export default function BlogDetailPage({ navigate, blogSlug }) {
       </div>
     )
   }
-
-  const img = (path) => BASE + path.replace(/^\//, '')
 
   const imageAfter = {}
   post.images?.forEach(im => { imageAfter[im.after] = im })
@@ -71,7 +68,7 @@ export default function BlogDetailPage({ navigate, blogSlug }) {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               {post.authorPhoto
-                ? <img src={img(post.authorPhoto)} alt={post.author} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ? <img src={asset(post.authorPhoto)} alt={post.author} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 : <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, color: '#c19a52' }}>
                     {post.author?.split(' ').map(w => w[0]).join('').slice(0, 2)}
                   </span>
@@ -89,7 +86,7 @@ export default function BlogDetailPage({ navigate, blogSlug }) {
       {post.coverImage && (
         <div style={{ background: '#0a1a2e', maxHeight: 480, overflow: 'hidden' }}>
           <img
-            src={img(post.coverImage.src)}
+            src={asset(post.coverImage.src)}
             alt={post.coverImage.alt}
             style={{ width: '100%', height: 480, objectFit: 'cover', objectPosition: 'center', display: 'block' }}
           />
@@ -126,7 +123,7 @@ export default function BlogDetailPage({ navigate, blogSlug }) {
                 {inlineImage && (
                   <figure style={{ margin: '8px 0 40px' }}>
                     <img
-                      src={img(inlineImage.src)}
+                      src={asset(inlineImage.src)}
                       alt={inlineImage.alt}
                       style={{ width: '100%', display: 'block', borderRadius: 2 }}
                     />

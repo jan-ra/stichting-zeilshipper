@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { TEAM } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
+import { asset } from '../utils/asset.js'
 
 export default function TeamPage() {
   const [open, setOpen] = useState(null)
@@ -31,7 +32,7 @@ export default function TeamPage() {
                 <div key={member.id}>
                   <div style={{ aspectRatio: '3/4', marginBottom: 24, overflow: 'hidden' }}>
                     <img
-                      src={import.meta.env.BASE_URL + member.photo.slice(1)}
+                      src={asset(member.photo)}
                       alt={member.name}
                       style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
                     />

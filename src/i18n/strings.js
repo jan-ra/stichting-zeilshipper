@@ -29,6 +29,7 @@ export const strings = {
       media: 'Media & Bouwdozen — Stichting Zeilschipper',
       blog: 'Blog — Stichting Zeilschipper',
       'blog-detail': 'Artikel — Stichting Zeilschipper',
+      'media-detail': 'Media — Stichting Zeilschipper',
     },
 
     regions: {
@@ -298,6 +299,16 @@ export const strings = {
       backToBlog: 'Terug naar blog',
       allArticles: '← Alle artikelen',
     },
+
+    mediaDetail: {
+      back: '← Media',
+      allFiles: '← Alle bestanden',
+      notFound: 'Bestand niet gevonden',
+      backToMedia: 'Terug naar media',
+      listenNow: 'Luister nu',
+      openLink: 'Open link',
+      typeLabels: { video: 'Video', photo: "Foto's", text: 'Tekst', podcast: 'Podcast', project: 'Project' },
+    },
   },
 
   // ─────────────────────────────────────────────────────────────── ENGLISH ──
@@ -332,6 +343,7 @@ export const strings = {
       media: 'Media & Toolkits — Stichting Zeilschipper',
       blog: 'Blog — Stichting Zeilschipper',
       'blog-detail': 'Article — Stichting Zeilschipper',
+      'media-detail': 'Media — Stichting Zeilschipper',
     },
 
     regions: {
@@ -600,6 +612,16 @@ export const strings = {
       notFound: 'Article not found',
       backToBlog: 'Back to blog',
       allArticles: '← All articles',
+    },
+
+    mediaDetail: {
+      back: '← Media',
+      allFiles: '← All files',
+      notFound: 'File not found',
+      backToMedia: 'Back to media',
+      listenNow: 'Listen now',
+      openLink: 'Open link',
+      typeLabels: { video: 'Video', photo: 'Photos', text: 'Text', podcast: 'Podcast', project: 'Project' },
     },
   },
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BLOG_POSTS } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
+import { asset } from '../utils/asset.js'
 
 const ALL_CAT_KEYS = ['Alles', 'Erfgoed']
 
@@ -47,7 +48,7 @@ export default function BlogPage({ navigate }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }} className="featured-grid">
               <div style={{ minHeight: 300, overflow: 'hidden', position: 'relative' }}>
                 {filtered[0].coverImage
-                  ? <img src={import.meta.env.BASE_URL + filtered[0].coverImage.src.replace(/^\//, '')} alt={filtered[0].coverImage.alt} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', position: 'absolute', inset: 0 }} />
+                  ? <img src={asset(filtered[0].coverImage.src)} alt={filtered[0].coverImage.alt} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', position: 'absolute', inset: 0 }} />
                   : <div style={{ width: '100%', height: '100%', background: '#0f2238', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: 'repeating-linear-gradient(135deg, rgba(193,154,82,0.03) 0px, rgba(193,154,82,0.03) 1px, transparent 1px, transparent 14px)' }}><div style={{ fontSize: 11, color: 'rgba(193,154,82,0.3)', fontFamily: 'monospace' }}>[ headerafbeelding ]</div></div>
                 }
               </div>
