@@ -1,4 +1,4 @@
-// Static mock data — replaced by WordPress REST API responses when VITE_WP_API_URL is set
+// Static mock data — switch back to generated/ imports when CMS is in use
 
 export const SHIPS = [
   { id: 1, name: "De Twee Gebroeders", type: "Tjalk", lat: 53.18, lng: 5.40, port: "Harlingen", speed: 4.2, year: 1912, region: "thuiswateren", passengers: 12 },
@@ -22,7 +22,7 @@ export const SHIPS = [
   { id: 19, name: "Helena", type: "Klipperaak", lat: 52.77, lng: 5.29, port: "Medemblik", speed: 3.1, year: 1902, region: "thuiswateren", passengers: 10 },
   { id: 20, name: "Johanna", type: "Stevenaak", lat: 51.69, lng: 5.30, port: "'s-Hertogenbosch", speed: 2.8, year: 1925, region: "thuiswateren", passengers: 8 },
   { id: 21, name: "Mars", type: "Brig", lat: 55.68, lng: 12.57, port: "Kopenhagen", speed: 8.1, year: 1878, region: "europa", passengers: 30 },
-];
+]
 
 export const ARCS = [
   { startLat: 53.18, startLng: 5.40, endLat: 57.20, endLng: 20.10 },
@@ -31,7 +31,7 @@ export const ARCS = [
   { startLat: 52.38, startLng: 4.90, endLat: 25.30, endLng: -70.10 },
   { startLat: 52.38, startLng: 4.90, endLat: -62.10, endLng: -57.90 },
   { startLat: 53.00, startLng: 8.80, endLat: 35.90, endLng: 14.51 },
-];
+]
 
 export const TEAM = [
   {
@@ -82,7 +82,7 @@ export const TEAM = [
     expertise: "Duurzaamheid, nautisch onderwijs, Bruine Vloot",
     expertise_en: "Sustainability, nautical education, Bruine Vloot",
   },
-];
+]
 
 export const HARBOURS = [
   { id: 1, name: "Zuiderzeemuseum", lat: 52.7062, lng: 5.2809, status: "afgerond", ships: 35, notes: "Informatiebord geplaatst bij het Zuiderzeemuseum in Enkhuizen.", notes_en: "Information board placed at the Zuiderzeemuseum in Enkhuizen.", date: "Afgerond 2023" },
@@ -106,7 +106,36 @@ export const HARBOURS = [
   { id: 19, name: "Hindelopen", lat: 52.9397, lng: 5.3965, status: "kandidaat", ships: 10, notes: "Historische havenplaats aan de Waddenzee.", notes_en: "Historic harbour town on the Wadden Sea.", date: "Kandidaat" },
   { id: 20, name: "Ameland", lat: 53.4551, lng: 5.7606, status: "kandidaat", ships: 9, notes: "Waddeneiland, contact gelegd met haven Nes.", notes_en: "Wadden island; contact established with the harbour at Nes.", date: "Kandidaat" },
   { id: 21, name: "Amsterdam", lat: 52.3737, lng: 4.9033, status: "kandidaat", ships: 67, notes: "NDSM-werf en historische IJ-oevers.", notes_en: "NDSM wharf and the historic IJ waterfront.", date: "Kandidaat" },
-];
+]
+
+export const UNESCO_STEPS = [
+  { id: 1, year: "2020", label: "Meer dan 150 schepen bijeen bij Pampus", label_en: "More than 150 ships gathered at Pampus", done: true, active: false, order: 1 },
+  { id: 2, year: "2021", label: "Stichting Zeilschipper opgericht", label_en: "Stichting Zeilschipper founded", done: true, active: false, order: 2 },
+  { id: 3, year: "2022", label: "Start kennisdocumentatie", label_en: "Start of knowledge documentation", done: true, active: false, order: 3 },
+  { id: 4, year: "2023", label: "Opname Inventaris Immaterieel Erfgoed", label_en: "Inclusion in Intangible Heritage Inventory", done: true, active: false, order: 4 },
+  { id: 5, year: "2024", label: "Eerste informatieborden geplaatst", label_en: "First information boards placed", done: true, active: false, order: 5 },
+  { id: 6, year: "2025", label: "Indiening bij Ministerie OCW", label_en: "Submission to Ministry of Education", done: false, active: true, order: 6 },
+  { id: 7, year: "2026–27", label: "UNESCO-nominatie & besluit", label_en: "UNESCO nomination & decision", done: false, active: false, order: 7 },
+]
+
+export const PARTNERS = [
+  { id: 1, name: "Vereniging Bruine Vloot", order: 1 },
+  { id: 2, name: "Rijksdienst voor het Cultureel Erfgoed", order: 2 },
+  { id: 3, name: "Ministerie van OCW", order: 3 },
+  { id: 4, name: "Gemeente Harlingen", order: 4 },
+  { id: 5, name: "Gemeente Enkhuizen", order: 5 },
+  { id: 6, name: "Gemeente Hoorn", order: 6 },
+  { id: 7, name: "Zuiderzeemuseum", order: 7 },
+  { id: 8, name: "Scheepvaartmuseum Amsterdam", order: 8 },
+  { id: 9, name: "Universiteit van Amsterdam", order: 9 },
+  { id: 10, name: "Rijksuniversiteit Groningen", order: 10 },
+  { id: 11, name: "Waddenzee Werelderfgoed", order: 11 },
+  { id: 12, name: "Fries Museum", order: 12 },
+  { id: 13, name: "Norsk Maritimt Museum", order: 13 },
+  { id: 14, name: "Museet for Søfart (DK)", order: 14 },
+  { id: 15, name: "Stichting Varend Erfgoed NL", order: 15 },
+  { id: 16, name: "International Sail Training Association", order: 16 },
+]
 
 export const BLOG_POSTS = [
   {
@@ -147,24 +176,15 @@ export const BLOG_POSTS = [
       "At the end of the day, after seeing the entire IJsselmeer, we sail into Workum. Noor has deliberately chosen this harbour because 't Soal can be sailed into. Under mainsail and jib alone we drift toward the town. Just before the harbour entrance we strike the sails and Robin starts the engine. Unhurried, she turns the ship, so that a good ten minutes later we are lying bow-out together with three other Bruine Vloot vessels. On the far side of the water are some handsome yachts, but every passing walker points a camera at our ships.",
     ],
   },
-];
+]
 
 export const MEDIA_ITEMS = [
-  // Video's erfgoed
-  { id: 1, type: "video", title: "Waterschatten", title_en: "Water Treasures", description: "Promotiefilm van de BBZ die heel goed gebruikt kan worden om de Bruine Vloot, haar bemanning en de bijbehorende beroepsvelden voor te stellen.", description_en: "Promotional film by the BBZ that can be used to introduce the Bruine Vloot, its crew and associated professions.", category: "video", tag: "Vloot", tag_en: "Fleet", format: "MP4" },
-  { id: 2, type: "video", title: "Renée, schipper van de Bontekoe", title_en: "Renée, skipper of the Bontekoe", description: "Schipper Renée vertelt over haar leven aan boord van een schip van de Bruine Vloot.", description_en: "Skipper Renée talks about her life on board a Bruine Vloot vessel.", category: "video", tag: "Schipper", tag_en: "Skipper", format: "MP4" },
-  { id: 3, type: "video", title: "Tess op zee", title_en: "Tess at sea", description: "Matroos Tess vertelt over haar leven aan boord van een schip op zee.", description_en: "Sailor Tess talks about her life on board a ship at sea.", category: "video", tag: "Matroos", tag_en: "Sailor", format: "MP4" },
-  { id: 4, type: "video", title: "Patrick, zeilmaker", title_en: "Patrick, sailmaker", description: "Patrick toont zijn ambacht van zeilen ontwerpen, repareren en onderhouden. Zijn passie en vakmanschap zijn cruciaal voor het behoud van het immaterieel erfgoed.", description_en: "Patrick demonstrates his craft of designing, repairing and maintaining sails. His passion and craftsmanship are crucial to preserving intangible cultural heritage.", category: "video", tag: "Zeilmaker", tag_en: "Sailmaker", format: "MP4" },
-  { id: 5, type: "video", title: "Patrick, zeilmaker", title_en: "Patrick, sailmaker", description: "Patrick, een zeilmaker voor de historische chartervloot, toont zijn ambacht van zeilen ontwerpen, repareren en onderhouden.", description_en: "Patrick, a sailmaker for the historic charter fleet, demonstrates his craft of designing, repairing and maintaining sails.", category: "video", tag: "Havens", tag_en: "Harbours", format: "MP4" },
-  { id: 6, type: "video", title: "Marijke de Jong", title_en: "Marijke de Jong", description: "De film portretteert scheepsbouwkundige Marijke de Jong als ontwerper en adviseur voor de zeilende chartervaart.", description_en: "The film portraits naval architect Marijke de Jong as a designer and adviser for the sailing charter industry.", category: "video", tag: "Tuigage", tag_en: "Rigging", format: "MP4" },
-  // Foto's erfgoed
-  { id: 7, type: "photo", title: "Fotocollectie", title_en: "Photo collection", description: "Een verzameling foto's uit de erfgoedsector voor vrij gebruik. Neem contact op voor meer of specifieke beelden.", description_en: "A collection of photos from the heritage sector for free use. Contact us for more or specific images.", category: "foto", tag: "Foto", tag_en: "Photo", format: "ZIP" },
-  // Complete projecten
-  { id: 8, type: "project", title: "Het kleinste kamertje", title_en: "The smallest room", description: "Film over het Zuiderzeemuseum in NL, DE en EN, inclusief teksten en instructies voor de speurtocht. Neem contact op voor hogere resoluties.", description_en: "Film about the Zuiderzeemuseum in Dutch, German and English, including texts and instructions for the trail. Contact us for higher resolutions.", category: "project", tag: "Museum", tag_en: "Museum", format: "ZIP" },
-  // Teksten erfgoed
-  { id: 9, type: "text", title: "Borgingsplan Kien", title_en: "Safeguarding plan Kien", description: "Het borgingsplan Schipper Bruine Vloot als tekst om te downloaden.", description_en: "The Bruine Vloot skipper safeguarding plan available to download.", category: "tekst", tag: "Borgingsplan", tag_en: "Safeguarding plan", format: "PDF" },
-  // Webpagina's erfgoed
-  { id: 10, type: "text", title: "Schipper Bruine Vloot", title_en: "Bruine Vloot Skipper", description: "Tekst over het immaterieel erfgoed Schipper Bruine Vloot en zijn betekenis. Beschikbaar in het Nederlands en het Duits.", description_en: "Text on the intangible cultural heritage of the Bruine Vloot skipper and its significance. Available in Dutch and German.", category: "tekst", tag: "Erfgoed", tag_en: "Heritage", format: "PDF" },
-  // Podcasts
-  { id: 11, type: "podcast", title: "Roefgesprekken", title_en: "Cabin conversations", description: "Podcast met verhalen van zeevarenden: kapiteins, stuurmannen en vrouwen, scheepskoks, matrozen en anderen werkzaam op een schip.", description_en: "Podcast featuring stories from seafarers: captains, mates, cooks, sailors and others who work aboard a ship.", category: "podcast", tag: "Podcast", tag_en: "Podcast", format: "MP3" },
-];
+  { id: 1, type: "video", title: "Waterschatten, een impressie van de chartervaart", title_en: "Water Treasures, an impression of the charter industry", description: "De film laat zien waarom de Nederlandse chartervaart zo bijzonder is. Met sfeervolle beelden van traditionele zeilschepen, vakmanschap aan boord en op de wal, en het varen op IJsselmeer en Waddenzee, toont de film hoe uniek deze vloot is.", description_en: "The film shows why Dutch charter sailing is so special. With atmospheric images of traditional sailing vessels, craftsmanship on board and ashore, and sailing on the IJsselmeer and Wadden Sea, the film shows how unique this fleet is.", category: "video", tag: "Erfgoed", tag_en: "Heritage", format: "MP4" },
+  { id: 2, type: "video", title: "Marijke de Jong", title_en: "Marijke de Jong", description: "Scheepsbouwkundige Marijke de Jong als ontwerper en adviseur voor de zeilende chartervaart. Ze vertelt over veilig en mooi schepen bouwen, haar werk voor rederijen en de Enkhuizer Zeevaartschool.", description_en: "Naval architect Marijke de Jong as a designer and adviser for the sailing charter industry. She talks about building safe and beautiful ships, her work for shipping companies and the Enkhuizer Nautical College.", category: "video", tag: "Vakmanschap", tag_en: "Craftsmanship", format: "MP4" },
+  { id: 3, type: "video", title: "Renée, schipper van de Bontekoe", title_en: "Renée, skipper of the Bontekoe", description: "Renée vertelt over haar leven en werk als schipper op een traditioneel zeilschip. De video benadrukt haar passie, vakmanschap en de vrijheid op het water.", description_en: "Renée talks about her life and work as a skipper on a traditional sailing vessel. The video highlights her passion, craftsmanship and the freedom on the water.", category: "video", tag: "Portret", tag_en: "Portrait", format: "MP4" },
+  { id: 4, type: "video", title: "De vloot en de haven. Niet uit te drukken in geld!", title_en: "The fleet and the harbour. Beyond price!", description: "De Bruine Vloot en historische havens versterken elkaar. De schepen zorgen voor sfeer, levendig toerisme, lokale werkgelegenheid, onderwijs en cultureel erfgoed.", description_en: "The Bruine Vloot and historic harbours reinforce each other. The ships provide atmosphere, vibrant tourism, local employment, education and cultural heritage.", category: "video", tag: "Erfgoed", tag_en: "Heritage", format: "MP4" },
+  { id: 5, type: "video", title: "De Bruine Vloot en de havens", title_en: "The Bruine Vloot and the harbours", description: "Hoe belangrijk de traditionele zeilschepen zijn voor de Nederlandse havens. Schippers en andere betrokkenen vertellen over de sfeer, het erfgoed en de economische waarde.", description_en: "How important the traditional sailing ships are to Dutch harbours. Skippers and others involved talk about the atmosphere, heritage and economic value.", category: "video", tag: "Erfgoed", tag_en: "Heritage", format: "MP4" },
+  { id: 6, type: "video", title: "Patrick, zeilmaker", title_en: "Patrick, sailmaker", description: "Patrick, zeilmaker voor de historische chartervloot, toont zijn ambacht van zeilen ontwerpen, repareren en onderhouden. Zijn passie en vakmanschap zijn cruciaal voor het behoud van varend erfgoed.", description_en: "Patrick, a sailmaker for the historic charter fleet, demonstrates his craft of designing, repairing and maintaining sails. His passion and craftsmanship are crucial to preserving floating heritage.", category: "video", tag: "Vakmanschap", tag_en: "Craftsmanship", format: "MP4" },
+  { id: 7, type: "video", title: "Tess op zee", title_en: "Tess at sea", description: "Tess vertelt over haar ervaringen als bemanningslid op een traditioneel zeilschip. Een persoonlijk portret van het leven op het water en de liefde voor de Bruine Vloot.", description_en: "Tess talks about her experiences as a crew member on a traditional sailing vessel. A personal portrait of life on the water and the love for the Bruine Vloot.", category: "video", tag: "Portret", tag_en: "Portrait", format: "MP4" },
+  { id: 8, type: "podcast", title: "Roefgesprekken", title_en: "Cabin conversations", description: "Podcast met verhalen van zeevarenden: kapiteins, stuurmannen en vrouwen, schepenskoks, matrozen en anderen werkzaam op een schip. Een initiatief van Peter Fokkens voor Stichting Zeilschipper.", description_en: "Podcast featuring stories from seafarers: captains, mates, cooks, sailors and others who work aboard a ship. An initiative by Peter Fokkens for Stichting Zeilschipper.", category: "podcast", tag: "Podcast", tag_en: "Podcast", format: "MP3", url: "https://www.stichtingzeilschipper.nl/podcasts/roefgesprekken/" },
+]

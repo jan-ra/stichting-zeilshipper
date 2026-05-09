@@ -6,7 +6,7 @@ const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉', pr
 const FORMAT_COLORS = { MP4: '#4a6e9e', ZIP: '#6b4a2b', PDF: '#9e4a4a', MP3: '#4a9e6a' }
 const CATEGORIES = ['all', 'video', 'foto', 'tekst', 'project', 'podcast']
 
-export default function MediaPage() {
+export default function MediaPage({ navigate }) {
   const [filter, setFilter] = useState('all')
   const { t, tc } = useLanguage()
 
@@ -51,7 +51,7 @@ export default function MediaPage() {
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 24 }}>{t('media.featuredBadge')}</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'center' }} className="grid-2">
-            <div style={{ aspectRatio: '16/9', borderRadius: 2, cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
+            <div onClick={() => navigate('media-detail', 1)} style={{ aspectRatio: '16/9', borderRadius: 2, cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
               <img src={`${import.meta.env.BASE_URL}waterschatten-thumbnail.jpg`} alt="Waterschatten" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,26,46,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(193,154,82,0.18)', border: '1px solid rgba(193,154,82,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -65,7 +65,7 @@ export default function MediaPage() {
               <p style={{ fontSize: 14, color: 'rgba(244,237,225,0.55)', lineHeight: 1.8, marginBottom: 24 }}>
                 {t('media.featuredBody')}
               </p>
-              <button style={{ background: '#c19a52', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', color: '#0f2238', padding: '11px 22px', borderRadius: 2 }}>
+              <button onClick={() => navigate('media-detail', 1)} style={{ background: '#c19a52', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', color: '#0f2238', padding: '11px 22px', borderRadius: 2 }}>
                 {t('media.downloadVideo')}
               </button>
             </div>
@@ -81,7 +81,7 @@ export default function MediaPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 2 }}>
             {filtered.map(item => (
-              <div key={item.id} style={{
+              <div key={item.id} onClick={() => navigate('media-detail', item.id)} style={{
                 background: '#fff', border: '1px solid rgba(15,34,56,0.08)',
                 padding: '24px', cursor: 'pointer', transition: 'all 0.2s',
                 display: 'flex', flexDirection: 'column', gap: 12,
@@ -101,7 +101,7 @@ export default function MediaPage() {
                   {item.tag && <span style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.1em', textTransform: 'uppercase', border: '1px solid rgba(193,154,82,0.35)', padding: '2px 8px', borderRadius: 2 }}>{tc(item, 'tag')}</span>}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 'auto', paddingTop: 12, borderTop: '1px solid rgba(15,34,56,0.06)' }}>
-                  <span style={{ fontSize: 12, color: '#c19a52', letterSpacing: '0.06em' }}>{t('media.download')}</span>
+                  <span style={{ fontSize: 12, color: '#c19a52', letterSpacing: '0.06em' }}>→</span>
                 </div>
               </div>
             ))}
@@ -131,7 +131,7 @@ export default function MediaPage() {
               <p style={{ fontSize: 14, color: 'rgba(244,237,225,0.55)', lineHeight: 1.8, marginBottom: 24 }}>
                 {t('media.podcastBody')}
               </p>
-              <button style={{ background: '#c19a52', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', color: '#0f2238', padding: '11px 22px', borderRadius: 2 }}>
+              <button onClick={() => navigate('media-detail', 8)} style={{ background: '#c19a52', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', color: '#0f2238', padding: '11px 22px', borderRadius: 2 }}>
                 {t('media.listenNow')}
               </button>
             </div>

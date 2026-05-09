@@ -1,15 +1,18 @@
 import { useState } from 'react'
 import { useLanguage } from '../context/LanguageContext.jsx'
+import { PARTNERS as PARTNERS_DATA } from '../data/content.js'
 
-const PARTNERS = [
-  'Vereniging Bruine Vloot', 'Rijksdienst voor het Cultureel Erfgoed',
-  'Ministerie van OCW', 'Gemeente Harlingen', 'Gemeente Enkhuizen',
-  'Gemeente Hoorn', 'Zuiderzeemuseum', 'Scheepvaartmuseum Amsterdam',
-  'Universiteit van Amsterdam', 'Rijksuniversiteit Groningen',
-  'Waddenzee Werelderfgoed', 'Fries Museum',
-  'Norsk Maritimt Museum', 'Museet for Søfart (DK)',
-  'Stichting Varend Erfgoed NL', 'International Sail Training Association',
-]
+const PARTNERS = PARTNERS_DATA.length > 0
+  ? PARTNERS_DATA.map(p => p.name)
+  : [
+      'Vereniging Bruine Vloot', 'Rijksdienst voor het Cultureel Erfgoed',
+      'Ministerie van OCW', 'Gemeente Harlingen', 'Gemeente Enkhuizen',
+      'Gemeente Hoorn', 'Zuiderzeemuseum', 'Scheepvaartmuseum Amsterdam',
+      'Universiteit van Amsterdam', 'Rijksuniversiteit Groningen',
+      'Waddenzee Werelderfgoed', 'Fries Museum',
+      'Norsk Maritimt Museum', 'Museet for Søfart (DK)',
+      'Stichting Varend Erfgoed NL', 'International Sail Training Association',
+    ]
 
 const statusColor = s => s === 'afgerond' ? '#c19a52' : s === 'sterk' ? '#4a9e6a' : '#7a9ec4'
 

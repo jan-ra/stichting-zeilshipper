@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "load-content": "node scripts/load-content.mjs",
+    "load-from-payload": "node scripts/load-from-payload.mjs",
+    "build:static": "vite build",
+    "serve:static": "vite preview"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

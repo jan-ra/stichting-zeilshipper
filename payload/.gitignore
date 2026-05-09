@@ -1,0 +1,18 @@
+node_modules/
+.next/
+out/
+
+# Local SQLite + uploads (mounted as a volume on fly.io)
+data/
+uploads/
+
+# Auto-generated TS types from collection configs
+src/payload-types.ts
+
+# Local secrets
+.env
+.env.local
+.env.*.local
+*.local
+
+.DS_Store
