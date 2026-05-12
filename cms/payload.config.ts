@@ -35,7 +35,16 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 export default buildConfig({
   plugins: [
     s3Storage({
-      collections: { media: true },
+      collections: {
+        media: {
+          // Override the default URL (S3 API endpoint) with our public host —
+          // MinIO bucket path locally, R2 custom subdomain in production.
+          generateFileURL: ({ filename, prefix }) => {
+            const base = (process.env.MEDIA_BASE_URL ?? 'http://localhost:9000/zeilshipper-media').replace(/\/+$/, '')
+            return prefix ? `${base}/${prefix}/${filename}` : `${base}/${filename}`
+          },
+        },
+      },
       bucket: process.env.S3_BUCKET ?? 'zeilshipper-media',
       config: {
         endpoint: process.env.S3_ENDPOINT ?? 'http://localhost:9000',
@@ -46,7 +55,6 @@ export default buildConfig({
           secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? 'minioadmin',
         },
       },
-      baseUrl: process.env.MEDIA_BASE_URL ?? 'http://localhost:9000/zeilshipper-media',
     }),
   ],
   admin: {

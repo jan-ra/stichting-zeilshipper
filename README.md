@@ -40,5 +40,5 @@ Re-run `load-from-payload` whenever you change content in the CMS.
 
 ## Production builds
 
-- **Site:** `cd site && npm run build` → `site/dist/`. CI does this automatically (`.github/workflows/deploy.yml`).
-- **CMS:** `cd cms && fly deploy`. Uses `cms/Dockerfile` and `cms/fly.toml`. First-time setup steps are in the comments at the top of `cms/fly.toml`.
+- **Site:** Cloudflare Pages auto-builds on every push to `main` (build command `npm ci && npm run build:full`, root `site`). For local production builds: `cd site && npm run build:full` → `site/dist/`.
+- **CMS:** `cd cms && flyctl deploy`. Uses `cms/Dockerfile` and `cms/fly.toml`. Full setup runbook in [infra/README.md](infra/README.md).

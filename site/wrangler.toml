@@ -1,0 +1,9 @@
+name = "stichting-zeilshipper"
+compatibility_date = "2025-01-01"
+
+# Workers Static Assets — replaces the old Pages `pages_build_output_dir`.
+# `wrangler deploy` reads this block and uploads the contents of `./dist`.
+# The site has no URL-based routing (sessionStorage-driven navigation), so
+# unknown paths return a normal 404 rather than the SPA fallback.
+[assets]
+directory = "./dist"

@@ -1,11 +1,13 @@
 import type { GlobalConfig } from 'payload'
 
 import { isAdminOrEditor } from '../access'
+import { globalRebuildHooks } from '../hooks/triggerRebuild'
 
 export const NavSettings: GlobalConfig = {
   slug: 'nav-settings',
   admin: { group: 'Site' },
   access: { read: () => true, update: isAdminOrEditor },
+  hooks: globalRebuildHooks,
   fields: [
     { name: 'homeLabel',       type: 'text', localized: true, label: 'Home label' },
     { name: 'fleetLabel',      type: 'text', localized: true, label: 'Fleet nav label' },

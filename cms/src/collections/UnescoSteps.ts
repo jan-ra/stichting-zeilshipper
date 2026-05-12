@@ -1,15 +1,17 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdminOrEditor } from '../access'
+import { collectionRebuildHooks } from '../hooks/triggerRebuild'
 
 export const UnescoSteps: CollectionConfig = {
   slug: 'unesco-steps',
   admin: {
     useAsTitle: 'label',
     defaultColumns: ['year', 'label', 'done', 'active'],
-    defaultSort: 'order',
   },
+  defaultSort: 'order',
   access: { read: () => true, create: isAdminOrEditor, update: isAdminOrEditor, delete: isAdminOrEditor },
+  hooks: collectionRebuildHooks,
   fields: [
     {
       name: 'year',

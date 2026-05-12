@@ -1,11 +1,13 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdminOrEditor } from '../access'
+import { collectionRebuildHooks } from '../hooks/triggerRebuild'
 
 export const Ships: CollectionConfig = {
   slug: 'ships',
   admin: { useAsTitle: 'name', defaultColumns: ['name', 'type', 'port', 'region'] },
   access: { read: () => true, create: isAdminOrEditor, update: isAdminOrEditor, delete: isAdminOrEditor },
+  hooks: collectionRebuildHooks,
   fields: [
     { name: 'name', type: 'text', required: true },
     { name: 'type', type: 'text' },

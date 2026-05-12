@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "load-from-payload": "node scripts/load-from-payload.mjs"
+    "load-from-payload": "node scripts/load-from-payload.mjs",
+    "bake-media": "node scripts/bake-media.mjs",
+    "build:full": "npm run load-from-payload && npm run bake-media && npm run build"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

@@ -1,11 +1,13 @@
 import type { GlobalConfig } from 'payload'
 
 import { isAdminOrEditor } from '../access'
+import { globalRebuildHooks } from '../hooks/triggerRebuild'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
   admin: { group: 'Site' },
   access: { read: () => true, update: isAdminOrEditor },
+  hooks: globalRebuildHooks,
   fields: [
     { name: 'orgName',       type: 'text', label: 'Organisation name' },
     { name: 'brandSubtitle', type: 'text', label: 'Brand subtitle (e.g. Bruine Vloot)' },

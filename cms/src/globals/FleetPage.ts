@@ -1,11 +1,13 @@
 import type { GlobalConfig } from 'payload'
 
 import { isAdminOrEditor } from '../access'
+import { globalRebuildHooks } from '../hooks/triggerRebuild'
 
 export const FleetPage: GlobalConfig = {
   slug: 'fleet-page',
   admin: { group: 'Site' },
   access: { read: () => true, update: isAdminOrEditor },
+  hooks: globalRebuildHooks,
   fields: [
     {
       type: 'collapsible',

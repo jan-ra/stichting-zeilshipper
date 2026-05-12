@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdminOrEditor } from '../access'
+import { collectionRebuildHooks } from '../hooks/triggerRebuild'
 
 // "Media items" are editorial download/spotlight entries (videos, podcasts,
 // PDFs) — not to be confused with the upload-backing `media` collection.
@@ -8,6 +9,7 @@ export const MediaItems: CollectionConfig = {
   slug: 'media-items',
   admin: { useAsTitle: 'title', defaultColumns: ['title', 'type', 'category'] },
   access: { read: () => true, create: isAdminOrEditor, update: isAdminOrEditor, delete: isAdminOrEditor },
+  hooks: collectionRebuildHooks,
   fields: [
     {
       name: 'type',

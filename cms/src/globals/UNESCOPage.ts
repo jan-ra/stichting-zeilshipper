@@ -1,11 +1,13 @@
 import type { GlobalConfig } from 'payload'
 
 import { isAdminOrEditor } from '../access'
+import { globalRebuildHooks } from '../hooks/triggerRebuild'
 
 export const UNESCOPage: GlobalConfig = {
   slug: 'unesco-page',
   admin: { group: 'Site' },
   access: { read: () => true, update: isAdminOrEditor },
+  hooks: globalRebuildHooks,
   fields: [
     // ── Hero ──────────────────────────────────────────────────────────────────
     { name: 'heroTitle', type: 'text',     localized: true, label: 'Page title' },

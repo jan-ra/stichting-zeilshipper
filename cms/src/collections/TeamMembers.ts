@@ -1,11 +1,13 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdminOrEditor } from '../access'
+import { collectionRebuildHooks } from '../hooks/triggerRebuild'
 
 export const TeamMembers: CollectionConfig = {
   slug: 'team-members',
   admin: { useAsTitle: 'name', defaultColumns: ['name', 'role', 'location'] },
   access: { read: () => true, create: isAdminOrEditor, update: isAdminOrEditor, delete: isAdminOrEditor },
+  hooks: collectionRebuildHooks,
   fields: [
     { name: 'name', type: 'text', required: true },
     { name: 'role', type: 'text', localized: true },

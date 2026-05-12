@@ -1,11 +1,13 @@
 import type { GlobalConfig } from 'payload'
 
 import { isAdminOrEditor } from '../access'
+import { globalRebuildHooks } from '../hooks/triggerRebuild'
 
 export const BlogPage: GlobalConfig = {
   slug: 'blog-page',
   admin: { group: 'Site' },
   access: { read: () => true, update: isAdminOrEditor },
+  hooks: globalRebuildHooks,
   fields: [
     // ── Page header ───────────────────────────────────────────────────────────
     { name: 'badge', type: 'text', localized: true, label: 'Page badge (e.g. "Nieuws & updates")' },

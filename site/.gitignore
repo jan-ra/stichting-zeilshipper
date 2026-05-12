@@ -10,3 +10,6 @@ vite.config.js.timestamp-*
 
 # Build-time content dump (regenerate with `npm run load-from-payload`)
 src/data/generated/*.json
+
+# Build-time baked media (regenerate with `npm run bake-media`)
+public/baked/

@@ -40,9 +40,10 @@ RUN addgroup --system --gid 1001 nodejs \
     && adduser  --system --uid 1001 nextjs
 
 # Standalone output bundles the minimum runtime + production dependencies.
+# (No `public/` to copy — this app has no static assets; Payload's admin UI
+# is served out of .next/static.)
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/public          ./public
 
 # /data is the fly.io mount point (SQLite DB + media uploads).
 RUN mkdir -p /data /app/uploads \
