@@ -1,18 +1,8 @@
-# Dependencies
-node_modules/
-
-# Build output
-dist/
-dist-ssr/
-
-# Environment variables
+# Env files (per-package .env files are also ignored by site/ and cms/)
 .env
 .env.local
 .env.*.local
-
-# Vite
 *.local
-vite.config.js.timestamp-*
 
 # Logs
 logs/
@@ -35,19 +25,3 @@ pnpm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
-
-# WordPress Docker secrets (never commit real credentials)
-wordpress/.env
-
-# Build-time content dump (from either CMS) — regenerate with
-# `npm run load-content` or `npm run load-from-payload`
-src/data/generated/*.json
-
-# Payload (artefacts that aren't checked in; payload/ has its own .gitignore
-# but we duplicate the high-level entries here for clarity)
-payload/node_modules
-payload/.next
-payload/data
-payload/uploads
-payload/.env
-payload/src/payload-types.ts
