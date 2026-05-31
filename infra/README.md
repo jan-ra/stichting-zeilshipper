@@ -2,11 +2,11 @@
 
 End-to-end setup for the production hosting stack:
 
-- **Site**         — Cloudflare Pages (custom domain, built by CF Pages Git integration)
-- **CMS**          — Fly.io, Payload + Next.js standalone, SQLite on a volume, scale-to-zero
+- **Site**         — Cloudflare Workers Builds, served at `<your-domain>` + `www.<your-domain>`
+- **CMS**          — Fly.io, Payload + Next.js standalone, SQLite on a volume, scale-to-zero. Served at `admin.<your-domain>`.
 - **Media**        — Cloudflare R2 bucket exposed via `media.<your-domain>`
 - **Backups**      — GitHub Actions daily cron → R2 `db-backups/` prefix → 7-day lifecycle delete
-- **Rebuild hook** — CMS `afterChange`/`afterDelete` → CF Pages Deploy Hook (debounced 30s)
+- **Rebuild hook** — CMS `afterChange`/`afterDelete` → Workers Builds Deploy Hook (debounced 30s)
 
 You'll need accounts on Cloudflare, Fly.io, and (already have) GitHub. The `.nl` domain must be registered at any Dutch registrar (TransIP, Versio, Mijndomein, etc.); only the nameservers need to point at Cloudflare.
 
@@ -45,6 +45,8 @@ Setup:
 
 ## 2. Fly.io (CMS)
 
+### 2a. Initial deploy on the `*.fly.dev` hostname
+
 ```bash
 cd cms
 
@@ -52,7 +54,9 @@ cd cms
 flyctl launch --no-deploy --copy-config --name stichting-zeilshipper-cms
 flyctl volumes create data --size 1 --region ams
 
-# Secrets — see SECRETS table below
+# Secrets — see SECRETS table below.
+# PAYLOAD_PUBLIC_URL points at the *.fly.dev URL for the very first deploy;
+# it gets swapped for the custom admin subdomain in step 2b.
 flyctl secrets set \
   PAYLOAD_SECRET="$(openssl rand -hex 32)" \
   DATABASE_URI="file:/data/payload.db" \
@@ -68,9 +72,39 @@ flyctl secrets set \
 flyctl deploy
 ```
 
-Verify: visit `https://stichting-zeilshipper-cms.fly.dev/admin`, create the first user. Upload a test image and confirm it appears at `https://media.<your-domain>/<filename>` and inside the R2 bucket listing.
+Confirm it boots: `https://stichting-zeilshipper-cms.fly.dev/admin` should serve the Payload login screen. Don't create the user yet — finish step 2b first so your admin account lives on the right hostname's session cookie.
 
 The Fly machine will auto-stop after a few minutes idle (`fly.toml` → `auto_stop_machines = "stop"`, `min_machines_running = 0`). First admin request after a stop incurs a cold start (~3–5 s).
+
+### 2b. Custom admin subdomain (`admin.<your-domain>`)
+
+1. **DNS** — Cloudflare → DNS → Records → Add record:
+   - Type: `CNAME`
+   - Name: `admin`
+   - Target: `stichting-zeilshipper-cms.fly.dev`
+   - Proxy status: **DNS only (grey cloud)** — Cloudflare's proxy intercepts Fly's HTTP-01 cert challenges, so leave it grey at least until the cert is `Ready`.
+
+2. **Cert provisioning on Fly:**
+   ```bash
+   flyctl certs add admin.<your-domain> -a stichting-zeilshipper-cms
+   flyctl certs show admin.<your-domain> -a stichting-zeilshipper-cms
+   # wait for Status: Ready (usually 1–2 min after DNS propagates)
+   ```
+
+3. **Point Payload at the new URL:**
+   ```bash
+   flyctl secrets set PAYLOAD_PUBLIC_URL="https://admin.<your-domain>" -a stichting-zeilshipper-cms
+   ```
+   Setting a secret triggers an automatic re-roll of the machine.
+
+   > **This is load-bearing for auth, not just URL generation.** Payload's config
+   > sanitization appends `serverURL` (= `PAYLOAD_PUBLIC_URL`) to the `csrf`
+   > allowlist, and the cookie-based JWT strategy rejects any request whose
+   > `Origin` is not in that list. If this stays pointed at `*.fly.dev` while you
+   > use `admin.<your-domain>`, every authenticated request from the custom
+   > domain returns `{user: null}` / 403 with `"U mag deze actie niet uitvoeren."
+
+4. **First user** — visit `https://admin.<your-domain>/admin`, create your admin account. Upload a test image; confirm it lands at `https://media.<your-domain>/<filename>` and shows up in the R2 bucket listing.
 
 ## 3. Cloudflare (site) — Workers Builds with Static Assets
 
@@ -87,8 +121,8 @@ directory" now lives in [site/wrangler.toml](../site/wrangler.toml) under the
    - **Version command**: `npx wrangler versions upload` (preview deployments)
    - No "build output directory" field — `wrangler deploy` reads `[assets].directory = "./dist"` from `site/wrangler.toml`.
 3. **Environment variables** (Production scope):
-   - `PAYLOAD_API_URL=https://stichting-zeilshipper-cms.fly.dev`
-   - `PAYLOAD_PUBLIC_URL=https://stichting-zeilshipper-cms.fly.dev`
+   - `PAYLOAD_API_URL=https://admin.<your-domain>`
+   - `PAYLOAD_PUBLIC_URL=https://admin.<your-domain>`
    - `MEDIA_BASE_URL=https://media.<your-domain>`
    - `BAKE_MAX_BYTES=2097152`
 4. **Custom domain**: Worker → Settings → Domains & Routes → add `<your-domain>` (apex) and/or `www.<your-domain>`.
@@ -123,8 +157,8 @@ aws s3 ls s3://zeilshipper-media/db-backups/ \
 
 ## 5. End-to-end smoke test
 
-1. Log into `https://stichting-zeilshipper-cms.fly.dev/admin`, edit a blog post, save.
-2. Within ~45 s a new CF Pages deployment with source "Deploy Hook" appears.
+1. Log into `https://admin.<your-domain>/admin`, edit a blog post, save.
+2. Within ~45 s a new Workers Builds deployment with source "Deploy Hook" appears in the Cloudflare dashboard.
 3. After it finishes (~1–2 min), the site at `https://<your-domain>` shows the edit.
 4. Upload a small (<2 MB) and a large (>2 MB) image to a doc, save. After the next deploy, inspect the deployment artifact — the small one lives under `/baked/...`, the large one references `https://media.<your-domain>/...`.
 
@@ -136,15 +170,15 @@ aws s3 ls s3://zeilshipper-media/db-backups/ \
 |---|---|---|
 | `PAYLOAD_SECRET` | Fly secret | `openssl rand -hex 32` |
 | `DATABASE_URI` | Fly secret | Literal: `file:/data/payload.db` |
-| `PAYLOAD_PUBLIC_URL` | Fly secret | Literal: `https://stichting-zeilshipper-cms.fly.dev` |
+| `PAYLOAD_PUBLIC_URL` | Fly secret | `https://admin.<your-domain>` (post-2b) |
 | `S3_BUCKET` | Fly secret | Literal: `zeilshipper-media` |
 | `S3_ENDPOINT` | Fly secret | `https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com` |
 | `S3_REGION` | Fly secret | Literal: `auto` |
 | `S3_ACCESS_KEY_ID` | Fly secret | R2 API token |
 | `S3_SECRET_ACCESS_KEY` | Fly secret | R2 API token |
-| `MEDIA_BASE_URL` | Fly secret **and** CF Pages env var | `https://media.<your-domain>` |
-| `CF_PAGES_DEPLOY_HOOK` | Fly secret | CF Pages → Deploy hooks → create |
-| `PAYLOAD_API_URL` | CF Pages env var | `https://stichting-zeilshipper-cms.fly.dev` |
+| `MEDIA_BASE_URL` | Fly secret **and** Workers env var | `https://media.<your-domain>` |
+| `CF_PAGES_DEPLOY_HOOK` | Fly secret | Worker → Settings → Builds → Deploy hooks → create |
+| `PAYLOAD_API_URL` | Workers env var | `https://admin.<your-domain>` |
 | `BAKE_MAX_BYTES` | CF Pages env var | `2097152` |
 | `FLY_API_TOKEN` | GitHub repo secret | `flyctl tokens create deploy --app stichting-zeilshipper-cms` |
 | `R2_ACCESS_KEY_ID` | GitHub repo secret | R2 API token (same as Fly) |
