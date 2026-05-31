@@ -1,0 +1,8 @@
+{
+  "name": "stichting-zeilshipper",
+  "private": true,
+  "scripts": {
+    "pull": "./scripts/pull.sh",
+    "dev": "./scripts/dev.sh"
+  }
+}
