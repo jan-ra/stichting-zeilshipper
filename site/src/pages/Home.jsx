@@ -36,8 +36,8 @@ function StickyGlobe({ chapter, onShipClick }) {
         .globeTileEngineUrl((x, y, l) => `https://a.basemaps.cartocdn.com/dark_nolabels/${l}/${x}/${y}.png`)
         .backgroundColor('rgba(0,0,0,0)')
         .showAtmosphere(true)
-        .atmosphereColor('#1a3a5c')
-        .atmosphereAltitude(0.15)
+        .atmosphereColor('#3a7abd')
+        .atmosphereAltitude(0.22)
         .pointsData(SHIPS)
         .pointLat('lat').pointLng('lng')
         .pointColor(() => '#c19a52')
@@ -51,7 +51,15 @@ function StickyGlobe({ chapter, onShipClick }) {
           const tip = document.createElement('div')
           tip.className = '_ship-tip-home'
           tip.style.cssText = 'position:fixed;pointer-events:none;display:none;z-index:9999;background:rgba(15,34,56,0.95);border:1px solid rgba(193,154,82,0.5);padding:10px 14px;border-radius:3px;font-family:sans-serif;min-width:150px;'
-          tip.innerHTML = `${d.image ? `<img src="${asset(d.image)}" style="width:160px;height:100px;object-fit:cover;display:block;margin-bottom:8px;border-radius:2px;" />` : ''}<strong style="color:#f4ede1;font-size:14px">${d.name}</strong><br><span style="color:#c19a52;font-size:11px">${d.type}</span><br><span style="color:rgba(244,237,225,0.6);font-size:12px">${d.port}</span>`
+          {
+            const posLabel = t('home.shipPanel.positionUpdated')
+            let html = d.image ? `<img src="${asset(d.image)}" style="width:160px;height:100px;object-fit:cover;display:block;margin-bottom:8px;border-radius:2px;" />` : ''
+            html += `<strong style="color:#f4ede1;font-size:14px">${d.name}</strong>`
+            html += `<br><span style="color:#c19a52;font-size:11px">${d.type}</span>`
+            html += `<br><span style="color:rgba(244,237,225,0.6);font-size:12px">${d.port}</span>`
+            if (d.positionUpdatedAt) html += `<br><span style="color:rgba(244,237,225,0.55);font-size:11px">${posLabel}: ${new Date(d.positionUpdatedAt).toLocaleString()}</span>`
+            tip.innerHTML = html
+          }
           document.body.appendChild(tip)
 
           const el = document.createElement('div')
@@ -135,6 +143,11 @@ function ShipPanel({ ship, onClose, t }) {
           <span style={{ color: '#f4ede1' }}>{v}</span>
         </div>
       ))}
+      {ship.positionUpdatedAt && (
+        <div style={{ fontSize: 11, color: 'rgba(244,237,225,0.55)' }}>
+          {t('home.shipPanel.positionUpdated')}: {new Date(ship.positionUpdatedAt).toLocaleString()}
+        </div>
+      )}
     </div>
   )
 }
@@ -292,7 +305,6 @@ export default function HomePage({ navigate }) {
 
           {/* RIGHT: sticky globe — zIndex: 2 renders it in front of the photo strip (zIndex: 1) */}
           <div style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', zIndex: 2 }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 50%, rgba(30,74,122,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
             <div style={{ position: 'absolute', bottom: 40, left: '50%', transform: 'translateX(-50%)', textAlign: 'center', zIndex: 10, pointerEvents: 'none' }}>
               <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.25em', textTransform: 'uppercase', opacity: 0.8 }}>
                 {chapter !== null && t(`regions.${GLOBE_CHAPTERS[chapter]?.regionKey}`)}

@@ -10,8 +10,16 @@ export const InfoBoards: CollectionConfig = {
   hooks: collectionRebuildHooks,
   fields: [
     { name: 'name', type: 'text', required: true },
-    { name: 'lat', type: 'number' },
-    { name: 'lng', type: 'number' },
+    {
+      name: 'lat',
+      type: 'number',
+      admin: { description: 'Decimale graden. Positief = Noord, negatief = Zuid. Bereik: −90 tot 90. Voorbeeld: 52.3738 (Amsterdam). Een antipode op het zuidelijk halfrond heeft een negatieve waarde, bijv. −33.8688 (Sydney).' },
+    },
+    {
+      name: 'lng',
+      type: 'number',
+      admin: { description: 'Decimale graden. Positief = Oost, negatief = West. Bereik: −180 tot 180. Voorbeeld: 4.8910 (Amsterdam). Locaties ten westen van de nulmeridiaan (Amerika, enz.) hebben een negatieve waarde, bijv. −74.0060 (New York).' },
+    },
     {
       name: 'status',
       type: 'select',

@@ -1,0 +1,4458 @@
+{
+    "2001739": {
+        "name": "HOLLANDIA",
+        "eni_number": "2001739",
+        "image": "https://www.zeilcharter.nl/zeilcharter/upload_afb/hollandia-har-zeil3.jpg",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 40,
+        "year_of_build": 1914,
+        "mmsi": "244670166",
+        "sources": [
+            "https: //www.rederij-vooruit.nl/zeilschepen-bruine-vloot/hollandia/",
+            "https://www.vesselfinder.com/vessels/details/244670166",
+            "https://zeilcharter.nl/zeilen-met-tweemastklipper-Hollandia-vanuit-Harlingen.php"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2002587": {
+        "name": "MIDDELSE",
+        "eni_number": "2002587",
+        "image": "https://www.friesevloot.nl/media/ax2nlecf/middelsee-friesevloot.jpg?rxy=0.5250510987230007,0.9001328767579976&width=1920&height=1080&rnd=133936851836300000",
+        "type_of_ship": "tjalk",
+        "home_port": "Stavoren",
+        "passenger_capacity": null,
+        "year_of_build": 1899,
+        "mmsi": 244770584,
+        "sources": [
+            "https://www.zeiltjalkenfriesland.nl/zeiltjalk-middelsee",
+            "https://en.zeilendeschepen.nl/schip/middelsee-stavoren/",
+            "https://www.friesevloot.nl/en/sailing-ships/middelsee/",
+            "https://boatcharterholland.com/boot-categorie/traditional-sailing-with-crew/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2008156": {
+        "name": "GOUDEN BOAYUM",
+        "eni_number": "2008156",
+        "image": null,
+        "type_of_ship": null,
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2008587": {
+        "name": "ONDERNEMING",
+        "eni_number": "2008587",
+        "image": "https://www.friesevloot.nl/media/1yhdgtkp/de-onderneming-lemmer.jpg?rxy=0.5130622907992489,0.9319303338171263&width=1920&height=1080&rnd=134214150991470000",
+        "type_of_ship": null,
+        "home_port": "Lemmer",
+        "passenger_capacity": 13,
+        "year_of_build": null,
+        "mmsi": 244250699,
+        "sources": [],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2009819": {
+        "name": "KLEINE JAGER",
+        "eni_number": "2009819",
+        "image": "https://www.zeilschipkleinejager.nl/wp-content/uploads/2019/05/kleine-jager-header.jpg",
+        "type_of_ship": "hektjalk",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": null,
+        "year_of_build": 1892,
+        "mmsi": 244770920,
+        "sources": [
+            "https://www.zeilschipkleinejager.nl/",
+            "https://www.hollandsail.nl/schepen/10058/kleine-jager",
+            "https://www.klipperwelvaart.nl/onze-vloot/67201/kleine-jager/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2012039": {
+        "name": "JEPPE VAN SCHIER",
+        "eni_number": "2012039",
+        "image": "https://www.friesevloot.nl/media/4hofvnb3/jeppevanschierfriesevloot.jpg?rxy=0.5078373744795494,0.9040638606676342&width=1920&height=1080&rnd=134212561757370000",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Stavoren",
+        "passenger_capacity": 28,
+        "year_of_build": 1903,
+        "mmsi": "244670329",
+        "sources": [
+            "https://binnenvaartlog.nl/jeppe-van-schier/",
+            "https://www.friesevloot.nl/zeilschepen/jeppe-van-schier/",
+            "https://en.zeilendeschepen.nl/schip/jeppe-van-schier-stavoren/",
+            "https://www.vesselfinder.com/vessels/details/244670329"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2013079": {
+        "name": "ZEEMEEUW",
+        "eni_number": "2013079",
+        "image": "http://www.tallship-fan.de/images/1000/brandarisrace2025_0883.jpg",
+        "type_of_ship": "logger",
+        "home_port": "Harlingen",
+        "passenger_capacity": 53,
+        "year_of_build": 1924,
+        "mmsi": "244710478",
+        "sources": [
+            "https://www.vesselfinder.com/vessels/details/244710478",
+            "https://www.hollandsail.com/ships/6339/zeemeeuw/",
+            "http://www.tallship-fan.de/cgi-bin/tallship_e.pl?ACTION=DISPLAY&SCHIFFSID=2284",
+            "https://www.hollandsail.nl/schepen/39/zeemeeuw"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2014115": {
+        "name": "SAFFIER",
+        "eni_number": "2014115",
+        "image": "https://www.sail.nl/_next/image?url=https%3A%2F%2Fs3-sail-2025.webbers.dev%2Fproduction%2Fapp_uploads_2019_12_8db11e5d_b6cf_e911_a981_000d3a206976_SFF_01_900x600_1_26caa443d8.png&w=2048&q=85",
+        "type_of_ship": "tjalk",
+        "home_port": "Muiden",
+        "passenger_capacity": 40,
+        "year_of_build": 1892,
+        "mmsi": 244700473,
+        "sources": [
+            "https://www.zeilcharter.nl/1381/zeilen_met_groninger_tjalk_Saffier_vanuit_Muiden.html",
+            "https://www.saffier.org/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2014117": {
+        "name": "DE REDERIJKER",
+        "eni_number": "2014117",
+        "image": "https://www.sail.nl/_next/image?url=https%3A%2F%2Fs3-sail-2025.webbers.dev%2Fproduction%2Fapp_uploads_2019_12_6c4c59ac_981d_ea11_a811_000d3a44a5b1_RDR_1_1_900x600_1ee7093d93.png&w=2048&q=85",
+        "type_of_ship": "tjalk",
+        "home_port": "Muiden",
+        "passenger_capacity": 60,
+        "year_of_build": 2000,
+        "mmsi": "244780676",
+        "sources": [
+            "https://www.muidercompagnie.nl/schepen/tjalkjacht-de-rederijker",
+            "https://www.muidercompagnie.nl/25-jaar-rederijker",
+            "https://www.vesselfinder.com/vessels/details/244780676"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2015414": {
+        "name": "BOUNTY",
+        "eni_number": "2015414",
+        "image": "https://zeilschipbounty.nl/wp-content/uploads/2020/10/Zeilschip-Bounty-header.jpg",
+        "type_of_ship": "brigantijn",
+        "home_port": "Lelystad (Bataviahaven)",
+        "passenger_capacity": 50,
+        "year_of_build": 1954,
+        "mmsi": "244090014",
+        "sources": [
+            "https://www.marinetraffic.com/nl/ais/details/ships/shipid:223675/mmsi:244090014/imo:0/vessel:BOUNTY",
+            "https://zeilschipbounty.nl/nieuws/zeilschip-bounty-viert-20j-jubileum/",
+            "https://watervakantie.nl/huurboot/bounty/",
+            "https://www.dagjeweg.nl/tip/4117/Zeilschip-Bounty"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2015523": {
+        "name": "DE UTRECHT",
+        "eni_number": "2015523",
+        "image": "https://www.muidercompagnie.nl/wp-content/uploads/2025/02/Statenjacht-de-Utrecht-op-het-IJsselmeer.webp",
+        "type_of_ship": "statenjacht",
+        "home_port": "Volendam",
+        "passenger_capacity": 55,
+        "year_of_build": 2003,
+        "mmsi": 244710985,
+        "sources": [
+            "https://nl.wikipedia.org/wiki/Utrecht_(schip,_2003)",
+            "https://statenjacht.nl/statenjacht-informatie/het-statenjacht-de-utrecht-2/",
+            "https://delfsail.nl/nl/schepen/overige-schepen/statenjacht-de-utrecht",
+            "https://www.bootnodig.nl/nl/boot_huren/muiden/statenjacht/de-utrecht",
+            "https://www.muidercompagnie.nl/schepen/statenjacht-de-utrecht"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2015956": {
+        "name": "MARS",
+        "eni_number": "2015956",
+        "image": "https://www.platbodemverhuurfriesland.nl/img/zeilschipmarszeilfoto1200.jpg",
+        "type_of_ship": "tweemaster zeillogger",
+        "home_port": "Harlingen",
+        "passenger_capacity": 51,
+        "year_of_build": 1924,
+        "mmsi": 244710380,
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/mars/",
+            "https://www.zeilschipmars.nl/zeilen-friesland/",
+            "https://www.hotelschip.eu/het-hotelschip/",
+            "https://fikkers.nl/schepen/wad-en-sontvaarder-mars-groningen-winter/",
+            "https://www.platbodemverhuurfriesland.nl/tweemaster_zeilschip_mars.html"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2100148": {
+        "name": "SANNE SOPHIA",
+        "eni_number": "2100148",
+        "image": "https://www.sailing.nl/wp-content/uploads/2024/02/muiderhardzeildagen2jpg-scaled.webp",
+        "type_of_ship": "driemast klipper",
+        "home_port": "Muiden",
+        "passenger_capacity": 150,
+        "year_of_build": 1886,
+        "mmsi": 244030628,
+        "sources": [
+            "https://www.sailing.nl/onze-vloot/driemaster-sanne-sophia",
+            "https://www.zeilcharter.nl/1415/zeilen_met_klipper_Sanne-Sophia_vanuit_Muiden.html",
+            "https://www.sail.nl/schepen/sanne-sophia",
+            "https://www.naupar.nl/schip/sanne-sophia/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2100447": {
+        "name": "LA BOHEME",
+        "eni_number": "2100447",
+        "image": "https://storage.e.jimdo.com/cdn-cgi/image/quality=85,fit=scale-down,format=auto,width=1024,height=767/image/541254913/fdcd8b0b-054b-406e-a11b-b31b56d69bef.jpg",
+        "type_of_ship": "stevenaak",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 25,
+        "year_of_build": 1876,
+        "mmsi": 244710171,
+        "sources": [
+            "https://www.la-boheme.info/",
+            "https://www.zeilendeschepen.nl/schip/la-boheme-enkhuizen/",
+            "https://m.hollandsail.nl/schepen/6321/la-boheme",
+            "https://zeilcharter.nl/index.php?zoeken=yes&vertrekhaven=%25&scheepstype=%25&huurtijd=midweek&sorteren=aantalplaatsen&passagiers=5"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2100632": {
+        "name": "LINDE",
+        "eni_number": "2100632",
+        "image": "https://www.naupar.nl/wp-content/uploads/2019/08/Linde-Harlingen-driemastklipper-1024x683.jpg",
+        "type_of_ship": "driemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 30,
+        "year_of_build": null,
+        "mmsi": 244660892,
+        "sources": [
+            "https://www.naupar.com/ships/linde/",
+            "https://www.naupar.nl/blog/met-de-linde-de-waddenzee-op/",
+            "https://nl.pinterest.com/pin/401383385543177057/",
+            "https://www.binnenvaart.eu/zeilschip/54491-rival.html"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2100693": {
+        "name": "EENSGEZINDHEID",
+        "eni_number": "2100693",
+        "image": "https://klippereensgezindheid.nl/themes/eensgezindheid2014/js/fancybox/blank.gif",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 45,
+        "year_of_build": 1896,
+        "mmsi": "244670137",
+        "sources": [
+            "https://klippereensgezindheid.nl/informatie/het-schip",
+            "https://atlasail.com/nl/zeilboten-huren-klassieke-zeilschepen/zeilen-met-de-eensgezindheid",
+            "https://www.facebook.com/Klipper-Eensgezindheid-238250622854881/",
+            "https://www.marinetraffic.com/en/ais/details/ships/shipid:239147/mmsi:244670137/vessel:EENSGEZINDHEID"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2100717": {
+        "name": "AVONTUUR",
+        "eni_number": "2100717",
+        "image": "https://www.avontuurgoes.nl/new/wp-content/uploads/2023/01/home-onder-links.jpg",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Goes",
+        "passenger_capacity": 50,
+        "year_of_build": 1914,
+        "mmsi": 244700591,
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/12821/",
+            "https://www.avontuurgoes.nl/",
+            "https://scheepspost.info/goese-zeilklipper-avontuur-kan-de-golven-weer-trotseren/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2100898": {
+        "name": "NOVEL",
+        "eni_number": "2100898",
+        "image": "https://www.hollandsail.de/assets/thumbnail/asset_192_685_w1200_fit.jpg?progressive=1&quality=70&captureSize=1",
+        "type_of_ship": "driemast klipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 56,
+        "year_of_build": 1898,
+        "mmsi": 244830318,
+        "sources": [
+            "https://www.hollandsail.nl/schepen/27/novel",
+            "https://www.weekendplanner.nl/botenverhuur/zeiltochten.htm",
+            "https://en.zeilendeschepen.nl/schip/novel-enkhuizen/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "medium",
+            "mmsi": "low"
+        }
+    },
+    "2101104": {
+        "name": "GAIA",
+        "eni_number": "2101104",
+        "image": "https://de-gaia.nl/wp-content/uploads/schip/gaia-vol-tuig-bij-marken.jpg",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Lemmer",
+        "passenger_capacity": null,
+        "year_of_build": 1910,
+        "mmsi": 244710488,
+        "sources": [
+            "https://en.zeilendeschepen.nl/schip/gaia-lemmer/",
+            "https://de-gaia.nl/het-schip/",
+            "https://de-gaia.nl/contact/",
+            "https://gaia.frisian-sailing.com/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2101230": {
+        "name": "MON DESIR",
+        "eni_number": "2101230",
+        "image": "https://www.hollandsail.nl/assets/thumbnail/asset_192_561_w1200_fit.jpg?progressive=1&quality=70&captureSize=1",
+        "type_of_ship": "klipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": 244660883,
+        "sources": [
+            "https://en.zeilendeschepen.nl/schip/mon-desir-enkhuizen/",
+            "https://www.mondesir.nl/",
+            "https://www.binnenvaart.eu/klipper/54811-adriana-johanna.html",
+            "https://www.hollandsail.nl/schepen/16563/mon-desir"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "medium",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2101302": {
+        "name": "SPERVER",
+        "eni_number": "2101302",
+        "image": "https://www.friesevloot.nl/media/jp1posmd/spes-nova-klipper.jpg?rxy=0.468609988479052,0.8575491612172104&width=1920&height=1080&rnd=133936854383230000",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Stavoren",
+        "passenger_capacity": 29,
+        "year_of_build": 1893,
+        "mmsi": 244670219,
+        "sources": [
+            "https://en.zeilendeschepen.nl/schip/spes-nova-stavoren/",
+            "https://www.friesevloot.nl/zeilschepen/spes-nova/",
+            "https://www.zeilcharter.nl/1181/zeilen_met_tweemastklipper_Spes-Nova_vanuit_Stavoren.html",
+            "https://www.zeilenmetmichiel.nl/schip/",
+            "https://www.zusterschepen.nl/spes-nova/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2101461": {
+        "name": "EENDRACHT",
+        "eni_number": "2101461",
+        "image": "https://www.uitagendarotterdam.nl/images/locations/49380/3476b927-6656-47ea-b5af-179fa05fd183.jpg?width=1440&height=466&&format=webp&quality=75",
+        "type_of_ship": "driemastschoener",
+        "home_port": "Rotterdam",
+        "passenger_capacity": 110,
+        "year_of_build": 1989,
+        "mmsi": "244543000",
+        "sources": [
+            "https://nl.wikipedia.org/wiki/Eendracht_(schip,_1989)",
+            "https://www.uitagendarotterdam.nl/locaties/locatie/zeilschip-eendracht/",
+            "https://www.marinetraffic.com/en/ais/details/ships/shipid:230768/mmsi:244543000/imo:8814275/vessel:EENDRACHT"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2101600": {
+        "name": "BREE SANT",
+        "eni_number": "2101600",
+        "image": "https://rederijvanlinschoten.de/wp-content/uploads/elementor/thumbs/media_71_43042_w900-qox4mjtnba58snky5iya2t21h78y0cwip2keda9xh4.jpg",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 40,
+        "year_of_build": 1995,
+        "mmsi": 244700620,
+        "sources": [
+            "https://www.hollandsail.nl/schepen/13/bree-sant",
+            "https://en.zeilendeschepen.nl/schip/bree-sant-enkhuizen/",
+            "https://www.bootnodig.nl/nl/thuishaven/harlingen"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2101903": {
+        "name": "BONTEKOE",
+        "eni_number": "2101903",
+        "image": "https://klipperbontekoe.nl/previews/2018/5/10/media_190_55392_w600_crop.png",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 28,
+        "year_of_build": 1909,
+        "mmsi": 244780392,
+        "sources": [
+            "https://klipperbontekoe.nl/de-bontekoe",
+            "https://www.naupar.nl/schip/bontekoe/",
+            "https://sites.google.com/site/bruinevlootnederland/zeilboot-huren-bruine-vloot",
+            "https://www.hollandsail.nl/schepen/11/bontekoe"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2101905": {
+        "name": "NIRWANA",
+        "eni_number": "2101905",
+        "image": "https://klippernirwana.nl/previews/2018/1/18/media_165_55156_w600_crop.png",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 26,
+        "year_of_build": 1910,
+        "mmsi": "244740441",
+        "sources": [
+            "https://klippernirwana.nl/over-het-schip",
+            "https://www.hollandsail.nl/schepen/25/nirwana",
+            "https://zeilcharter.nl/zeilen-met-tweemastklipper-Nirwana-vanuit-Enkhuizen.php",
+            "https://www.vesselfinder.com/nl/vessels/details/244740441"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2102017": {
+        "name": "BEANTRA",
+        "eni_number": "2102017",
+        "image": "https://beantra.nl/wp-content/uploads/2017/03/Beantra.jpg",
+        "type_of_ship": "tweemastklipper",
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": 1898,
+        "mmsi": "244615771",
+        "sources": [
+            "https://beantra.nl/beantra/over-de-beantra/",
+            "https://www.vesselfinder.com/vessels/details/244615771",
+            "https://www.zeilcharter.nl/1294/zeilen_met_tweemastklipper_Beantra_vanuit_Lemmer.html"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2102090": {
+        "name": "ANNA",
+        "eni_number": "2102090",
+        "image": "https://www.zeilcharter.nl/zeilcharter/upload_afb/anna-har.jpg",
+        "type_of_ship": "klipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 28,
+        "year_of_build": null,
+        "mmsi": "244740285",
+        "sources": [
+            "https://zeilcharter.nl/zeilen-met-klipper-Anna-vanuit-Harlingen.php",
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/klipper-anna/",
+            "https://www.vesselfinder.com/vessels/details/244740285"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "low",
+            "mmsi": "medium"
+        }
+    },
+    "2102126": {
+        "name": "POSEIDON",
+        "eni_number": "2102126",
+        "image": "https://bootbootboot.nl/media/images/BootBootBoot-Poseidon-zeilen_9gY6kYg.max-992x900.jpg",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 32,
+        "year_of_build": 1903,
+        "mmsi": 244670960,
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/8929/",
+            "https://www.goudenvloot.nl/de-zeilklipper-poseidon/",
+            "https://bootbootboot.nl/schepen/poseidon/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2102166": {
+        "name": "SUCCES",
+        "eni_number": "2102166",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Succes_%28schip%2C_1909%29.jpg",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": null,
+        "year_of_build": 1909,
+        "mmsi": "244780460",
+        "sources": [
+            "https://nl.wikipedia.org/wiki/Succes_(schip,_1909,_Lekkerkerk)",
+            "https://klippersucces.com/het-schip/",
+            "https://www.marinetraffic.com/nl/ais/details/ships/shipid:251032/mmsi:244780460/imo:0/vessel:SUCCES"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "medium"
+        }
+    },
+    "2102250": {
+        "name": "ALLIANTIE",
+        "eni_number": "2102250",
+        "image": "https://assets.naupar.nl/media/thumbnails/33/0c/330c59f43575603c997bfa3cf7247dac/a33524b6-e3f5-f011-8406-7ced8d5c2300_900x600Alliantie%2520zeilend.png",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Elburg",
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": 244730643,
+        "sources": [
+            "https://www.naupar.com/ships/alliantie/",
+            "https://www.zeiltochten.nl/charterschepen/1/Tweemastklipper/Alliantie/Elburg/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "medium",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2102304": {
+        "name": "ZUID HOLLAND",
+        "eni_number": "2102304",
+        "image": "https://www.hollandsail.nl/assets/thumbnail/asset_192_989_w1200_fit.jpg?progressive=1&quality=70&captureSize=1",
+        "type_of_ship": null,
+        "home_port": "Harlingen",
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": "244770444",
+        "sources": [
+            "https://www.vesselfinder.com/da/vessels/details/244770444",
+            "https://marinetraffic.com/nl/ais/details/ships/shipid:250181/mmsi:244770444/vessel:ZUID%20HOLLAND",
+            "https://www.hollandsail.nl/schepen/40/zuid-holland",
+            "https://www.hollandsail.nl/meezeilen/reisaanbod"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "high"
+        }
+    },
+    "2102352": {
+        "name": "REA KLIF",
+        "eni_number": "2102352",
+        "image": "https://primary.jwwb.nl/public/g/h/p/temp-bhfzwjnncybnttfkeqpw/friesevloot-zeilschepen-segelschiffe-sailingships-standard.jpg?enable-io=true&enable=upscale&crop=1920%2C960%2Cx0%2Cy120%2Csafe",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 25,
+        "year_of_build": 1894,
+        "mmsi": "244670508",
+        "sources": [
+            "https://en.zeilendeschepen.nl/schip/rea-klif-enkhuizen/",
+            "https://www.hollandsail.nl/schepen/16831/rea-klif",
+            "https://www.vesselfinder.com/nl/vessels/details/244670508",
+            "https://klipperreaklif.nl/over-ons/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2102373": {
+        "name": "ISIS",
+        "eni_number": "2102373",
+        "image": "https://assets.plaece.nl/thumb/ppuf0NzLa1hy6KLJt2OSYiWvsSrkc6Y6GaqipNaGkTM/resizing_type:fit/width:1280/height:0/gravity:sm/enlarge:0/aHR0cHM6Ly9hc3NldHMucGxhZWNlLm5sL29kcC1mcmllc2xhbmQvaW1hZ2Uva2lscHBlci1pc2lzMnNhdF8yNTc3MTY0NzkuanBn.webp",
+        "type_of_ship": "klipperaak",
+        "home_port": "Harlingen",
+        "passenger_capacity": 35,
+        "year_of_build": 1892,
+        "mmsi": 244820803,
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/6363/",
+            "https://www.goudenvloot.nl/klipper-isis/",
+            "https://watervakantie.nl/huurboot/klipper-isis/",
+            "https://www.zeiltochten.nl/charterschepen/16/Klipper/Isis/Harlingen/",
+            "https://www.visitwadden.nl/nl/bezoeken/activiteiten-overzicht/2525084651/klipper-isis"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2102502": {
+        "name": "ORTOLAN",
+        "eni_number": "2102502",
+        "image": "https://www.hollandsail.nl/assets/thumbnail/asset_192_7168_w1200_fit.jpg?progressive=1&quality=70&captureSize=1",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Stavoren",
+        "passenger_capacity": 45,
+        "year_of_build": 1896,
+        "mmsi": "244770005",
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/7571/",
+            "https://www.friesevloot.nl/zeilschepen/ortolan/",
+            "https://www.hollandsail.nl/schepen/16643/ortolan",
+            "https://www.vesselfinder.com/nl/vessels/details/244770005"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2102556": {
+        "name": "RADBOUD",
+        "eni_number": "2102556",
+        "image": "https://klipper-radboud.nl/wp-content/themes/klipper-radboud/assets/img/radboud-header-zeiltochten.jpg",
+        "type_of_ship": "driemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 60,
+        "year_of_build": 1909,
+        "mmsi": "244870286",
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/9575/",
+            "https://www.hollandsail.nl/schepen/29/radboud",
+            "https://klipper-radboud.nl/schip/",
+            "https://www.vesselfinder.com/vessels/details/244870286"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2102958": {
+        "name": "SCALDIS",
+        "eni_number": "2102958",
+        "image": "https://www.descaldis.nl/wp-content/uploads/2022/03/Voor-Wemeldingen-scaled.jpg",
+        "type_of_ship": "paviljoentjalk",
+        "home_port": "Zierikzee",
+        "passenger_capacity": 25,
+        "year_of_build": null,
+        "mmsi": 244700698,
+        "sources": [
+            "https://www.descaldis.nl/scaldis-goedgekeurd/",
+            "https://www.descaldis.nl/",
+            "https://zeilcharter.nl/index.php?zoeken=yes&vertrekhaven=%25&scheepstype=%25&huurtijd=dagtocht&sorteren=huurprijsweekdag&passagiers=5",
+            "https://www.meezeilenzierikzee.nl/nl"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2200077": {
+        "name": "GROOTVORST",
+        "eni_number": "2200077",
+        "image": "https://www.t-s-c.de/wp-content/uploads/2025/01/segelschiff-grootvorst-traditionssegelschiff.jpg",
+        "type_of_ship": "driemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": null,
+        "year_of_build": 1896,
+        "mmsi": 244750440,
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/8840/",
+            "https://www.historischezeilvaart.co.uk/grootvorst/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2200350": {
+        "name": "VRIJHEID",
+        "eni_number": "2200350",
+        "image": "https://www.loungeklipper.nl/wp-content/uploads/2017/02/IMG_6714.jpg",
+        "type_of_ship": "driemast topzeilschoener",
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": 1900,
+        "mmsi": 244730365,
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/vrijheid/",
+            "https://www.shipspotting.com/photos/3723855"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "medium",
+            "mmsi": "low"
+        }
+    },
+    "2200682": {
+        "name": "SPARTIVENTO",
+        "eni_number": "2200682",
+        "image": "https://www.zeilcharter.nl/zeilcharter/upload_afb/spartivento-zeil.jpg",
+        "type_of_ship": "aak",
+        "home_port": "Willemstad",
+        "passenger_capacity": 24,
+        "year_of_build": 1908,
+        "mmsi": 244051393,
+        "sources": [
+            "http://www.spartivento.nl/geschiedenis.html",
+            "http://www.spartivento.nl/scheepsinfo.html",
+            "https://www.spartivento.nl/",
+            "https://zeilcharter.nl/zeilen-met-aak-Spartivento-vanuit-Enkhuizen.php?title=zeilen+met+aak+Spartivento+vanuit+Enkhuizen%60"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2200893": {
+        "name": "TIJDGEEST",
+        "eni_number": "2200893",
+        "image": "https://debinnenvaart.nl/wp-content/uploads/image.php?url=https://de-binnenvaart.b-cdn.net/2019/12/img-2340.jpg",
+        "type_of_ship": null,
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": "244750313",
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/9171/",
+            "https://www.vesselfinder.com/vessels/details/244750313"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "high"
+        }
+    },
+    "2200983": {
+        "name": "ZWARTE RUITER",
+        "eni_number": "2200983",
+        "image": "https://www.natuurzeiltochten.nl/NZTfotos/droog_bij_de_cocksdorp.JPG",
+        "type_of_ship": "tjalk",
+        "home_port": "Franeker",
+        "passenger_capacity": 20,
+        "year_of_build": 1903,
+        "mmsi": "244780877",
+        "sources": [
+            "https://www.marinetraffic.com/en/ais/details/ships/shipid:251384/mmsi:244780877/imo:0/vessel:ZWARTE_RUITER",
+            "http://www.schepenlijst.nl/test/index.php?page=item&id=802",
+            "https://www.zeilcharter.nl/zeilen-met-tjalk-Zwarte-Ruiter-vanuit-Harlingen.php",
+            "https://watervakantie.nl/huurboot/zwarte-ruiter-2/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2201080": {
+        "name": "STORE BAELT",
+        "eni_number": "2201080",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 50,
+        "year_of_build": 1928,
+        "mmsi": null,
+        "sources": [
+            "https://www.naupar.com/ships/store-baelt/",
+            "https://en.zeilendeschepen.nl/schip/storebaelt-harlingen/",
+            "https://www.zeilcharter.nl/zeilen-met-wad--en-sontvaarder-Store-Baelt-vanuit-Harlingen.php?title=zeilen+met+wad--en-sontvaarder+Store-Baelt+vanuit+Harlingen%60",
+            "https://www.facebook.com/storebaeltsailing/",
+            "https://sites.google.com/site/bruinevlootnederland/zeilschepen-huren"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "medium",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2201129": {
+        "name": "EKE MARIA",
+        "eni_number": "2201129",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": null,
+        "passenger_capacity": 20,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://www.zeilcharter.nl/schip_huren.php?vertrekhaven=nee&huurtijd=midweek&passagiers=24&zoeken=yes"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "low",
+            "passenger_capacity": "medium",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2201662": {
+        "name": "LARUS",
+        "eni_number": "2201662",
+        "image": null,
+        "type_of_ship": "Oostzeetjalk",
+        "home_port": "Harlingen",
+        "passenger_capacity": 22,
+        "year_of_build": 1894,
+        "mmsi": null,
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/7652/",
+            "https://www.historischezeilvaart.co.uk/larus/",
+            "https://zeilcharter.nl/index.php?zoeken=yes&vertrekhaven=%25&scheepstype=%25&huurtijd=midweek&sorteren=aantalplaatsen&passagiers=5"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2202037": {
+        "name": "AAGTJE",
+        "eni_number": "2202037",
+        "image": "https://www.naupar.com/wp-content/uploads/Aagtje-1.jpg",
+        "type_of_ship": "tweemasttjalk",
+        "home_port": "Harlingen",
+        "passenger_capacity": 18,
+        "year_of_build": 1902,
+        "mmsi": "244660941",
+        "sources": [
+            "https://www.naupar.com/ships/aagtje/",
+            "https://www.debinnenvaart.nl/schip_detail/7549/",
+            "https://bootbootboot.nl/schepen/aagtje/",
+            "https://zeilcharter.nl/1150/zeilen_met_tweemasttjalk_Aagtje_vanuit_Harlingen.html",
+            "https://www.marinetraffic.com/en/ais/details/ships/shipid:238201/imo:0/mmsi:244660941/vessel:AAGTJE"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "medium"
+        }
+    },
+    "2202805": {
+        "name": "LOTUS",
+        "eni_number": "2202805",
+        "image": null,
+        "type_of_ship": "Oostzeetjalk",
+        "home_port": "Harlingen",
+        "passenger_capacity": null,
+        "year_of_build": 1889,
+        "mmsi": null,
+        "sources": [
+            "https://sbcme.nl/project-buiswater-sailing/",
+            "https://zeilcharter.nl/zeilen-met-eenmasttjalk-Lotus-vanuit-Harlingen.php?title=zeilen+met+eenmasttjalk+Lotus+vanuit+Harlingen",
+            "https://en.zeilendeschepen.nl/schip/lotus-harlingen/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2202834": {
+        "name": "NOORDSTER",
+        "eni_number": "2202834",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": "Harlingen",
+        "passenger_capacity": null,
+        "year_of_build": 1913,
+        "mmsi": null,
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/noordster/",
+            "https://zeilcharter.nl/index.php?huurtijd=midweek&passagiers=5&zoeken=yes"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2203203": {
+        "name": "DE HESTER",
+        "eni_number": "2203203",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Kampen",
+        "passenger_capacity": 60,
+        "year_of_build": 1898,
+        "mmsi": "244710787",
+        "sources": [
+            "https://www.sailinghester.com/over-ons/",
+            "https://www.sailinghester.com/de-hester/",
+            "https://www.vesselfinder.com/vessels/details/244710787",
+            "https://bootbootboot.nl/schepen/hester/",
+            "https://www.naupar.nl/schip/hester/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2203219": {
+        "name": "SPES MEA",
+        "eni_number": "2203219",
+        "image": null,
+        "type_of_ship": "zeetjalk",
+        "home_port": "Harlingen",
+        "passenger_capacity": 20,
+        "year_of_build": 1902,
+        "mmsi": "244660760",
+        "sources": [
+            "https://www.bootnodig.nl/nl/boot_huren/harlingen/tjalk/spes-mea",
+            "https://www.vesselfinder.com/vessels/details/244660760",
+            "https://en.zeilendeschepen.nl/schip/spes-mea-harlingen/",
+            "https://bootbootboot.nl/schepen/d/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2205367": {
+        "name": "CONFIANCE",
+        "eni_number": "2205367",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": "Harlingen",
+        "passenger_capacity": 35,
+        "year_of_build": 1901,
+        "mmsi": "244730312",
+        "sources": [
+            "https://www.traditional-sailing-charter.eu/home/our-ships/confiance/",
+            "https://en.zeilendeschepen.nl/schip/confiance-harlingen/",
+            "https://www.bootnodig.nl/nl/boot_huren/harlingen/tjalk/confiance",
+            "https://www.vesselfinder.com/nl/vessels/details/244730312",
+            "https://www.scheepspost.info/127-jaar-oude-zeilschip-confiance-van-delfzijl-naar-termunterzijl/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "medium"
+        }
+    },
+    "2205520": {
+        "name": "BRANDARIS",
+        "eni_number": "2205520",
+        "image": null,
+        "type_of_ship": "driemast topzeilschoener",
+        "home_port": "Kampen",
+        "passenger_capacity": 40,
+        "year_of_build": 1905,
+        "mmsi": "244690405",
+        "sources": [
+            "https://brandariszeilschip.nl/",
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/brandaris/",
+            "https://www.marinetraffic.com/nl/ais/details/ships/shipid:2805399/mmsi:244690405/imo:0/vessel:BRANDARIS",
+            "https://zeepost.info/10891/",
+            "https://www.destadskoerier.nl/nieuws/algemeen/237890/het-is-erop-of-eronder-voor-driemaster-brandaris"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "medium"
+        }
+    },
+    "2205587": {
+        "name": "WILLEM BARENTZ",
+        "eni_number": "2205587",
+        "image": null,
+        "type_of_ship": "topzeilschoener",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": null,
+        "year_of_build": 1931,
+        "mmsi": null,
+        "sources": [
+            "https://www.naupar.com/ships/willem-barentsz/",
+            "https://www.delfsail.nl/nl/schepen/tall-ships/willem-barentsz",
+            "https://www.sail.nl/schepen/willem-barentsz",
+            "https://www.debinnenvaart.nl/schip_detail/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2206045": {
+        "name": "LIBERTÉ",
+        "eni_number": "2206045",
+        "image": null,
+        "type_of_ship": null,
+        "home_port": "Weesp",
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://www.hotels.com/ho674787200/zeilschip-liberte-weesp-netherlands/",
+            "https://us.trip.com/hotels/weesp-hotel-detail-21873774/zeilschip-libert/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2206391": {
+        "name": "SCHUTTEVAER",
+        "eni_number": "2206391",
+        "image": null,
+        "type_of_ship": "koftjalk",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 80,
+        "year_of_build": 1910,
+        "mmsi": null,
+        "sources": [
+            "https://schuttevaer.info/",
+            "https://schuttevaer.info/historie-schip/",
+            "https://www.sail.nl/schepen/schuttevaer",
+            "https://en.zeilendeschepen.nl/schip/schuttevaer-enkhuizen/",
+            "https://www.zeilcharter.nl/zeilen-met-koftjalk-Schuttevaer-vanuit-Enkhuizen.php?title=zeilen+met+koftjalk+Schuttevaer+vanuit+Enkhuizen",
+            "http://www.schepenlijst.nl/test/index.php?page=item&id=136"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2206581": {
+        "name": "STEDEMAEGHT",
+        "eni_number": "2206581",
+        "image": null,
+        "type_of_ship": "bark",
+        "home_port": "Lelystad",
+        "passenger_capacity": 175,
+        "year_of_build": 1926,
+        "mmsi": "244210283",
+        "sources": [
+            "https://en.zeilendeschepen.nl/schip/stedemaeght-lelystad/?vg",
+            "https://oxalex.nl/zeilschip-stedemaeght-huren",
+            "https://www.vesselfinder.com/vessels/details/244210283",
+            "https://www.leukstetickets.nl/product/stedemaeght",
+            "https://www.naupar.com/ships/stedemaeght/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2207513": {
+        "name": "STERRENWIND",
+        "eni_number": "2207513",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Lemmer",
+        "passenger_capacity": 40,
+        "year_of_build": 1909,
+        "mmsi": null,
+        "sources": [
+            "https://sterrenwind.frisian-sailing.com/info",
+            "https://www.zeilendeschepen.nl/schip/sterrenwind-lemmer/",
+            "https://zeilcharter.nl/zeilen-met-tweemastklipper-Sterrenwind-vanuit-Lemmer.php?title=zeilen+met+tweemastklipper+Sterrenwind+vanuit+Lemmer",
+            "https://www.naupar.com/ships/sterrenwind/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2208297": {
+        "name": "ABEL TASMAN",
+        "eni_number": "2208297",
+        "image": null,
+        "type_of_ship": "tweemastschoener",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 60,
+        "year_of_build": 1913,
+        "mmsi": "244810550",
+        "sources": [
+            "https://www.abel-tasman.nl/het-zeilschip-abel-tasman",
+            "https://www.abel-tasman.nl/geschiedenis-van-tweemastschoener-abel-tasman",
+            "https://www.naupar.com/ships/abel-tasman/",
+            "https://visitkampen.nl/sailkampen/abel-tasman-0",
+            "https://www.vesselfinder.com/nl/vessels/details/244810550"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2209043": {
+        "name": "LEAFDE FAN FRYSLAN",
+        "eni_number": "2209043",
+        "image": null,
+        "type_of_ship": "viermastschoener",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 38,
+        "year_of_build": 1937,
+        "mmsi": "244690713",
+        "sources": [
+            "https://www.vesselfinder.com/nl/vessels/details/244190178",
+            "https://en.zeilendeschepen.nl/schip/leafde-fan-fryslan-enkhuizen/",
+            "https://www.boatbiketours.nl/schepen/leafde-fan-fryslan/",
+            "https://wp.zeilcharter.nl/schip/leafde-fan-fryslan/",
+            "https://www.marinetraffic.com/nl/ais/details/ships/shipid:3359815/mmsi:244690713/imo:0/vessel:LEAFDE_FAN_FRYSLAN",
+            "https://www.naupar.nl/schip/leafde-fan-fryslan/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "medium",
+            "mmsi": "high"
+        }
+    },
+    "2209357": {
+        "name": "EUREKA",
+        "eni_number": "2209357",
+        "image": null,
+        "type_of_ship": null,
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/4526/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2209359": {
+        "name": "WIJLDE WIJTSING",
+        "eni_number": "2209359",
+        "image": null,
+        "type_of_ship": null,
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2209785": {
+        "name": "ANNA VAN ORANJE",
+        "eni_number": "2209785",
+        "image": null,
+        "type_of_ship": "klipper",
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": 1906,
+        "mmsi": null,
+        "sources": [
+            "https://rederijdebehoudenvaart.nl/anna-van-oranje/",
+            "https://www.deklassiekerederij.nl/zeilboot-huren-friesland/overige-boten-huren/klipper-anna-van-oranje/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "medium",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "medium",
+            "mmsi": "low"
+        }
+    },
+    "2211132": {
+        "name": "NOORDERLICHT",
+        "eni_number": "2211132",
+        "image": null,
+        "type_of_ship": "tweemastschoener",
+        "home_port": "Harlingen",
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://www.historischezeilvaart.co.uk/noorderlicht/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2211253": {
+        "name": "BABBELAER",
+        "eni_number": "2211253",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": "Dokkumer Nieuwe Zijlen",
+        "passenger_capacity": 16,
+        "year_of_build": 1914,
+        "mmsi": null,
+        "sources": [
+            "https://www.friesevloot.nl/zeilschepen/babbelaer/",
+            "https://www.zeilendeschepen.nl/schip/babbelaer-dokkumer-nieuwe-zijlen/",
+            "https://www.zeiltjalkenfriesland.nl/zeiltjalk-babbelaer",
+            "https://www.kustvaartforum.com/viewtopic.php?t=3906&start=10"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2212267": {
+        "name": "FORTUNA",
+        "eni_number": "2212267",
+        "image": null,
+        "type_of_ship": "topzeilschoener",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 30,
+        "year_of_build": 1913,
+        "mmsi": "244730659",
+        "sources": [
+            "https://www.hollandsail.nl/schepen/18/fortuna",
+            "https://www.debinnenvaart.nl/schip_detail/8056/",
+            "https://www.fortuna-sail.nl/",
+            "http://m.www.fortuna.hollandsail.nl/over-de-fortuna",
+            "https://www.vesselfinder.com/vessels/details/244730659"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2212934": {
+        "name": "KAAT MOSSEL",
+        "eni_number": "2212934",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Lelystad (Bataviahaven)",
+        "passenger_capacity": 29,
+        "year_of_build": 1905,
+        "mmsi": "244050021",
+        "sources": [
+            "https://kaat-mossel.com/kaat-mossel/het-schip/",
+            "https://rederijvanlinschoten.com/ships/kaat-mossel/",
+            "https://www.naupar.nl/schip/kaat-mossel/",
+            "https://www.visitflevoland.nl/nl/locaties/1071165058/kaat-mossel",
+            "https://www.vesselfinder.com/vessels/details/244050021"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2301037": {
+        "name": "UMOJA",
+        "eni_number": "2301037",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Monnickendam",
+        "passenger_capacity": 150,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://zeilvlootmonnickendam.nl/en/our-ships/umoja-uk/",
+            "https://www.loungeklipper.nl/bedrijfsuitje-zeilen/umoja/",
+            "https://www.zeilcharters.nl/?page_id=23"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2301226": {
+        "name": "STELLA FRISIA",
+        "eni_number": "2301226",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Akkrum",
+        "passenger_capacity": 30,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://www.frieslandcharter.nl/nederlands/schepen.html",
+            "https://www.waterlandvanfriesland.nl/en/locations/3438246253/friesland-charter-klipper-stella-frisia",
+            "https://www.friesland.nl/nl/locaties/2356136985/stella-frisia",
+            "https://www.frieslandcharter.de/stellafrisiade.html"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2301449": {
+        "name": "D' EERSTELING",
+        "eni_number": "2301449",
+        "image": null,
+        "type_of_ship": "tweemast hektjalk",
+        "home_port": null,
+        "passenger_capacity": 20,
+        "year_of_build": 1908,
+        "mmsi": "244182197",
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/eersteling/",
+            "https://zeilcharter.nl/index.php?zoeken=yes&vertrekhaven=%25&scheepstype=%25&huurtijd=midweek&sorteren=aantalplaatsen&passagiers=5",
+            "https://www.vesselfinder.com/vessels/details/244182197"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "low",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "medium"
+        }
+    },
+    "2301705": {
+        "name": "IDEAAL",
+        "eni_number": "2301705",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": "Harlingen",
+        "passenger_capacity": null,
+        "year_of_build": 1926,
+        "mmsi": null,
+        "sources": [
+            "https://www.historischezeilvaart.co.uk/ideaal/",
+            "https://www.t-s-c.nl/home-1/onze-schepen/ideaal/",
+            "https://zeilcharter.nl/index.php?zoeken=yes&vertrekhaven=%25&scheepstype=%25&huurtijd=midweek&sorteren=aantalplaatsen&passagiers=5",
+            "https://www.binnenvaart.eu/zeilschip/73501-ideaal.html"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "medium",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2301727": {
+        "name": "AEGIR",
+        "eni_number": "2301727",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 35,
+        "year_of_build": 1904,
+        "mmsi": null,
+        "sources": [
+            "https://www.hollandsail.nl/schepen/10181/aegir",
+            "https://zeilcharter.nl/zeilen-met-tweemastklipper-Aegir-vanuit-Harlingen.php",
+            "https://en.zeilendeschepen.nl/schip/aegir-harlingen/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2301776": {
+        "name": "GOUWZEE",
+        "eni_number": "2301776",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Monnickendam",
+        "passenger_capacity": 55,
+        "year_of_build": 1907,
+        "mmsi": "244670681",
+        "sources": [
+            "https://www.gouwzee.eu/en/",
+            "https://zeilvlootmonnickendam.nl/en/our-ships/gouwzee-uk/",
+            "https://www.zeilcharter.nl/1313/zeilen_met_klipper_Gouwzee_vanuit_Monnickendam.html",
+            "https://www.laagholland.com/nl/locaties/2212294583/gouwzee",
+            "https://www.marinetraffic.com/nl/ais/details/ships/shipid:239684/mmsi:244670681/imo:0/vessel:GOUWZEE"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2302173": {
+        "name": "ADMIRAAL VAN KINSBERGEN",
+        "eni_number": "2302173",
+        "image": null,
+        "type_of_ship": "driemastbarkentijn",
+        "home_port": "Lelystad",
+        "passenger_capacity": 30,
+        "year_of_build": 1891,
+        "mmsi": "244188325",
+        "sources": [
+            "https://www.brugnieuws.nl/nieuws/algemeen/302195/nieuwe-exploitant-renoveert-historisch-zeilschip-admiraal-van-kinsbergen",
+            "https://www.debinnenvaart.nl/schip_detail/12673/",
+            "https://binnenvaartlog.nl/77617-2/",
+            "https://www.naupar.nl/schip/admiraal-van-kinsbergen/",
+            "https://www.vesselfinder.com/nl/vessels/details/244188325"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "medium"
+        }
+    },
+    "2302217": {
+        "name": "KOREVAER",
+        "eni_number": "2302217",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Monnickendam",
+        "passenger_capacity": 45,
+        "year_of_build": 1911,
+        "mmsi": "244700154",
+        "sources": [
+            "https://zeilvlootmonnickendam.nl/en/our-ships/korevaer-uk/",
+            "https://bootbootboot.nl/schepen/korevaer/",
+            "https://www.vesselfinder.com/vessels/details/244700154",
+            "https://korevaer.nl/vaarroutes/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2302541": {
+        "name": "GULDEN BELOFTE",
+        "eni_number": "2302541",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Monnickendam",
+        "passenger_capacity": 37,
+        "year_of_build": 1911,
+        "mmsi": "244660939",
+        "sources": [
+            "https://www.guldenbelofte.nl/het-schip/",
+            "https://zeilvlootmonnickendam.nl/en/our-ships/gulden-belofte-uk/",
+            "https://en.zeilendeschepen.nl/schip/gulden-belofte-monnickendam/",
+            "https://zeilcharter.nl/zeilen-met-tweemastklipper-Gulden-Belofte-vanuit-Monnickendam.php",
+            "https://www.vesselfinder.com/vessels/details/244660939"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2302889": {
+        "name": "BOEKANIER",
+        "eni_number": "2302889",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Makkum",
+        "passenger_capacity": 26,
+        "year_of_build": 1901,
+        "mmsi": "244670965",
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/boekanier/",
+            "https://www.vesselfinder.com/vessels/details/244670965",
+            "https://www.debinnenvaart.nl/schip_detail/6854/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2303243": {
+        "name": "RODE SWAN",
+        "eni_number": "2303243",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 32,
+        "year_of_build": null,
+        "mmsi": "244182720",
+        "sources": [
+            "https://www.t-s-c.nl/home-1/onze-schepen/rode-swan/",
+            "https://www.vesselfinder.com/vessels/details/244182720",
+            "https://zeilcharter.nl/index.php?zoeken=yes&vertrekhaven=%25&scheepstype=%25&huurtijd=midweek&sorteren=aantalplaatsen&passagiers=5"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "low",
+            "mmsi": "high"
+        }
+    },
+    "2303506": {
+        "name": "UTOPIA",
+        "eni_number": "2303506",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Kampen",
+        "passenger_capacity": 60,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/utopia/",
+            "https://www.naupar.com/ships/utopia/",
+            "https://www.bookahouseboat.com/rentals/kampen-netherlands-938"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2303525": {
+        "name": "PELIKAAN",
+        "eni_number": "2303525",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 50,
+        "year_of_build": 1914,
+        "mmsi": null,
+        "sources": [
+            "https://www.kustvaartforum.com/viewtopic.php?t=2758&start=30",
+            "https://www.friesevloot.nl/en/sailing-ships/pelikaan/",
+            "https://zeilklipperdepelikaan.nl/",
+            "https://www.kustvaartforum.com/viewtopic.php?t=2758&start=168"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2303678": {
+        "name": "AMBIANCE",
+        "eni_number": "2303678",
+        "image": null,
+        "type_of_ship": "klipper",
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": 1908,
+        "mmsi": "244820229",
+        "sources": [
+            "https://binnenvaartlog.nl/ambiance/",
+            "https://www.vesselfinder.com/vessels/details/244820229"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2304407": {
+        "name": "TSJERK HIDDES",
+        "eni_number": "2304407",
+        "image": null,
+        "type_of_ship": "driemast stevenaak",
+        "home_port": "Harlingen",
+        "passenger_capacity": 30,
+        "year_of_build": 1881,
+        "mmsi": "244700724",
+        "sources": [
+            "https://www.tsjerkhiddes.nl/",
+            "https://www.friesevloot.nl/zeilschepen/tsjerk-hiddes/",
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/tsjerk-hiddes/",
+            "https://www.vesselfinder.com/vessels/details/244700724"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2304739": {
+        "name": "GROTE BEER",
+        "eni_number": "2304739",
+        "image": null,
+        "type_of_ship": "driemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 60,
+        "year_of_build": 1911,
+        "mmsi": "244780777",
+        "sources": [
+            "https://www.klippergrotebeer.nl/informatie/over-het-schip",
+            "https://www.hollandsail.nl/schepen/19/grote-beer",
+            "https://en.zeilendeschepen.nl/schip/grote-beer-harlingen/",
+            "https://www.vesselfinder.com/vessels/details/244780777"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2304809": {
+        "name": "ACTIEF",
+        "eni_number": "2304809",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 36,
+        "year_of_build": 1899,
+        "mmsi": "244700005",
+        "sources": [
+            "https://www.historischezeilvaart.co.uk/actief/",
+            "https://en.zeilendeschepen.nl/schip/actief-harlingen/",
+            "https://www.bootnodig.nl/nl/boot_huren/harlingen/klipper/actief",
+            "https://zeilcharter.nl/index.php?huurtijd=midweek&passagiers=5&zoeken=yes",
+            "https://www.vesselfinder.com/vessels/details/244700005"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2305068": {
+        "name": "VRIENDSCHAP",
+        "eni_number": "2305068",
+        "image": null,
+        "type_of_ship": "klipper",
+        "home_port": "Monnickendam",
+        "passenger_capacity": 75,
+        "year_of_build": 1898,
+        "mmsi": null,
+        "sources": [
+            "https://zeilvlootmonnickendam.nl/en/our-ships/vriendschap-uk/",
+            "https://zeilklippers.nl/nl/schepen/vriendschap/",
+            "https://1dagzeilen.nl/klasse-tjalken/klipper-vriendschap/",
+            "https://www.vfczeilcharters.nl/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "medium",
+            "mmsi": "low"
+        }
+    },
+    "2305622": {
+        "name": "VERTROUWEN",
+        "eni_number": "2305622",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": "Harlingen",
+        "passenger_capacity": 20,
+        "year_of_build": 1910,
+        "mmsi": null,
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/9316/",
+            "https://www.hollandsail.nl/schepen/36/vertrouwen-harlingen",
+            "https://nl.wikipedia.org/wiki/Vertrouwen_(schip,_1904,_Echtenerbrug)"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2305652": {
+        "name": "ISELMAR",
+        "eni_number": "2305652",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Heeg",
+        "passenger_capacity": 60,
+        "year_of_build": 1902,
+        "mmsi": null,
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/2456/",
+            "https://www.hollandsail.nl/schepen/4092/iselmar",
+            "https://zeilcharter.nl/index.php?zoeken=yes&vertrekhaven=%25&scheepstype=%25&huurtijd=midweek&sorteren=aantalplaatsen&passagiers=5",
+            "https://www.kustvaartforum.com/viewtopic.php?t=6943"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2305839": {
+        "name": "PHOENIX",
+        "eni_number": "2305839",
+        "image": null,
+        "type_of_ship": null,
+        "home_port": "Hoorn",
+        "passenger_capacity": 33,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://en.zeilendeschepen.nl/schip/phoenix-weesp/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "medium",
+            "passenger_capacity": "medium",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2305891": {
+        "name": "WATERWOLF",
+        "eni_number": "2305891",
+        "image": "https://www.hollandsail.nl/schepen/37/waterwolf",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 26,
+        "year_of_build": 1899,
+        "mmsi": "244180952",
+        "sources": [
+            "https://www.hollandsail.nl/schepen/37/waterwolf",
+            "https://www.debinnenvaart.nl/schip_detail/11957/",
+            "https://www.vesselfinder.com/vessels/details/244180952",
+            "https://zeilcharter.nl/zeilen-met-tweemastklipper-Waterwolf-vanuit-Harlingen.php",
+            "https://www.bluescruise.nl/schepen/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2306527": {
+        "name": "LAUWERSZEE",
+        "eni_number": "2306527",
+        "image": null,
+        "type_of_ship": "eenmastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 36,
+        "year_of_build": 1915,
+        "mmsi": "244670578",
+        "sources": [
+            "https://www.naupar.nl/schip/lauwerszee/",
+            "https://www.hollandsail.nl/schepen/10528/lauwerszee",
+            "https://en.zeilendeschepen.nl/schip/lauwerszee-harlingen/",
+            "https://www.marinetraffic.com/nl/ais/details/ships/shipid:239584/mmsi:244670578/imo:0/vessel:LAUWERSZEE",
+            "https://www.hiswa.nl/bedrijven/hiswa-erkende-bedrijven/4035/zeilschip-lauwerszee",
+            "https://zeilcharter.nl/index.php?huurtijd=midweek&passagiers=5&scheepstype=%25&sorteren=aantalplaatsen&vertrekhaven=%25&zoeken=yes"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "medium"
+        }
+    },
+    "2307652": {
+        "name": "SYBARIS",
+        "eni_number": "2307652",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 45,
+        "year_of_build": 1894,
+        "mmsi": "244700349",
+        "sources": [
+            "https://bootbootboot.nl/schepen/sybaris/",
+            "https://www.bookahouseboat.com/rentals/enkhuizen-netherlands-936",
+            "https://www.vesselfinder.com/vessels/details/244700349",
+            "https://en.zeilendeschepen.nl/schip/sybaris-enkhuizen/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2308480": {
+        "name": "'T MANNA",
+        "eni_number": "2308480",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": 1897,
+        "mmsi": null,
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/manna/",
+            "https://www.kustvaartforum.com/viewtopic.php?t=6943"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2308648": {
+        "name": "ELBRICH",
+        "eni_number": "2308648",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 16,
+        "year_of_build": 1885,
+        "mmsi": "244100663",
+        "sources": [
+            "https://klipperelbrich.nl/",
+            "https://www.friesnieuws.nl/schipper-eelke-dijkstra-van-historisch-zeilschip-elbrich-heeft-het-weer-ouderwets-druk/",
+            "https://www.hollandsail.nl/schepen/17/elbrich",
+            "https://www.vesselfinder.com/vessels/details/244100663"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2308772": {
+        "name": "BOREAS",
+        "eni_number": "2308772",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": "Harlingen",
+        "passenger_capacity": 16,
+        "year_of_build": 1897,
+        "mmsi": "244650667",
+        "sources": [
+            "https://www.vesselfinder.com/vessels/details/244650667",
+            "https://www.hollandsail.nl/schepen/12/boreas",
+            "https://www.vakantievaren.nl/boot-huren/holland-sail/1712/boreas",
+            "https://harlingenboeit.nl/index/bedrijven/zeilcharter-boreas"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2309185": {
+        "name": "DE ZEVENWOUDEN",
+        "eni_number": "2309185",
+        "image": null,
+        "type_of_ship": "zeilklipper",
+        "home_port": "Stavoren",
+        "passenger_capacity": 24,
+        "year_of_build": 1898,
+        "mmsi": "244730658",
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/6351/",
+            "https://www.rederijvanlinschoten.de/vaargebieden/ijsselmeer-en-waddenzee/die-schiffe-nl-nl/zevenwouden/",
+            "https://www.marinetraffic.com/nl/ais/details/ships/shipid:246488/mmsi:244730658/imo:0/vessel:ZEVENWOUDEN"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2309209": {
+        "name": "MERMAID",
+        "eni_number": "2309209",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 45,
+        "year_of_build": 1907,
+        "mmsi": null,
+        "sources": [
+            "https://zeilcharter.nl/zeilen-met-tweemastklipper-Mermaid-vanuit-Harlingen.php?title=zeilen+met+tweemastklipper+Mermaid+vanuit+Harlingen",
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/mermaid/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2309784": {
+        "name": "SOEVEREIN",
+        "eni_number": "2309784",
+        "image": null,
+        "type_of_ship": "spiegelretourschip",
+        "home_port": null,
+        "passenger_capacity": 150,
+        "year_of_build": 1956,
+        "mmsi": null,
+        "sources": [
+            "https://schip-soeverein.nl/",
+            "https://www.brugnieuws.nl/nieuws/algemeen/260949/unieke-replica-van-17e-eeuws-schip-vaart-weer",
+            "https://www.naupar.com/ships/soeverein/",
+            "https://groot-waterland.nl/2024/09/02/spiegelretourschip-soeverein-in-monnickendam/",
+            "https://zeepost.info/de-soeverein-wordt-volledig-opgeknapt-en-gerestyled/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "low",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2320420": {
+        "name": "ZEEWOLF",
+        "eni_number": "2320420",
+        "image": null,
+        "type_of_ship": "klipper",
+        "home_port": "Willemstad",
+        "passenger_capacity": 100,
+        "year_of_build": 1902,
+        "mmsi": "244690813",
+        "sources": [
+            "https://www.vesselfinder.com/vessels/details/244690813",
+            "http://www.schepenlijst.nl/test/index.php?page=item&id=864",
+            "https://www.klipperzeewolf.nl/",
+            "https://zeepost.info/inspecteurs-schrikken-van-grote-gebreken-op-de-bruine-vloot-of-controleren-ze-te-rigide/",
+            "https://www.klipperzeewolf.nl/geschiedenis"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "medium",
+            "mmsi": "high"
+        }
+    },
+    "2321624": {
+        "name": "HOLLANDSCH DIEP",
+        "eni_number": "2321624",
+        "image": null,
+        "type_of_ship": "klipperaak",
+        "home_port": "Hellevoetsluis",
+        "passenger_capacity": 45,
+        "year_of_build": 1994,
+        "mmsi": "244740618",
+        "sources": [
+            "https://www.zeilschiphollandschdiep.nl/contact/vaargebied/",
+            "https://www.zeilschiphollandschdiep.nl/",
+            "https://www.groothellevoet.nl/nieuws/actueel/69401/hollandsch-diep-verwent-eenzame-bejaarden-",
+            "https://www.vesselfinder.com/vessels/details/244740618",
+            "https://www.groothellevoet.nl/nieuws/actueel/52540/-ondernemer-van-de-week-zeilschip-hollandsch-diep-"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2323249": {
+        "name": "FRANS HORJUS",
+        "eni_number": "2323249",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 35,
+        "year_of_build": 1904,
+        "mmsi": "244770433",
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/7618/",
+            "https://www.t-s-c.nl/home-1/onze-schepen/frans-horjus/",
+            "https://en.zeilendeschepen.nl/schip/frans-horjus-harlingen/",
+            "https://www.historischezeilvaart.co.uk/frans-horjus/",
+            "https://www.vesselfinder.com/vessels/details/244770433"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2324076": {
+        "name": "HELENA",
+        "eni_number": "2324076",
+        "image": "https://www.hetrotterdamsezeilschip.nl/wp-content/uploads/helena-zeilschip-rotterdam.jpg",
+        "type_of_ship": "stevenaak",
+        "home_port": "Rotterdam (Leuvehaven)",
+        "passenger_capacity": 48,
+        "year_of_build": 1875,
+        "mmsi": null,
+        "sources": [
+            "https://www.hetrotterdamsezeilschip.nl/schepen/helena",
+            "https://nl.wikipedia.org/wiki/Helena_(schip,_1876)",
+            "https://www.oosterschelde.nl/helena/",
+            "https://www.oosterschelde.nl/helena_150_jaar/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2324314": {
+        "name": "ZEELAND",
+        "eni_number": "2324314",
+        "image": null,
+        "type_of_ship": null,
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": "244131023",
+        "sources": [
+            "https://www.vesselfinder.com/vessels/details/244131023"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "high"
+        }
+    },
+    "2325121": {
+        "name": "DE TITAAN",
+        "eni_number": "2325121",
+        "image": null,
+        "type_of_ship": "klipper",
+        "home_port": "Amsterdam",
+        "passenger_capacity": null,
+        "year_of_build": 2001,
+        "mmsi": "244780751",
+        "sources": [
+            "https://detitaan.amsterdam/",
+            "https://www.vesselfinder.com/nl/vessels/details/244780751"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "medium",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2325123": {
+        "name": "DE TOEKOMST",
+        "eni_number": "2325123",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": 2002,
+        "mmsi": null,
+        "sources": [
+            "https://www.sail.nl/schepen/toekomst",
+            "https://uitmetvrienden.nl/uitje/zeilschip-de-toekomst/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "medium",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2325185": {
+        "name": "JANNES VAN CAMPEN",
+        "eni_number": "2325185",
+        "image": null,
+        "type_of_ship": "schoenerbrik",
+        "home_port": "Kampen",
+        "passenger_capacity": null,
+        "year_of_build": 1936,
+        "mmsi": null,
+        "sources": [
+            "https://rondvaartkampen.nl/jannes-van-campen/",
+            "https://stad.kampen.nl/nl/evenementen/20265-1-uur-vaartocht-met-schip-van-bruine-vloot.html",
+            "https://en.zeilendeschepen.nl/schip/jannes-van-campen-kampen/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2325210": {
+        "name": "HOOP OP ZEGEN",
+        "eni_number": "2325210",
+        "image": null,
+        "type_of_ship": "klipper",
+        "home_port": "Numansdorp",
+        "passenger_capacity": 45,
+        "year_of_build": 2002,
+        "mmsi": "244030587",
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/14538/",
+            "https://www.dagjezeilen.nl/",
+            "https://watervakantie.nl/huurboot/hoop-op-zegen-2/",
+            "https://waterwonen.nl/klipper-hoop-op-zegen/",
+            "https://www.vesselfinder.com/vessels/details/244030587"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2325375": {
+        "name": "GROTE JAGER",
+        "eni_number": "2325375",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 35,
+        "year_of_build": 1893,
+        "mmsi": "244780261",
+        "sources": [
+            "https://www.hollandsail.nl/schepen/17037/grote-jager",
+            "https://www.debinnenvaart.nl/schip_detail/8056/",
+            "https://www.vesselfinder.com/vessels/details/244780261"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2325542": {
+        "name": "DE EENHOORN",
+        "eni_number": "2325542",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 40,
+        "year_of_build": 1903,
+        "mmsi": null,
+        "sources": [
+            "https://eenhoorn-sailing.com/schip/",
+            "https://www.sail.nl/schepen/eenhoorn",
+            "https://www.kustvaartforum.com/viewtopic.php?t=2758&start=168",
+            "https://www.naupar.com/ships/eenhoorn/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2325588": {
+        "name": "'T WAPEN FAN FRYSLÂN",
+        "eni_number": "2325588",
+        "image": null,
+        "type_of_ship": "tweemastschoener",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 70,
+        "year_of_build": 1965,
+        "mmsi": null,
+        "sources": [
+            "https://wapen-fan-fryslan.frisian-sailing.com/info",
+            "https://www.boatbiketours.nl/schepen/wapen-fan-fryslan/",
+            "https://riviercruisereiziger.nl/2021/08/20/scheepsportret-t-wapen-fan-fryslan-van-boat-bike-tours/",
+            "https://tweemastschoener.nl/en/the-ship/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2330822": {
+        "name": "TWEE GEBROEDERS",
+        "eni_number": "2330822",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Muiden",
+        "passenger_capacity": 50,
+        "year_of_build": 1900,
+        "mmsi": null,
+        "sources": [
+            "https://nl.wikipedia.org/wiki/Twee_Gebroeders_(schip,_1900)",
+            "https://tweegebroeders.nl/twee-gebroeders-een-varend-verhaal-sinds-1900/",
+            "https://zeilvlootmuiden.nl/schepen/twee-gebroeders/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2332509": {
+        "name": "WEISSE DÜNE",
+        "eni_number": "2332509",
+        "image": null,
+        "type_of_ship": null,
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2336467": {
+        "name": "KLAAS KOMPAAN",
+        "eni_number": "2336467",
+        "image": null,
+        "type_of_ship": "tweemastschoener",
+        "home_port": "Amsterdam",
+        "passenger_capacity": 250,
+        "year_of_build": null,
+        "mmsi": "244890270",
+        "sources": [
+            "http://klaaskompaan.nl/specificaties.php",
+            "https://www.nauticlink.com/vermelding/klaas-kompaan/",
+            "https://www.facebook.com/PartySchipKlaasKompaan/",
+            "https://www.vesselfinder.com/vessels/details/244890270"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "medium",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "low",
+            "mmsi": "high"
+        }
+    },
+    "2508890": {
+        "name": "FRANCISCUS XAVERIUS (VD10)",
+        "eni_number": "2508890",
+        "image": "https://www.shipspotting.com/photos/3649220",
+        "type_of_ship": "kotter",
+        "home_port": "Volendam",
+        "passenger_capacity": null,
+        "year_of_build": 1936,
+        "mmsi": "244780384",
+        "sources": [
+            "https://www.shipspotting.com/photos/3649220",
+            "https://vaartips.nl/verhalen9.htm",
+            "https://kotterspotter.jouwweb.nl/vd-volendam",
+            "https://www.visserijnieuws.nl/nieuws/algemeen/19919/logger-blijft-voor-volendam-behouden"
+        ],
+        "field_confidence": {
+            "image": "medium",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2508933": {
+        "name": "STRIJD",
+        "eni_number": "2508933",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": null,
+        "year_of_build": 1889,
+        "mmsi": null,
+        "sources": [
+            "https://klipperstrijd.nl/informatie/over-het-schip",
+            "https://www.debinnenvaart.nl/schip_detail/8801/",
+            "https://www.hollandsail.nl/schepen/34/strijd"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2508992": {
+        "name": "STÂNFRIES",
+        "eni_number": "2508992",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": "Stavoren",
+        "passenger_capacity": 14,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://www.naupar.nl/schip/stanfries/",
+            "https://zeilcharter.nl/index.php?zoeken=yes&vertrekhaven=%25&scheepstype=%25&huurtijd=midweek&sorteren=aantalplaatsen&passagiers=5"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2605609": {
+        "name": "WINDBRUID",
+        "eni_number": "2605609",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 30,
+        "year_of_build": 1908,
+        "mmsi": "244615099",
+        "sources": [
+            "https://www.vesselfinder.com/vessels/details/244615099",
+            "http://www.schepenlijst.nl/test/index.php?page=item&id=755",
+            "https://visitenkhuizen.nl/en/seeing-and-doing/ports/sailing/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2605611": {
+        "name": "VRIENDSCHAP",
+        "eni_number": "2605611",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 20,
+        "year_of_build": 1905,
+        "mmsi": null,
+        "sources": [
+            "https://www.naupar.com/ships/vriendschap/",
+            "https://www.nhnieuws.nl/nieuws/353252/een-kijkje-op-de-antieke-klipper-de-vriendschap-die-de-klipperrace-dit-jaar-overslaat",
+            "https://www.streekomroepwestfriesland.nl/een-kijkje-op-de-antieke-klipper-de-vriendschap-die-de-klipperrace-dit-jaar-overslaat/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2605619": {
+        "name": "ORION",
+        "eni_number": "2605619",
+        "image": null,
+        "type_of_ship": "zeetjalk",
+        "home_port": "Monnickendam",
+        "passenger_capacity": 40,
+        "year_of_build": 1892,
+        "mmsi": null,
+        "sources": [
+            "https://www.egasail.com/sailing-ship/",
+            "https://www.egasail.com/brown-fleet-sailing/",
+            "http://www.bruinevlootzeilen.nl/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2605633": {
+        "name": "DE VLIETER",
+        "eni_number": "2605633",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": 1905,
+        "mmsi": null,
+        "sources": [
+            "https://www.bleuetvert.com/wadden/wadden-accomodatie",
+            "https://zeilcharter.nl/index.php?huurtijd=midweek&passagiers=5&zoeken=yes"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2605781": {
+        "name": "DE AMAZONE",
+        "eni_number": "2605781",
+        "image": null,
+        "type_of_ship": "driemastschoener",
+        "home_port": "Rotterdam",
+        "passenger_capacity": null,
+        "year_of_build": 1929,
+        "mmsi": null,
+        "sources": [
+            "https://www.de-amazone.nl/",
+            "https://www.bookasailingship.com/sailing-ship-rentals/rotterdam-netherlands-984",
+            "https://puurfeesten.nl/feestlocaties/driemaster-amazone/",
+            "https://nl.linkedin.com/company/de-amazone"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "medium",
+            "mmsi": "low"
+        }
+    },
+    "2717266": {
+        "name": "WILLEM JACOB",
+        "eni_number": "2717266",
+        "image": null,
+        "type_of_ship": "eenmastklipper",
+        "home_port": "Groningen",
+        "passenger_capacity": 39,
+        "year_of_build": 1889,
+        "mmsi": "244660712",
+        "sources": [
+            "https://eilandhopper.nl/nl/info/schepen/willem-jacob",
+            "https://www.vesselfinder.com/nl/vessels/details/244660712",
+            "https://zeepost.info/historische-zeilschepen-in-groningen-in-de-problemen-bruine-vloot-ligt-op-apegapen/",
+            "http://zeilklippers.nl/nl/schepen/willem-jacob/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2717610": {
+        "name": "HOLLANDIA",
+        "eni_number": "2717610",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": "Stavoren",
+        "passenger_capacity": 16,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://www.friesevloot.nl/en/sailing-ships/hollandia/",
+            "https://www.naupar.nl/schip/hollandia/",
+            "https://en.zeilendeschepen.nl/schip/hollandia-tjalk-stavoren/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "2717746": {
+        "name": "JOHANNA ENGELINA",
+        "eni_number": "2717746",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 33,
+        "year_of_build": 1897,
+        "mmsi": "244670013",
+        "sources": [
+            "https://www.marhisdata.nl/public/publicaties/publicatie_2024-10-12_409b101bebe35a30e66e885469298b67.pdf",
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/johanna-engelina/",
+            "https://bootbootboot.nl/schepen/johanna-engelina/",
+            "https://www.rederij-vooruit.nl/havens/willemshaven/",
+            "https://www.vesselfinder.com/vessels/details/244670013"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2717838": {
+        "name": "DAGERAAD",
+        "eni_number": "2717838",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 37,
+        "year_of_build": 1910,
+        "mmsi": null,
+        "sources": [
+            "https://dageraad.com/?lang=nl",
+            "https://www.naupar.nl/schip/dageraad/",
+            "https://www.bootnodig.nl/nl/thuishaven/harlingen"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "2717930": {
+        "name": "AMBULANT",
+        "eni_number": "2717930",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 26,
+        "year_of_build": 1904,
+        "mmsi": "244710673",
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/zeilschip-ambulant/",
+            "https://zeilcharter.nl/index.php?huurtijd=midweek&passagiers=5&zoeken=yes",
+            "https://www.vesselfinder.com/vessels/details/244710673"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "2718267": {
+        "name": "AVANTI",
+        "eni_number": "2718267",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": null,
+        "year_of_build": 1898,
+        "mmsi": null,
+        "sources": [
+            "https://www.naupar.com/ships/avanti/",
+            "https://bootbootboot.nl/schepen/avanti/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3010002": {
+        "name": "VLIEGENDE HOLLANDER",
+        "eni_number": "3010002",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Lemmer",
+        "passenger_capacity": 34,
+        "year_of_build": null,
+        "mmsi": "244700780",
+        "sources": [
+            "https://www.friesevloot.nl/en/sailing-ships/vliegende-hollander/",
+            "https://zeilklippers.nl/en/ships/de-vliegende-hollander/",
+            "https://vliegende-hollander.frisian-sailing.com/info",
+            "https://www.vesselfinder.com/vessels/details/244700780"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "low",
+            "mmsi": "high"
+        }
+    },
+    "3010320": {
+        "name": "ANNA TRIJNTJE",
+        "eni_number": "3010320",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 25,
+        "year_of_build": 1902,
+        "mmsi": "244670058",
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/8838/",
+            "https://www.vesselfinder.com/vessels/details/244670058",
+            "https://www.bookahouseboat.com/rentals/enkhuizen-netherlands-929",
+            "https://bootbootboot.nl/schepen/anna-trijntje/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3010467": {
+        "name": "MARGOT",
+        "eni_number": "3010467",
+        "image": null,
+        "type_of_ship": "klipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 45,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://www.klippermargot.nl/",
+            "https://en.zeilendeschepen.nl/schip/margot-harlingen/",
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/margot/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "3010689": {
+        "name": "ANTONIUS",
+        "eni_number": "3010689",
+        "image": null,
+        "type_of_ship": "klipper",
+        "home_port": "Muiden",
+        "passenger_capacity": 25,
+        "year_of_build": 1898,
+        "mmsi": null,
+        "sources": [
+            "https://rederij-muiden.nl/antonius/",
+            "https://en.zeilendeschepen.nl/schip/antonius-muiden/",
+            "https://sites.google.com/site/bruinevlootnederland/charterschip-huren-bruine-vloot",
+            "https://www.bootnodig.nl/nl/boot_huren/muiden/klipper/antonius"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3010765": {
+        "name": "SUDWESTER",
+        "eni_number": "3010765",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Kampen",
+        "passenger_capacity": 40,
+        "year_of_build": 1912,
+        "mmsi": null,
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/6904/",
+            "https://www.hollandsail.nl/schepen/16905/de-sudwester",
+            "https://www.hollandsail.nl/schepen/762/de-sudwester"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3010792": {
+        "name": "DE VRIJHEID",
+        "eni_number": "3010792",
+        "image": null,
+        "type_of_ship": "driemast topzeilschoener",
+        "home_port": "Harlingen",
+        "passenger_capacity": null,
+        "year_of_build": 1900,
+        "mmsi": null,
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/vrijheid/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "medium",
+            "mmsi": "low"
+        }
+    },
+    "3020244": {
+        "name": "WELVAART",
+        "eni_number": "3020244",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 35,
+        "year_of_build": 1906,
+        "mmsi": "244710389",
+        "sources": [
+            "https://www.hollandsail.nl/schepen/38/welvaart",
+            "https://www.marinetraffic.com/nl/ais/details/ships/shipid:244869/mmsi:244710389/imo:0/vessel:WELVAART"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3030094": {
+        "name": "MORGANA",
+        "eni_number": "3030094",
+        "image": null,
+        "type_of_ship": "driemastschoener",
+        "home_port": "Harlingen",
+        "passenger_capacity": 60,
+        "year_of_build": 1924,
+        "mmsi": "244290095",
+        "sources": [
+            "https://www.comesailwithus.nl/morgana",
+            "https://en.zeilendeschepen.nl/schip/morgana-harlingen/",
+            "https://www.hollandsail.nl/schepen/24/morgana",
+            "https://www.marinetraffic.com/nl/ais/details/ships/shipid:227093/mmsi:244290095/imo:0/vessel:MORGANA"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "medium"
+        }
+    },
+    "3030257": {
+        "name": "BRACKSAND",
+        "eni_number": "3030257",
+        "image": null,
+        "type_of_ship": "tweemast zeilklipper (Groningse klipper)",
+        "home_port": "Amsterdam",
+        "passenger_capacity": 54,
+        "year_of_build": 1899,
+        "mmsi": "244690838",
+        "sources": [
+            "https://www.botentekoop.nl/boot/1899-custom-groningse-klipper-bracksand-9096921/",
+            "https://nextndsm.nl/rondvaart-zeilklipper-bracksand/",
+            "https://www.marinetraffic.com/nl/ais/details/ships/shipid:241931/mmsi:244690838/imo:0/vessel:BRACKSAND",
+            "https://bootbootboot.nl/schepen/bracksand/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3030398": {
+        "name": "AVONTUUR",
+        "eni_number": "3030398",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 22,
+        "year_of_build": 1909,
+        "mmsi": null,
+        "sources": [
+            "https://www.avontuur.nl/historie/",
+            "https://atlasail.com/nl/zeilboten-huren-klassieke-zeilschepen/zeilen-waddenzee",
+            "https://en.zeilendeschepen.nl/schip/loungeklipper-avontuur-harlingen/",
+            "https://www.sail.nl/schepen/avontuur"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3030598": {
+        "name": "EMMALIS",
+        "eni_number": "3030598",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 35,
+        "year_of_build": 1911,
+        "mmsi": "244730536",
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/7606/",
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/emmalis/",
+            "https://zeilcharter.nl/zeilen-met-tweemastklipper-Emmalis-vanuit-Harlingen.php",
+            "https://en.zeilendeschepen.nl/schip/emmalis-harlingen/",
+            "https://www.vesselfinder.com/vessels/details/244730536"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3040011": {
+        "name": "LINQUENDA II",
+        "eni_number": "3040011",
+        "image": null,
+        "type_of_ship": "klipperaak",
+        "home_port": "Hellevoetsluis",
+        "passenger_capacity": 35,
+        "year_of_build": 1914,
+        "mmsi": null,
+        "sources": [
+            "https://www.gezelligzeilen.nl/about/",
+            "https://en.zeilendeschepen.nl/schip/linquenda-ii-hellevoetsluis/",
+            "https://www.bootnodig.nl/nl/boottype/klipper"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3040777": {
+        "name": "RIVAL",
+        "eni_number": "3040777",
+        "image": null,
+        "type_of_ship": "steilsteven",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 40,
+        "year_of_build": 1929,
+        "mmsi": null,
+        "sources": [
+            "https://zeilcharter.nl/zeilen-met-steilsteven-Rival-vanuit-Enkhuizen.php?title=zeilen+met+steilsteven+Rival+vanuit+Enkhuizen",
+            "https://zeilcharter.nl/index.php?huurtijd=weekend&passagiers=5&zoeken=yes"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3050018": {
+        "name": "BRUINVISCH",
+        "eni_number": "3050018",
+        "image": null,
+        "type_of_ship": "Friese dektjalk",
+        "home_port": "Harlingen",
+        "passenger_capacity": 18,
+        "year_of_build": 1902,
+        "mmsi": null,
+        "sources": [
+            "https://nl.wikipedia.org/wiki/Bruinvisch_(schip,_1902)",
+            "https://uitgevist.nl/historische-zeiltjalk-bruinvisch",
+            "https://zeilcharter.nl/zeilen-met-Friesche-dektjalk-Bruinvisch-vanuit-Harlingen.php",
+            "https://www.bootnodig.nl/nl/boot_huren/harlingen/tjalk/bruinvisch",
+            "https://www.visitnoardwestfryslan.nl/nl/inspiratie/bruine-vloot-v1"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3050202": {
+        "name": "MEDUSA",
+        "eni_number": "3050202",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": "Kampen",
+        "passenger_capacity": 28,
+        "year_of_build": 1903,
+        "mmsi": null,
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/medusa/",
+            "http://zeilklippers.nl/nl/schepen/medusa/",
+            "https://www.medusa-sailing.nl/",
+            "https://bootbootboot.nl/schepen/medusa/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "high",
+            "year_of_build": "medium",
+            "mmsi": "low"
+        }
+    },
+    "3050231": {
+        "name": "VROUWEZAND",
+        "eni_number": "3050231",
+        "image": null,
+        "type_of_ship": "tweemasttjalk",
+        "home_port": "Stavoren",
+        "passenger_capacity": 20,
+        "year_of_build": 1903,
+        "mmsi": null,
+        "sources": [
+            "https://www.friesevloot.nl/en/sailing-ships/vrouwezand/",
+            "https://www.vrouwezand.nl/",
+            "https://en.zeilendeschepen.nl/schip/vrouwezand-stavoren/",
+            "https://www.friesevloot.nl/nl/zeilboot-huren/zeilschip-vrouwezand"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3050259": {
+        "name": "CHATEAUROUX",
+        "eni_number": "3050259",
+        "image": null,
+        "type_of_ship": "tweemast klipperaak",
+        "home_port": "Monnickendam",
+        "passenger_capacity": 35,
+        "year_of_build": 1908,
+        "mmsi": null,
+        "sources": [
+            "https://zeilvlootmonnickendam.nl/en/our-ships/chateauroux-uk/",
+            "https://en.zeilendeschepen.nl/schip/chateauroux-monnickendam/",
+            "https://www.laagholland.com/nl/locaties/2162625244/chateauroux",
+            "https://www.bootnodig.nl/nl/boot_huren/monnickendam/klipper/chateauroux"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3050406": {
+        "name": "ALIDA",
+        "eni_number": "3050406",
+        "image": null,
+        "type_of_ship": "keenaak",
+        "home_port": "Harlingen",
+        "passenger_capacity": null,
+        "year_of_build": 1906,
+        "mmsi": null,
+        "sources": [
+            "https://alida.frisian-sailing.com/info",
+            "https://zeilcharter.nl/1289/zeilen_met_keenaak_Alida_vanuit_Harlingen.html",
+            "https://www.zeilcharter.nl/",
+            "https://www.sail.nl/schepen/alida"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "medium",
+            "mmsi": "low"
+        }
+    },
+    "3050556": {
+        "name": "MAXIMA",
+        "eni_number": "3050556",
+        "image": null,
+        "type_of_ship": "hasselteraak",
+        "home_port": "Harlingen",
+        "passenger_capacity": 18,
+        "year_of_build": 1900,
+        "mmsi": null,
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/8674/",
+            "https://www.zeilschipmaxima.nl/",
+            "https://watervakantie.nl/huurboot/maxima-2/",
+            "https://www.zeilschipmaxima.nl/prijzen-beschikbaarheid"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "medium",
+            "mmsi": "low"
+        }
+    },
+    "3050631": {
+        "name": "SUMMERTIME",
+        "eni_number": "3050631",
+        "image": null,
+        "type_of_ship": "viermastklipper",
+        "home_port": "Kampen",
+        "passenger_capacity": 100,
+        "year_of_build": 1937,
+        "mmsi": "244130373",
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/3565/",
+            "https://www.sailingbird.com/nl/zeilschip-boeken/de-vloot/summertime-10",
+            "https://www.marinetraffic.com/nl/ais/details/ships/shipid:6263591/mmsi:244130373/imo:0/vessel:SUMMERTIME"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3050691": {
+        "name": "DE VROUW DINA",
+        "eni_number": "3050691",
+        "image": null,
+        "type_of_ship": "zeetjalk",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 30,
+        "year_of_build": 1897,
+        "mmsi": "244730545",
+        "sources": [
+            "https://devrouwdina.nl/nl/home",
+            "http://zeilklippers.nl/nl/schepen/de-vrouw-dina/",
+            "https://bootbootboot.nl/schepen/vrouw-dina/",
+            "https://www.vesselfinder.com/nl/vessels/details/244730545"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3050764": {
+        "name": "VLIEGENDE DRAECK",
+        "eni_number": "3050764",
+        "image": "https://www.t-s-c.nl/home-1/onze-schepen/vliegende-draeck/",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 40,
+        "year_of_build": 1909,
+        "mmsi": "244660936",
+        "sources": [
+            "https://www.t-s-c.nl/home-1/onze-schepen/vliegende-draeck/",
+            "https://www.historischezeilvaart.co.uk/vliegende-draeck/",
+            "https://www.vesselfinder.com/vessels/details/244660936",
+            "https://www.shipspotting.com/photos/1042249"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3050848": {
+        "name": "SUYDERSEE",
+        "eni_number": "3050848",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": 1906,
+        "mmsi": "244700954",
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/suydersee/",
+            "https://www.vesselfinder.com/nl/vessels/details/244700954"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3050895": {
+        "name": "BALDER",
+        "eni_number": "3050895",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://www.friesevloot.nl/zeilschepen/balder/",
+            "https://www.friesevloot.nl/nl/zeilboot-huren/zeilschip-balder"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "3050909": {
+        "name": "CATHARINA VAN MIJDRECHT",
+        "eni_number": "3050909",
+        "image": null,
+        "type_of_ship": "klipperaak",
+        "home_port": "Monnickendam",
+        "passenger_capacity": 40,
+        "year_of_build": 1916,
+        "mmsi": null,
+        "sources": [
+            "https://zeilklippers.nl/en/ships/catharina-van-mijdrecht-2/",
+            "https://zeilvlootmonnickendam.nl/en/our-ships/catharina-van-mijdrecht-uk/",
+            "https://zeepost.info/catharina-van-mijdrecht-klaar-voor-een-nieuw-seizoen/",
+            "https://watervakantie.nl/huurboot/catharina-van-mijdrecht/",
+            "https://www.catharinavanmijdrecht.nl/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3051170": {
+        "name": "ONVERWACHT",
+        "eni_number": "3051170",
+        "image": null,
+        "type_of_ship": null,
+        "home_port": "Makkum",
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://www.naupar.nl/schip/onverwacht/",
+            "https://www.onverwacht.nl/nl/op-de-onverwacht",
+            "https://www.onverwacht.nl/nl/op-de-onverwacht/thuishaven"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "3051225": {
+        "name": "ANNA CATHARINA",
+        "eni_number": "3051225",
+        "image": null,
+        "type_of_ship": "klipperaak",
+        "home_port": "Harlingen",
+        "passenger_capacity": null,
+        "year_of_build": 1914,
+        "mmsi": "244850090",
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/anna-catharina/",
+            "https://www.vesselfinder.com/vessels/details/244850090",
+            "https://en.zeilendeschepen.nl/schip/anna-catharina-harlingen/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3051245": {
+        "name": "ANTONIA",
+        "eni_number": "3051245",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 24,
+        "year_of_build": 1913,
+        "mmsi": null,
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/antonia/",
+            "https://antonia.frisian-sailing.com/",
+            "https://www.waddenhop.com/rondreizen-waddeneilanden/waddenhoppen-met-traditioneel-zeilschip/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3150101": {
+        "name": "ACTIA",
+        "eni_number": "3150101",
+        "image": null,
+        "type_of_ship": "aak",
+        "home_port": "Lelystad",
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": "244710661",
+        "sources": [
+            "https://www.naupar.com/ships/actia/",
+            "http://www.schepenlijst.nl/test/index.php?page=item&id=162",
+            "https://www.marinetraffic.com/nl/ais/details/ships/shipid:2084862/mmsi:244710661/imo:0/vessel:ACTIA",
+            "https://www.brugnieuws.nl/nieuws/algemeen/302195/nieuwe-exploitant-renoveert-historisch-zeilschip-admiraal-van-kinsbergen"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "high"
+        }
+    },
+    "3150303": {
+        "name": "NOOIT VOLMAECKT",
+        "eni_number": "3150303",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 25,
+        "year_of_build": 1893,
+        "mmsi": null,
+        "sources": [
+            "https://klippernooitvolmaeckt.nl/informatie/over-het-schip",
+            "http://www.schepenlijst.nl/test/index.php?page=item&id=499",
+            "https://en.zeilendeschepen.nl/schip/nooit-volmaeckt-enkhuizen/",
+            "https://visitenkhuizen.nl/en/seeing-and-doing/ports/sailing/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3160007": {
+        "name": "ZEESTER",
+        "eni_number": "3160007",
+        "image": null,
+        "type_of_ship": "tweemast klipperaak",
+        "home_port": "Lemmer",
+        "passenger_capacity": 32,
+        "year_of_build": 1913,
+        "mmsi": "244690201",
+        "sources": [
+            "https://www.vesselfinder.com/vessels/details/244690201",
+            "https://www.friesevloot.nl/en/sailing-ships/zeester/",
+            "https://www.zeilendeschepen.nl/schip/zeester-lemmer/",
+            "https://www.friesevloot.nl/en/ports/lemmer/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3160010": {
+        "name": "LIS",
+        "eni_number": "3160010",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": "Muiden",
+        "passenger_capacity": null,
+        "year_of_build": 1902,
+        "mmsi": null,
+        "sources": [
+            "https://www.bootnodig.nl/nl/boot_huren/muiden/tjalk/lis",
+            "https://delis.nl/",
+            "https://zeilcharter.nl/index.php?zoeken=yes&vertrekhaven=%25&scheepstype=%25&huurtijd=midweek&sorteren=aantalplaatsen&passagiers=5"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3160099": {
+        "name": "VRIJBUITER",
+        "eni_number": "3160099",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": "Zierikzee",
+        "passenger_capacity": 35,
+        "year_of_build": 1901,
+        "mmsi": null,
+        "sources": [
+            "https://zeilklippers.nl/schepen/de-vrijbuiter/",
+            "https://www.zeilen.nl/actueel/nieuws/vrijbuiter-elektrisch",
+            "https://www.facebook.com/p/Vrijbuiter-Zeilen-100063582760996/",
+            "https://vrijbuiterzeilen.nl/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3160107": {
+        "name": "VROUWE FRIDA CORNELIA",
+        "eni_number": "3160107",
+        "image": null,
+        "type_of_ship": "klipperaak",
+        "home_port": "Monnickendam",
+        "passenger_capacity": 40,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://zeilvlootmonnickendam.nl/en/our-ships/vrouwe-frida-cornelia-uk/",
+            "https://www.vfczeilcharters.nl/klipperaak-vrouwe-frida-cornelia/",
+            "https://en.zeilendeschepen.nl/schip/vrouwe-frida-cornelia-monnickendam/",
+            "https://zeilcharter.nl/zeilen-met-klipperaak-Vrouwe-Frida-Cornelia-vanuit-Monnickendam.php"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "3160161": {
+        "name": "LINQUENDA",
+        "eni_number": "3160161",
+        "image": null,
+        "type_of_ship": "Oostzeetjalk",
+        "home_port": "Monnickendam",
+        "passenger_capacity": 18,
+        "year_of_build": 1916,
+        "mmsi": null,
+        "sources": [
+            "https://zeilvlootmonnickendam.nl/en/our-ships/linquenda-uk/",
+            "https://en.zeilendeschepen.nl/schip/linquenda-monnickendam/",
+            "https://zeilklippers.nl/schepen/linquenda/",
+            "https://zeilcharter.nl/index.php?zoeken=yes&vertrekhaven=%25&scheepstype=%25&huurtijd=dagtocht&sorteren=huurprijsweekdag&passagiers=5"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3170039": {
+        "name": "WATERMAN",
+        "eni_number": "3170039",
+        "image": null,
+        "type_of_ship": "klipperaak",
+        "home_port": null,
+        "passenger_capacity": 29,
+        "year_of_build": 1887,
+        "mmsi": null,
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/waterman/",
+            "https://www.naupar.com/ships/waterman/",
+            "https://zeilklipper-waterman.com/en/sail-ship/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "low",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3170068": {
+        "name": "ALLURE",
+        "eni_number": "3170068",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Lelystad",
+        "passenger_capacity": 45,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://www.bootnodig.nl/nl/boot_huren/lelystad/klipper/allure",
+            "https://zeilcharter.nl/index.php?huurtijd=weekend&passagiers=5&zoeken=yes"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "3170105": {
+        "name": "AMORE VICI",
+        "eni_number": "3170105",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Amore_Vici_ENI_3170105_S_Ijsselmeer_01-07-2019.jpg/1200px-Amore_Vici_ENI_3170105_S_Ijsselmeer_01-07-2019.jpg",
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 18,
+        "year_of_build": 1897,
+        "mmsi": null,
+        "sources": [
+            "https://hollandsail.nl/schepen/6308/amore-vici",
+            "https://commons.wikimedia.org/wiki/Category:Amore_Vici_(ship,_1897)",
+            "https://www.vakantievaren.nl/boot-huren/1710/amore-vici",
+            "https://zeilcharter.nl/index.php?huurtijd=midweek&passagiers=5&zoeken=yes"
+        ],
+        "field_confidence": {
+            "image": "high",
+            "type_of_ship": "medium",
+            "home_port": "medium",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3170114": {
+        "name": "RISICO",
+        "eni_number": "3170114",
+        "image": null,
+        "type_of_ship": "klipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": null,
+        "year_of_build": 1895,
+        "mmsi": null,
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/risico/",
+            "https://www.kustvaartforum.com/viewtopic.php?t=2758&start=168",
+            "https://zeilcharter.nl/index.php?huurtijd=midweek&passagiers=5&scheepstype=%25&sorteren=aantalplaatsen&vertrekhaven=%25&zoeken=yes"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3170230": {
+        "name": "BROEDERTROUW",
+        "eni_number": "3170230",
+        "image": "https://www.shipspotting.com/photos/2033320",
+        "type_of_ship": "stevenklipper",
+        "home_port": "Hoorn",
+        "passenger_capacity": 45,
+        "year_of_build": 1882,
+        "mmsi": "244780982",
+        "sources": [
+            "https://nl.wikipedia.org/wiki/Broedertrouw_(schip,_1882)",
+            "https://www.debinnenvaart.nl/schip_detail/11375/",
+            "https://www.shipspotting.com/photos/2033320",
+            "https://www.broedertrouw.com/schip/",
+            "https://www.naupar.nl/schip/broedertrouw/"
+        ],
+        "field_confidence": {
+            "image": "medium",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3170274": {
+        "name": "GROTE JAGER",
+        "eni_number": "3170274",
+        "image": null,
+        "type_of_ship": "lemsteraak",
+        "home_port": "Muiden",
+        "passenger_capacity": 22,
+        "year_of_build": 2002,
+        "mmsi": null,
+        "sources": [
+            "https://www.ssrp.nl/stamboek/schepen/le196-grote-jager-2192",
+            "https://www.rederijbelle.nl/schepen/de-grote-jager/",
+            "https://zeilvlootmuiden.nl/schepen/grote-jager/",
+            "https://lemsteraakhurenmuiden.nl/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3170401": {
+        "name": "JOSINA ELISABETH",
+        "eni_number": "3170401",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": null,
+        "year_of_build": 1900,
+        "mmsi": "244770429",
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/josina-elisabeth/",
+            "https://zeilcharter.nl/zeilen-met-tweemastklipper-Josina-Elisabeth-vanuit-Harlingen.php",
+            "https://www.vesselfinder.com/vessels/details/244770429",
+            "https://www.myshiptracking.com/nl/vessels/josina--elisabeth-mmsi-244770429-imo-3170401"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3170403": {
+        "name": "EMMA",
+        "eni_number": "3170403",
+        "image": "https://emma.frisian-sailing.com/wp-content/uploads/2021/04/emma-tjalk-lemmer-zeilen.jpg",
+        "type_of_ship": "tjalk",
+        "home_port": "Lemmer",
+        "passenger_capacity": 25,
+        "year_of_build": 1889,
+        "mmsi": null,
+        "sources": [
+            "https://emma.frisian-sailing.com/info",
+            "https://emma.frisian-sailing.com/voorzieningen",
+            "https://en.zeilendeschepen.nl/schip/emma-lemmer/",
+            "https://www.zeilcharter.nl/zeilen-met-tjalk-Emma-vanuit-Lemmer.php"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3170405": {
+        "name": "ELIZABETH",
+        "eni_number": "3170405",
+        "image": null,
+        "type_of_ship": "klipper",
+        "home_port": "Lemmer",
+        "passenger_capacity": null,
+        "year_of_build": 1914,
+        "mmsi": null,
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/5459/",
+            "https://elizabeth.frisian-sailing.com/",
+            "https://bootbootboot.nl/schepen/d/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3170475": {
+        "name": "ALDEBARAN",
+        "eni_number": "3170475",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 50,
+        "year_of_build": 1893,
+        "mmsi": null,
+        "sources": [
+            "https://zonnewind.nl/en/aldebaran/",
+            "https://www.zonnewind.com/the-ships/history-aldebaran/",
+            "https://zeilcharter.nl/zeilen-met-klipper-Aldebaran-vanuit-Harlingen.php",
+            "https://en.zeilendeschepen.nl/schip/aldebaran-harlingen/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3230104": {
+        "name": "NIL DESPERANDUM",
+        "eni_number": "3230104",
+        "image": null,
+        "type_of_ship": "driemastschoener",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 50,
+        "year_of_build": 1894,
+        "mmsi": "244690526",
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/7196/",
+            "https://www.vesselfinder.com/vessels/details/244690526",
+            "http://zeilklippers.nl/en/ships/nil-desperandum-3/",
+            "https://en.zeilendeschepen.nl/schip/nil-desperandum-enkhuizen/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3230114": {
+        "name": "ANNA",
+        "eni_number": "3230114",
+        "image": null,
+        "type_of_ship": null,
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "3250042": {
+        "name": "MINERVA",
+        "eni_number": "3250042",
+        "image": null,
+        "type_of_ship": "stevenaak",
+        "home_port": "Harlingen",
+        "passenger_capacity": null,
+        "year_of_build": 1878,
+        "mmsi": null,
+        "sources": [
+            "https://eilandhopper.nl/nl/info/schepen/minerva",
+            "https://www.historischezeilvaart.nl/minerva/",
+            "https://www.vvvterschelling.nl/excursies/eilandhopper-sunsetsail/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3250257": {
+        "name": "DE ZWARTE VALK",
+        "eni_number": "3250257",
+        "image": null,
+        "type_of_ship": "klipperaak",
+        "home_port": "Makkum",
+        "passenger_capacity": null,
+        "year_of_build": 1889,
+        "mmsi": "244690792",
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/10480/",
+            "https://www.naupar.nl/schip/zwarte-valk/",
+            "https://www.vesselfinder.com/vessels/details/244690792",
+            "https://zeilcharter.nl/index.php?zoeken=yes&vertrekhaven=%25&scheepstype=%25&huurtijd=dagtocht&sorteren=huurprijsweekdag&passagiers=5"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3270099": {
+        "name": "NOORDFRIES",
+        "eni_number": "3270099",
+        "image": null,
+        "type_of_ship": "oostzeetjalk",
+        "home_port": "Harlingen",
+        "passenger_capacity": 20,
+        "year_of_build": 1896,
+        "mmsi": null,
+        "sources": [
+            "https://www.historischezeilvaart.co.uk/noordfries/",
+            "https://en.zeilendeschepen.nl/schip/noordfries-harlingen/",
+            "https://zeilcharter.nl/index.php?zoeken=yes&vertrekhaven=%25&scheepstype=%25&huurtijd=midweek&sorteren=aantalplaatsen&passagiers=5"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3270196": {
+        "name": "ZORG MET VLIJT",
+        "eni_number": "3270196",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 22,
+        "year_of_build": 1907,
+        "mmsi": "244700406",
+        "sources": [
+            "https://www.vesselfinder.com/vessels/details/244700406",
+            "https://zorgmetvlijt.nl/en/",
+            "https://www.naupar.com/ships/zorg-met-vlijt/",
+            "https://en.zeilendeschepen.nl/schip/zorg-met-vlijt-enkhuizen/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "medium",
+            "mmsi": "high"
+        }
+    },
+    "3270542": {
+        "name": "HALVE MAAN",
+        "eni_number": "3270542",
+        "image": "https://www.zeilzwerven.nl/wp-content/uploads/skutsje-halve-maan.jpg",
+        "type_of_ship": "skûtsje",
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": 1923,
+        "mmsi": null,
+        "sources": [
+            "https://bedrijfsuitjefriesland.nl/onze-skutsjes/skutsje-halve-maan",
+            "https://www.zeilzwerven.nl/over-prego/onze-schepen/skutsje-halve-maan"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "medium",
+            "mmsi": "low"
+        }
+    },
+    "3270575": {
+        "name": "GRIETJE",
+        "eni_number": "3270575",
+        "image": null,
+        "type_of_ship": "driemast stagzeilschoener",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 34,
+        "year_of_build": 1960,
+        "mmsi": "244010051",
+        "sources": [
+            "https://www.schuttevaer.nl/nieuws/schip-en-bedrijf/2012/02/24/een_tweede_leven_voor_de_grietje/",
+            "https://www.debinnenvaart.nl/binnenvaarttaal/index.php?afbeeldingen2=grietje",
+            "https://bootbootboot.nl/schepen/grietje/",
+            "https://www.naupar.com/ships/grietje/",
+            "https://www.marinetraffic.com/nl/ais/details/ships/shipid:219609/mmsi:244010051/imo:0/vessel:GRIETJE"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "medium"
+        }
+    },
+    "3270613": {
+        "name": "MARE FAN FRYSLÂN",
+        "eni_number": "3270613",
+        "image": null,
+        "type_of_ship": "driemastschoener",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": 85,
+        "year_of_build": 1960,
+        "mmsi": null,
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/1509/",
+            "https://www.sailingbird.com/nl/zeilschip-boeken/de-vloot/mare-fan-fryslan-86",
+            "https://www.friesevloot.nl/en/sailing-ships/mare-fan-fryslan/",
+            "https://en.zeilendeschepen.nl/schip/mare-fan-fryslan-enkhuizen/",
+            "https://zeilcharter.nl/index.php?zoeken=yes&vertrekhaven=%25&scheepstype=%25&huurtijd=midweek&sorteren=aantalplaatsen&passagiers=5"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "medium",
+            "mmsi": "low"
+        }
+    },
+    "3290004": {
+        "name": "POUWEL JONAS",
+        "eni_number": "3290004",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Kampen",
+        "passenger_capacity": 50,
+        "year_of_build": 1897,
+        "mmsi": "244750400",
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/pouwel-jonas/",
+            "https://en.zeilendeschepen.nl/schip/pouwel-jonas-harlingen/",
+            "https://www.bookasailingship.com/sailing-ship-rentals/kampen-netherlands-949",
+            "https://www.vesselfinder.com/nl/vessels/details/244750400"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3310349": {
+        "name": "DE HOOP",
+        "eni_number": "3310349",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Akkrum",
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://www.frieslandhollandtravel.nl/nieuws/elfsteden-fietscruise-met-klipper-als-hotel/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "3330036": {
+        "name": "ZUIDERZEE",
+        "eni_number": "3330036",
+        "image": null,
+        "type_of_ship": null,
+        "home_port": null,
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://www.binnenvaart.eu/motorvrachtschip/50762-luctor-et-emergo.html"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "low",
+            "home_port": "low",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "3330098": {
+        "name": "NOORDVAARDER",
+        "eni_number": "3330098",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": null,
+        "year_of_build": 1909,
+        "mmsi": "244780855",
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/9375/",
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/noordvaarder/",
+            "https://www.vesselfinder.com/nl/vessels/details/244780855",
+            "https://www.marinetraffic.com/nl/ais/details/ships/shipid:251367/mmsi:244780855/imo:0/vessel:NOORDVAARDER",
+            "https://zeilklippernoordvaarder.nl/en/the-ships/the-noordvaarder/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3330111": {
+        "name": "SUDERMAR",
+        "eni_number": "3330111",
+        "image": null,
+        "type_of_ship": "tjalk",
+        "home_port": "Enschede",
+        "passenger_capacity": 25,
+        "year_of_build": 1904,
+        "mmsi": null,
+        "sources": [
+            "https://www.debinnenvaart.nl/schip_detail/6647/",
+            "https://www.friesevloot.nl/zeilschepen/sudermar/",
+            "https://www.triodos.co.uk/projects/zeilschip-de-sudermar"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "medium",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3330144": {
+        "name": "DE HOGE WIER",
+        "eni_number": "3330144",
+        "image": null,
+        "type_of_ship": "eenmast klipper",
+        "home_port": "Muiden",
+        "passenger_capacity": 60,
+        "year_of_build": 1899,
+        "mmsi": null,
+        "sources": [
+            "https://muidenmaritiem.nl/en/schepen/clipper-de-hoge-wier/",
+            "https://zeilvlootmuiden.nl/schepen/de-hoge-wier/",
+            "https://zeilklippers.nl/nl/schepen/hoge-wier/",
+            "https://muidenmaritiem.nl/klipper-huren/",
+            "https://sites.google.com/site/debruinevloot/zeilen-op-het-ijsselmeer"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "medium",
+            "mmsi": "low"
+        }
+    },
+    "3340129": {
+        "name": "MERIDIAAN",
+        "eni_number": "3340129",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Enkhuizen",
+        "passenger_capacity": null,
+        "year_of_build": null,
+        "mmsi": null,
+        "sources": [
+            "https://bootbootboot.nl/schepen/meridiaan/",
+            "https://zeilcharter.nl/zeilen-met-klipper-Meridiaan-vanuit-Enkhuizen.php?title=zeilen+met+klipper+Meridiaan+vanuit+Enkhuizen%60",
+            "https://www.bookasailingship.com/sailing-ship-rentals/enkhuizen-netherlands-945"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "low",
+            "mmsi": "low"
+        }
+    },
+    "3350127": {
+        "name": "PASSAAT",
+        "eni_number": "3350127",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 45,
+        "year_of_build": 1900,
+        "mmsi": null,
+        "sources": [
+            "https://www.zonnewind.nl/schepen/historie-passaat/",
+            "https://zeilcharter.nl/zeilen-met-klipper-Passaat-vanuit-Harlingen.php?title=zeilen+met+klipper+Passaat+vanuit+Harlingen",
+            "https://bootbootboot.nl/schepen/d/31/harlingen/",
+            "https://www.kustvaartforum.com/viewtopic.php?t=2758&start=168"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3350185": {
+        "name": "AVONDROOD",
+        "eni_number": "3350185",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Kampen",
+        "passenger_capacity": null,
+        "year_of_build": 1900,
+        "mmsi": "244670968",
+        "sources": [
+            "https://www.vesselfinder.com/vessels/details/244670968",
+            "https://klipperavondrood.com/het-schip/",
+            "https://www.naupar.nl/blog/avondrood-hendrik-reher/",
+            "https://zeepost.info/expeditie-oost-van-kampen-naar-urk-met-de-schipper-van-de-klipper-avondrood/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "low",
+            "year_of_build": "medium",
+            "mmsi": "high"
+        }
+    },
+    "3360004": {
+        "name": "POOLSTER",
+        "eni_number": "3360004",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 50,
+        "year_of_build": 1902,
+        "mmsi": null,
+        "sources": [
+            "https://www.hollandsail.nl/schepen/16549/zeilschip-poolster",
+            "https://www.harlingenwelkomaanzee.nl/nl/verhalen/blog/schippersgezin-moen",
+            "https://www.kustvaartforum.com/viewtopic.php?t=2758&start=168"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    },
+    "3360021": {
+        "name": "WADDENZEE",
+        "eni_number": "3360021",
+        "image": null,
+        "type_of_ship": "tweemastklipper",
+        "home_port": "Harlingen",
+        "passenger_capacity": 32,
+        "year_of_build": 1885,
+        "mmsi": "244020019",
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/waddenzee-1885/",
+            "https://zeilcharter.nl/index.php?huurtijd=midweek",
+            "https://www.vesselfinder.com/vessels/details/244020019"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "medium",
+            "year_of_build": "high",
+            "mmsi": "high"
+        }
+    },
+    "3370010": {
+        "name": "VICTORIA S",
+        "eni_number": "3370010",
+        "image": null,
+        "type_of_ship": "stevenaak",
+        "home_port": "Harlingen",
+        "passenger_capacity": 24,
+        "year_of_build": 1876,
+        "mmsi": null,
+        "sources": [
+            "https://www.rederij-vooruit.nl/zeilschepen-bruine-vloot/victoria-s/",
+            "https://zeilklippernoordvaarder.nl/en/the-ships/the-victoria-s/",
+            "https://www.zeepost.info/index.php/2022/08/13/bruine-vloot-zet-alle-zeilen-bij-deze-zomer/"
+        ],
+        "field_confidence": {
+            "image": "low",
+            "type_of_ship": "high",
+            "home_port": "high",
+            "passenger_capacity": "high",
+            "year_of_build": "high",
+            "mmsi": "low"
+        }
+    }
+}

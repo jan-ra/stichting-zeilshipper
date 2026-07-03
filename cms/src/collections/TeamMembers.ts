@@ -10,10 +10,10 @@ export const TeamMembers: CollectionConfig = {
   hooks: collectionRebuildHooks,
   fields: [
     { name: 'name', type: 'text', required: true },
+    { name: 'photo', type: 'upload', relationTo: 'media' },
     { name: 'role', type: 'text', localized: true },
     { name: 'location', type: 'text' },
     { name: 'since', type: 'text', admin: { description: 'e.g. "2021"' } },
-    { name: 'photo', type: 'upload', relationTo: 'media' },
     { name: 'bio', type: 'textarea', localized: true },
     { name: 'expertise', type: 'text', localized: true, admin: { description: 'Comma-separated.' } },
   ],

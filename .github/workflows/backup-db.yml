@@ -12,6 +12,31 @@ jobs:
     steps:
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
+      - name: Wake CMS machine and wait for it to be healthy
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          APP=stichting-zeilshipper-cms
+
+          # Get the first machine ID and start it (no-op if already running).
+          MACHINE_ID=$(flyctl machine list -a "$APP" --json | jq -r '.[0].id')
+          flyctl machine start "$MACHINE_ID" -a "$APP" || true
+
+          # Wait until flyctl considers the machine started.
+          flyctl machine wait "$MACHINE_ID" -a "$APP" --state started --timeout 120
+
+          # Wait until Payload itself is accepting requests (Next.js can take ~20s to boot).
+          echo "Waiting for Payload health check..."
+          for i in $(seq 1 30); do
+            if curl -sf "https://${APP}.fly.dev/api/access" -o /dev/null; then
+              echo "Payload is up."
+              break
+            fi
+            echo "  attempt $i/30 — retrying in 5s"
+            sleep 5
+          done
+
       - name: Snapshot SQLite on Fly
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

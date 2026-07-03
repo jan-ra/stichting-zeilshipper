@@ -13,7 +13,7 @@ const ALL_ITEMS = [...SHIPS, ...EASTER_EGGS]
 const TYPES = ['all', 'Tjalk', 'Klipper', 'Schoener', 'Galjas', 'Botter', 'Topzeilschoener', 'Volschip', 'Bark', 'Barkentijn', 'Schoenerbrik', 'Aak', 'Klipperaak', 'Stevenaak', 'Brig', 'easter-egg']
 const REGIONS = ['all', 'thuiswateren', 'europa', 'wereld']
 
-function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted }) {
+function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positionLabel }) {
   const containerRef = useRef(null)
   const globeRef = useRef(null)
   const filterRef = useRef(filter)
@@ -42,8 +42,8 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted }) {
         .globeTileEngineUrl((x, y, l) => `https://a.basemaps.cartocdn.com/dark_nolabels/${l}/${x}/${y}.png`)
         .backgroundColor('rgba(0,0,0,0)')
         .showAtmosphere(true)
-        .atmosphereColor('#1a3a5c')
-        .atmosphereAltitude(0.15)
+        .atmosphereColor('#3a7abd')
+        .atmosphereAltitude(0.22)
         .pointsData(ALL_ITEMS)
         .pointLat('lat').pointLng('lng')
         .pointColor(() => '#c19a52')
@@ -63,7 +63,14 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted }) {
           const tip = document.createElement('div')
           tip.className = '_ship-tip'
           tip.style.cssText = 'position:fixed;pointer-events:none;display:none;z-index:9999;background:rgba(15,34,56,0.95);border:1px solid rgba(193,154,82,0.5);padding:10px 14px;border-radius:3px;font-family:sans-serif;min-width:150px;'
-          tip.innerHTML = `${d.image ? `<img src="${asset(d.image)}" style="width:160px;height:100px;object-fit:cover;display:block;margin-bottom:8px;border-radius:2px;" />` : ''}<strong style="color:#f4ede1;font-size:14px">${d.name}</strong><br><span style="color:#c19a52;font-size:11px">${d.type}</span><br><span style="color:rgba(244,237,225,0.6);font-size:12px">${d.port}</span>`
+          {
+            let html = d.image ? `<img src="${asset(d.image)}" style="width:160px;height:100px;object-fit:cover;display:block;margin-bottom:8px;border-radius:2px;" />` : ''
+            html += `<strong style="color:#f4ede1;font-size:14px">${d.name}</strong>`
+            html += `<br><span style="color:#c19a52;font-size:11px">${d.type}</span>`
+            html += `<br><span style="color:rgba(244,237,225,0.6);font-size:12px">${d.port}</span>`
+            if (d.positionUpdatedAt) html += `<br><span style="color:rgba(244,237,225,0.55);font-size:11px">${positionLabel}: ${new Date(d.positionUpdatedAt).toLocaleString()}</span>`
+            tip.innerHTML = html
+          }
           document.body.appendChild(tip)
 
           const el = document.createElement('div')
@@ -165,6 +172,7 @@ export default function FleetPage() {
   const [selected, setSelected] = useState(null)
   const [filter, setFilter] = useState({ type: 'all', region: 'all' })
   const [userInteracted, setUserInteracted] = useState(false)
+  const [lightbox, setLightbox] = useState(null)
   const { t, tc } = useLanguage()
 
   const regionLabels = t('fleet.regionLabels')
@@ -243,7 +251,12 @@ export default function FleetPage() {
           {selected && (
             <div style={{ margin: '12px 16px 0', background: 'rgba(193,154,82,0.1)', border: '1px solid rgba(193,154,82,0.4)', borderRadius: 3, overflow: 'hidden' }}>
               {selected.image && (
-                <img src={asset(selected.image)} alt={selected.name} style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }} />
+                <div style={{ position: 'relative', cursor: 'zoom-in' }} onClick={() => setLightbox(asset(selected.image))}>
+                  <img src={asset(selected.image)} alt={selected.name} style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }} />
+                  <div style={{ position: 'absolute', bottom: 8, right: 8, background: 'rgba(8,18,34,0.7)', borderRadius: 2, padding: '3px 7px', fontSize: 11, color: 'rgba(244,237,225,0.7)', letterSpacing: '0.06em', pointerEvents: 'none' }}>
+                    ⤢
+                  </div>
+                </div>
               )}
               <div style={{ padding: '16px 20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
@@ -258,18 +271,25 @@ export default function FleetPage() {
                   📍 {selected.address}
                 </div>
               ) : (
-                <div style={{ display: 'flex', gap: 20, fontSize: 12, color: 'rgba(244,237,225,0.55)' }}>
-                  {[
-                    [t('fleet.port'), selected.port],
-                    [t('fleet.speed'), `${selected.speed} kn`],
-                    [t('fleet.passengers'), selected.passengers],
-                  ].map(([k, v]) => (
-                    <div key={k}>
-                      <div style={{ fontSize: 10, color: 'rgba(244,237,225,0.35)', marginBottom: 2 }}>{k}</div>
-                      <div style={{ color: '#f4ede1' }}>{v}</div>
+                <>
+                  <div style={{ display: 'flex', gap: 20, fontSize: 12, color: 'rgba(244,237,225,0.55)' }}>
+                    {[
+                      [t('fleet.port'), selected.port],
+                      [t('fleet.speed'), `${selected.speed} kn`],
+                      [t('fleet.passengers'), selected.passengers],
+                    ].map(([k, v]) => (
+                      <div key={k}>
+                        <div style={{ fontSize: 10, color: 'rgba(244,237,225,0.35)', marginBottom: 2 }}>{k}</div>
+                        <div style={{ color: '#f4ede1' }}>{v}</div>
+                      </div>
+                    ))}
+                  </div>
+                  {selected.positionUpdatedAt && (
+                    <div style={{ marginTop: 10, fontSize: 11, color: 'rgba(244,237,225,0.55)', letterSpacing: '0.02em' }}>
+                      {t('fleet.positionUpdated')}: {new Date(selected.positionUpdatedAt).toLocaleString()}
                     </div>
-                  ))}
-                </div>
+                  )}
+                </>
               )}
               </div>
             </div>
@@ -312,6 +332,11 @@ export default function FleetPage() {
                         </>
                       )}
                     </div>
+                    {!item.isEasterEgg && item.positionUpdatedAt && (
+                      <div style={{ marginTop: 4, fontSize: 10, color: 'rgba(244,237,225,0.55)' }}>
+                        {t('fleet.positionUpdated')}: {new Date(item.positionUpdatedAt).toLocaleString()}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -326,7 +351,7 @@ export default function FleetPage() {
 
         {/* ── Right: globe ── */}
         <div style={{ background: '#0b1d30', position: 'relative' }}>
-          <FleetGlobe onShipClick={handleSelect} filter={filter} selectedShip={selected} userInteracted={userInteracted} />
+          <FleetGlobe onShipClick={handleSelect} filter={filter} selectedShip={selected} userInteracted={userInteracted} positionLabel={t('fleet.positionUpdated')} />
           {!selected && (
             <div style={{ position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', fontSize: 10, color: 'rgba(244,237,225,0.22)', letterSpacing: '0.15em', textTransform: 'uppercase', pointerEvents: 'none', whiteSpace: 'nowrap' }}>
               {t('fleet.clickHint')}
@@ -334,6 +359,32 @@ export default function FleetPage() {
           )}
         </div>
       </div>
+
+      {lightbox && (
+        <div
+          onClick={() => setLightbox(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 2000,
+            background: 'rgba(0,0,0,0.92)', display: 'flex',
+            alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out',
+          }}
+        >
+          <img
+            src={lightbox}
+            alt=""
+            style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 2 }}
+            onClick={e => e.stopPropagation()}
+          />
+          <button
+            onClick={() => setLightbox(null)}
+            style={{
+              position: 'absolute', top: 20, right: 24,
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: 'rgba(244,237,225,0.6)', fontSize: 28, lineHeight: 1,
+            }}
+          >✕</button>
+        </div>
+      )}
 
       <style>{`
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }

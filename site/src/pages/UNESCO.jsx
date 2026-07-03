@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useLanguage } from '../context/LanguageContext.jsx'
-import { PARTNERS, UNESCO_PAGE } from '../data/content.js'
+import { PARTNERS, UNESCO_PAGE, UNESCO_STEPS } from '../data/content.js'
 import { asset } from '../utils/asset.js'
 
 const statusColor = s => s === 'afgerond' ? '#c19a52' : s === 'sterk' ? '#4a9e6a' : '#7a9ec4'
@@ -15,7 +15,7 @@ export default function UNESCOPage() {
     body:     tc(c, 'body'),
     evidence: c.evidence.map(e => tc(e, 'text')),
   }))
-  const timeline = t('home.timeline')
+  const timeline = UNESCO_STEPS
   const statusLabels = t('unesco.statusLabels')
 
   return (
@@ -80,11 +80,11 @@ export default function UNESCOPage() {
       {/* Timeline */}
       <div style={{ background: '#0f2238', padding: '80px 2rem' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 16 }}>{t('unesco.timelineBadge')}</div>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 38, color: '#f4ede1', marginBottom: 48, fontWeight: 400 }}>{t('unesco.timelineTitle')}</h2>
+          <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 16 }}>{tc(UNESCO_PAGE, 'timelineBadge') || t('unesco.timelineBadge')}</div>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 38, color: '#f4ede1', marginBottom: 48, fontWeight: 400 }}>{tc(UNESCO_PAGE, 'timelineTitle') || t('unesco.timelineTitle')}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
             {timeline.map((step, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 20, paddingBottom: 20 }}>
+              <div key={step.id ?? i} style={{ display: 'flex', alignItems: 'flex-start', gap: 20, paddingBottom: 20 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 4 }}>
                   <div style={{ width: 10, height: 10, borderRadius: '50%', flexShrink: 0, background: step.done ? '#c19a52' : 'none', border: step.done ? '2px solid #c19a52' : step.active ? '2px solid #c19a52' : '2px solid rgba(193,154,82,0.25)', boxShadow: step.active ? '0 0 0 4px rgba(193,154,82,0.12)' : 'none' }} />
                   {i < timeline.length - 1 && <div style={{ width: 1, height: 28, background: step.done ? 'rgba(193,154,82,0.4)' : 'rgba(193,154,82,0.12)', marginTop: 4 }} />}
@@ -92,7 +92,7 @@ export default function UNESCOPage() {
                 <div>
                   <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.1em', marginBottom: 3 }}>{step.year}</div>
                   <div style={{ fontSize: 14, color: step.done ? '#f4ede1' : step.active ? '#f4ede1' : 'rgba(244,237,225,0.35)', fontStyle: step.done || step.active ? 'normal' : 'italic' }}>
-                    {step.label}
+                    {tc(step, 'label')}
                     {step.active && <span style={{ fontSize: 9, background: '#c19a52', color: '#0f2238', padding: '2px 6px', borderRadius: 2, marginLeft: 8, fontWeight: 700, letterSpacing: '0.08em' }}>{t('home.timelineNow')}</span>}
                   </div>
                 </div>

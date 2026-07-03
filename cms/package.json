@@ -13,7 +13,8 @@
     "generate:importmap": "payload generate:importmap",
     "seed": "tsx --env-file=.env src/seed.ts",
     "minio:up": "docker compose -f docker-compose.minio.yml up -d",
-    "minio:down": "docker compose -f docker-compose.minio.yml down"
+    "minio:down": "docker compose -f docker-compose.minio.yml down",
+    "update-positions": "node --env-file=.env scripts/update-positions.mjs"
   },
   "dependencies": {
     "@payloadcms/db-sqlite": "3.84.1",
@@ -33,7 +34,8 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "ws": "^8.18.0"
   },
   "engines": {
     "node": ">=20.9.0"
