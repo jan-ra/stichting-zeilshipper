@@ -90,12 +90,11 @@ export default function BlogPage({ navigate }) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '3rem' }}>
             {filtered.slice(1).map(post => (
               <div key={post.id} style={{ cursor: 'pointer' }} onClick={() => navigate('blog-detail', post.slug)}>
-                <div style={{
-                  aspectRatio: '16/9', background: '#0f2238', marginBottom: 20,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  backgroundImage: 'repeating-linear-gradient(135deg, rgba(193,154,82,0.04) 0px, rgba(193,154,82,0.04) 1px, transparent 1px, transparent 12px)',
-                }}>
-                  <span style={{ fontSize: 10, color: 'rgba(193,154,82,0.25)', fontFamily: 'monospace' }}>[ foto ]</span>
+                <div style={{ aspectRatio: '16/9', marginBottom: 20, overflow: 'hidden', position: 'relative', background: '#0f2238' }}>
+                  {post.coverImage
+                    ? <img src={asset(post.coverImage.src)} alt={post.coverImage.alt} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', position: 'absolute', inset: 0 }} />
+                    : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: 'repeating-linear-gradient(135deg, rgba(193,154,82,0.04) 0px, rgba(193,154,82,0.04) 1px, transparent 1px, transparent 12px)' }}><span style={{ fontSize: 10, color: 'rgba(193,154,82,0.25)', fontFamily: 'monospace' }}>[ foto ]</span></div>
+                  }
                 </div>
                 <div style={{ borderTop: '1px solid rgba(15,34,56,0.15)', paddingTop: 20 }}>
                   <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 12 }}>

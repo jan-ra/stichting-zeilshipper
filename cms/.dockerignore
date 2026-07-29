@@ -7,6 +7,10 @@
 **/data
 **/uploads
 
+# Local-only seeding assets (~143 MB of videos) — used by `npm run seed`, never
+# needed in the deployed image.
+seed-assets/
+
 # Auto-generated TS types from collection configs
 **/src/payload-types.ts
 

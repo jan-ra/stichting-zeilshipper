@@ -66,11 +66,17 @@ export default function Footer({ navigate }) {
             {t('footer.copyright')}
           </div>
           <div style={{ fontSize: 12, color: 'rgba(244,237,225,0.35)', display: 'flex', gap: 20 }}>
-            {t('footer.legal').map(l => (
-              <span key={l} style={{ cursor: 'pointer', transition: 'color 0.2s' }}
-                onMouseEnter={e => e.target.style.color = 'rgba(244,237,225,0.65)'}
-                onMouseLeave={e => e.target.style.color = 'rgba(244,237,225,0.35)'}
-              >{l}</span>
+            {[
+              { id: 'privacy', label: t('footer.privacyLabel') },
+              { id: 'photo-credits', label: t('footer.photoCreditsLabel') },
+            ].map(link => (
+              <button key={link.id} onClick={() => { navigate(link.id); window.scrollTo(0,0) }} style={{
+                background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                fontSize: 12, color: 'rgba(244,237,225,0.35)', transition: 'color 0.2s',
+              }}
+              onMouseEnter={e => e.target.style.color = 'rgba(244,237,225,0.65)'}
+              onMouseLeave={e => e.target.style.color = 'rgba(244,237,225,0.35)'}
+              >{link.label}</button>
             ))}
           </div>
         </div>

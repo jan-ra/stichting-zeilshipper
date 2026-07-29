@@ -5,7 +5,7 @@ import { collectionRebuildHooks } from '../hooks/triggerRebuild'
 
 export const Ships: CollectionConfig = {
   slug: 'ships',
-  admin: { useAsTitle: 'name', defaultColumns: ['name', 'type', 'port', 'region'] },
+  admin: { useAsTitle: 'name', defaultColumns: ['name', 'image', 'type', 'port', 'region'] },
   access: { read: () => true, create: isAdminOrEditor, update: isAdminOrEditor, delete: isAdminOrEditor },
   hooks: collectionRebuildHooks,
   fields: [
@@ -22,9 +22,39 @@ export const Ships: CollectionConfig = {
         { label: 'Wereld', value: 'wereld' },
       ],
     },
-    { name: 'image', type: 'upload', relationTo: 'media' },
+    {
+      name: 'image',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        components: {
+          Cell: '@/components/ShipImageCell#default',
+        },
+      },
+    },
     { name: 'lat', type: 'number' },
     { name: 'lng', type: 'number' },
+    {
+      name: 'mmsi',
+      type: 'text',
+      admin: {
+        description: '9-digit AIS MMSI for nightly position tracking. Look it up by ship name on marinetraffic.com or vesselfinder.com.',
+      },
+    },
+    {
+      name: 'autoTrack',
+      type: 'checkbox',
+      defaultValue: true,
+      label: 'Auto-update position from AIS',
+    },
+    {
+      name: 'positionUpdatedAt',
+      type: 'date',
+      admin: {
+        readOnly: true,
+        description: 'Last time the position was refreshed from AIS.',
+      },
+    },
     { name: 'speed', type: 'number', label: 'Speed (kn)' },
     { name: 'year', type: 'number', label: 'Year built' },
     { name: 'passengers', type: 'number' },

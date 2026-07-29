@@ -126,6 +126,7 @@ async function loadShips() {
     year: num(d.year),
     region: text(d.region) || 'thuiswateren',
     passengers: num(d.passengers),
+    positionUpdatedAt: text(d.positionUpdatedAt) || null,
     image: image(d.image)?.src || '',
   }))
 }
@@ -148,6 +149,7 @@ async function loadBlogPosts() {
       authorPhoto: author?.src || '',
       readTime: text(d.readTime),
       coverImage: cover ? { src: cover.src, alt: cover.alt } : null,
+      coverImageFocus: text(d.coverImageFocus) || 'center',
       images: (d.images || [])
         .map(row => {
           const img = image(row?.image)
@@ -405,8 +407,10 @@ async function loadUNESCOPage() {
   const emit = (key, f) => ({ [key]: locStr(f, 'nl'), [`${key}_en`]: locStr(f, 'en') || locStr(f, 'nl') })
 
   return {
-    ...emit('heroTitle', d.heroTitle),
-    ...emit('heroPara',  d.heroPara),
+    ...emit('heroTitle',     d.heroTitle),
+    ...emit('heroPara',      d.heroPara),
+    ...emit('timelineBadge', d.timelineBadge),
+    ...emit('timelineTitle', d.timelineTitle),
     criteria: (d.criteria || []).map(c => ({
       code:   text(c.code),
       status: text(c.status),

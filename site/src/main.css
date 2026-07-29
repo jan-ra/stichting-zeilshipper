@@ -17,7 +17,7 @@ button { font-family: 'Source Sans 3', sans-serif; }
 img { max-width: 100%; display: block; }
 
 ::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: #0f2238; }
+::-webkit-scrollbar-track { background: #e4d8c2; }
 ::-webkit-scrollbar-thumb { background: #c19a52; border-radius: 3px; }
 
 @keyframes pulse {

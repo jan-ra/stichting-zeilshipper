@@ -87,6 +87,10 @@ async function uploadImage(relPath: string, alt: string) {
 async function uploadVideo(filename: string) {
   const abs  = path.join(VIDEOS, filename)
   const name = path.basename(abs)
+  if (!fs.existsSync(abs)) {
+    console.warn(`    ⚠ ${filename} not found — skipping (media item will have no attached video)`)
+    return null
+  }
   const data = fs.readFileSync(abs)
   const size = data.byteLength
   console.log(`    ↑ ${filename} (${(size / 1_000_000).toFixed(0)} MB)`)
@@ -441,7 +445,7 @@ const videoFiles = [
 ]
 for (const filename of videoFiles) {
   const doc = await uploadVideo(filename)
-  videos[filename] = doc.id as number
+  if (doc) videos[filename] = doc.id as number
 }
 
 const mediaItems = [

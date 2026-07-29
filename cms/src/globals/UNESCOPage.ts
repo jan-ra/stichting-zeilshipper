@@ -13,6 +13,10 @@ export const UNESCOPage: GlobalConfig = {
     { name: 'heroTitle', type: 'text',     localized: true, label: 'Page title' },
     { name: 'heroPara',  type: 'textarea', localized: true, label: 'Hero paragraph' },
 
+    // ── Timeline heading ──────────────────────────────────────────────────────
+    { name: 'timelineBadge', type: 'text', localized: true, label: 'Timeline badge (small uppercase label)' },
+    { name: 'timelineTitle', type: 'text', localized: true, label: 'Timeline section heading' },
+
     // ── Criteria ──────────────────────────────────────────────────────────────
     {
       name: 'criteria',

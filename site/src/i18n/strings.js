@@ -16,7 +16,8 @@ export const strings = {
       contact: 'Contact',
       mediaLabel: 'Media & Bouwdozen',
       copyright: '© 2025 Stichting Zeilschipper. Alle rechten voorbehouden.',
-      legal: ['Privacybeleid', 'Disclaimer', 'Toegankelijkheid'],
+      privacyLabel: 'Privacybeleid',
+      photoCreditsLabel: 'Fotoverantwoording',
     },
 
     pageTitles: {
@@ -30,6 +31,8 @@ export const strings = {
       'blog-detail': 'Artikel — Stichting Zeilschipper',
       'media-detail': 'Media — Stichting Zeilschipper',
       support: 'Steunbrief — Stichting Zeilschipper',
+      privacy: 'Privacybeleid — Stichting Zeilschipper',
+      'photo-credits': 'Fotoverantwoording — Stichting Zeilschipper',
     },
 
     regions: {
@@ -79,6 +82,7 @@ export const strings = {
         yearBuilt: 'Bouwjaar',
         passengers: 'Passagiers',
         region: 'Regio',
+        positionUpdated: 'Positie bijgewerkt',
       },
     },
 
@@ -87,11 +91,14 @@ export const strings = {
       of: 'van',
       ships: 'schepen',
       allTypes: 'Alle types',
+      otherType: 'Overig',
+      searchPlaceholder: 'Zoek een schip...',
       noShips: 'Geen schepen gevonden met de huidige filters.',
       clickHint: 'Klik een schip voor details',
       port: 'Haven',
       speed: 'Snelheid',
       passengers: 'Passagiers',
+      positionUpdated: 'Positie bijgewerkt',
       regionLabels: {
         all: "Alle regio's",
         thuiswateren: 'Nederland',
@@ -255,7 +262,8 @@ export const strings = {
       contact: 'Contact',
       mediaLabel: 'Media & Toolkits',
       copyright: '© 2025 Stichting Zeilschipper. All rights reserved.',
-      legal: ['Privacy Policy', 'Disclaimer', 'Accessibility'],
+      privacyLabel: 'Privacy Policy',
+      photoCreditsLabel: 'Photo Credits',
     },
 
     pageTitles: {
@@ -269,6 +277,8 @@ export const strings = {
       'blog-detail': 'Article — Stichting Zeilschipper',
       'media-detail': 'Media — Stichting Zeilschipper',
       support: 'Support Letter — Stichting Zeilschipper',
+      privacy: 'Privacy Policy — Stichting Zeilschipper',
+      'photo-credits': 'Photo Credits — Stichting Zeilschipper',
     },
 
     regions: {
@@ -318,6 +328,7 @@ export const strings = {
         yearBuilt: 'Year built',
         passengers: 'Passengers',
         region: 'Region',
+        positionUpdated: 'Position updated',
       },
     },
 
@@ -326,11 +337,14 @@ export const strings = {
       of: 'of',
       ships: 'ships',
       allTypes: 'All types',
+      otherType: 'Other',
+      searchPlaceholder: 'Search for a ship...',
       noShips: 'No ships found with the current filters.',
       clickHint: 'Click a ship for details',
       port: 'Port',
       speed: 'Speed',
       passengers: 'Passengers',
+      positionUpdated: 'Position updated',
       regionLabels: {
         all: 'All regions',
         thuiswateren: 'Netherlands',

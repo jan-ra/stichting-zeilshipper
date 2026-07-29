@@ -88,7 +88,7 @@ export default function BlogDetailPage({ navigate, blogSlug }) {
           <img
             src={asset(post.coverImage.src)}
             alt={post.coverImage.alt}
-            style={{ width: '100%', height: 480, objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+            style={{ width: '100%', height: 480, objectFit: 'cover', objectPosition: post.coverImageFocus || 'center', display: 'block' }}
           />
         </div>
       )}
@@ -110,10 +110,16 @@ export default function BlogDetailPage({ navigate, blogSlug }) {
               {body[0]}
             </p>
           )}
+          {imageAfter[1] && (
+            <figure style={{ margin: '8px 0 40px' }}>
+              <img src={asset(imageAfter[1].src)} alt={imageAfter[1].alt} style={{ width: '100%', display: 'block', borderRadius: 2 }} />
+              <figcaption style={{ marginTop: 10, fontSize: 12, color: 'rgba(15,34,56,0.45)', fontStyle: 'italic' }}>{imageAfter[1].alt}</figcaption>
+            </figure>
+          )}
 
           {/* Remaining paragraphs, with images interspersed */}
           {body?.slice(1).map((paragraph, i) => {
-            const paragraphIndex = i + 1
+            const paragraphIndex = i + 2
             const inlineImage = imageAfter[paragraphIndex]
             return (
               <div key={i}>
