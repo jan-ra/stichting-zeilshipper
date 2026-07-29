@@ -111,6 +111,11 @@ export default buildConfig({
     client: {
       url: process.env.DATABASE_URI || 'file:./data/payload.db',
     },
+    // Schema is managed exclusively through committed migrations (src/migrations),
+    // applied identically on local and prod. `push` (dev auto-sync) is OFF so that
+    // local schema can never silently drift from what prod will run.
+    push: false,
+    migrationDir: path.resolve(dirname, 'src/migrations'),
   }),
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

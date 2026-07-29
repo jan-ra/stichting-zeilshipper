@@ -8,7 +8,7 @@ on:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15   # 10-min AIS listen cap + checkout/npm ci/patch overhead
     steps:
       - uses: actions/checkout@v4
 
