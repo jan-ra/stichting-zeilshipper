@@ -1,47 +1,31 @@
 #!/usr/bin/env node
 /**
- * Nightly AIS position updater (adaptive).
+ * One-shot position updater via the MyShipTracking REST API.
  *
- * Fetches all ships with an MMSI + autoTrack from Payload, opens ONE WebSocket
- * to AISStream, and listens for PositionReport messages. Each ship is PATCHed
- * back to Payload the first time it is heard (incremental — a crash/timeout
- * keeps everything caught so far). Ships never heard keep their old position.
+ * Fetches all ships with an MMSI + autoTrack from Payload, asks MyShipTracking
+ * for their current positions in as few requests as possible, and PATCHes each
+ * ship that came back. Ships MyShipTracking has no recent position for keep
+ * their old coordinates.
  *
- * The listen ends on whichever comes first:
- *   • coverage target reached   (heard >= AIS_TARGET_COVERAGE of trackable)
- *   • diminishing returns       (no NEW ship heard in AIS_STALE_MS)
- *   • hard cap                  (AIS_MAX_TOTAL_MS total wall-clock)
- *
- * AISStream's free tier allows only ONE concurrent connection, so we keep a
- * single socket open and, if it drops, reconnect after a backoff — subscribing
- * to just the ships we still need. We never open connections in parallel.
+ * Credit usage is the floor for "position every ship once": the bulk endpoint
+ * with response=simple costs 1 credit per vessel, and we batch up to 100 MMSIs
+ * per HTTP call — so ~180 ships is 2 requests and ~180 credits, no polling.
  *
  * Required env vars:
- *   AISSTREAM_API_KEY     – from your aisstream.io account
- *   POSITION_BOT_API_KEY  – Payload API key for the position-bot editor user
- *   PAYLOAD_API_URL       – default: http://localhost:3001
- *
- * Optional tuning:
- *   AIS_MAX_TOTAL_MS       – hard cap on the whole run   (default: 600000 = 10 min)
- *   AIS_TARGET_COVERAGE    – stop when this fraction heard (default: 0.85)
- *   AIS_STALE_MS           – stop after this long with no new ship (default: 240000 = 4 min)
- *   AIS_RECONNECT_BACKOFF_MS – wait before reconnecting on a drop (default: 8000)
+ *   MYSHIPTRACKING_API_KEY – from your myshiptracking.com account
+ *   POSITION_BOT_API_KEY   – Payload API key for the position-bot editor user
+ *   PAYLOAD_API_URL        – default: http://localhost:3001
  */
 
-import WebSocket from 'ws'
-
 const API = (process.env.PAYLOAD_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
-const AISSTREAM_API_KEY    = process.env.AISSTREAM_API_KEY
+const MST_API_KEY          = process.env.MYSHIPTRACKING_API_KEY
 const POSITION_BOT_API_KEY = process.env.POSITION_BOT_API_KEY
-const AIS_URL              = 'wss://stream.aisstream.io/v0/stream'
+const MST_BULK_URL         = 'https://api.myshiptracking.com/api/v2/vessel/bulk'
 
-const MAX_TOTAL_MS   = Number(process.env.AIS_MAX_TOTAL_MS ?? 600_000)
-const TARGET_COVERAGE = Number(process.env.AIS_TARGET_COVERAGE ?? 0.85)
-const STALE_MS       = Number(process.env.AIS_STALE_MS ?? 240_000)
-const BACKOFF_MS     = Number(process.env.AIS_RECONNECT_BACKOFF_MS ?? 8_000)
+const CHUNK_SIZE = 100 // MyShipTracking bulk limit is 100 identifiers per request.
 
-if (!AISSTREAM_API_KEY)    { console.error('Missing AISSTREAM_API_KEY');    process.exit(1) }
-if (!POSITION_BOT_API_KEY) { console.error('Missing POSITION_BOT_API_KEY'); process.exit(1) }
+if (!MST_API_KEY)          { console.error('Missing MYSHIPTRACKING_API_KEY'); process.exit(1) }
+if (!POSITION_BOT_API_KEY) { console.error('Missing POSITION_BOT_API_KEY');   process.exit(1) }
 
 // ── Fetch ships that should be tracked ─────────────────────────────────────
 
@@ -61,16 +45,39 @@ async function fetchTrackedShips() {
   return tracked
 }
 
+// ── Ask MyShipTracking for a batch of positions ────────────────────────────
+
+async function fetchPositions(mmsis) {
+  const url = `${MST_BULK_URL}?mmsi=${mmsis.join(',')}&response=simple`
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${MST_API_KEY}` },
+  })
+  const charged = res.headers.get('x-credit-charged')
+  if (!res.ok) {
+    const body = await res.text().catch(() => '')
+    throw new Error(`GET /vessel/bulk returned ${res.status}: ${body.slice(0, 300)}`)
+  }
+  const json = await res.json()
+  if (json.status && json.status !== 'success') {
+    throw new Error(`MyShipTracking status "${json.status}": ${JSON.stringify(json).slice(0, 300)}`)
+  }
+  return { rows: Array.isArray(json.data) ? json.data : [], charged }
+}
+
 // ── PATCH a single ship's position ─────────────────────────────────────────
 
-async function patchShip(id, lat, lng) {
+async function patchShip(id, lat, lng, receivedAt) {
   const res = await fetch(`${API}/api/ships/${id}`, {
     method: 'PATCH',
     headers: {
       'Content-Type':  'application/json',
       'Authorization': `users API-Key ${POSITION_BOT_API_KEY}`,
     },
-    body: JSON.stringify({ lat, lng, positionUpdatedAt: new Date().toISOString() }),
+    body: JSON.stringify({
+      lat,
+      lng,
+      positionUpdatedAt: receivedAt || new Date().toISOString(),
+    }),
   })
   if (!res.ok) {
     const body = await res.text().catch(() => '')
@@ -79,6 +86,12 @@ async function patchShip(id, lat, lng) {
 }
 
 // ── Main ───────────────────────────────────────────────────────────────────
+
+function chunk(arr, size) {
+  const out = []
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size))
+  return out
+}
 
 async function main() {
   console.log(`Payload: ${API}`)
@@ -89,106 +102,49 @@ async function main() {
     return
   }
 
-  const all    = [...tracked.keys()]
-  const target = Math.ceil(all.length * TARGET_COVERAGE)
-  console.log(
-    `Tracking ${all.length} ship(s). Target ${target} (${Math.round(TARGET_COVERAGE * 100)}%), ` +
-    `cap ${Math.round(MAX_TOTAL_MS / 1000)}s, stale-stop ${Math.round(STALE_MS / 1000)}s.`,
-  )
+  const all     = [...tracked.keys()]
+  const batches = chunk(all, CHUNK_SIZE)
+  console.log(`Tracking ${all.length} ship(s) → ${batches.length} bulk request(s) of ≤${CHUNK_SIZE}.`)
 
-  const heard    = new Set()
-  const deadline = Date.now() + MAX_TOTAL_MS
-  let lastNewAt  = Date.now()
+  let heard      = 0
   let updated    = 0
-  let stopping   = false
-  let ws         = null
+  let creditsSum = 0
 
-  const remaining = () => all.filter(m => !heard.has(m))
-
-  await new Promise((resolve) => {
-    const timers = []
-    const finish = (reason) => {
-      if (stopping) return
-      stopping = true
-      for (const t of timers) clearInterval(t)
-      try { ws?.removeAllListeners('close'); ws?.close() } catch { /* noop */ }
-      console.log(`\nStopping — ${reason}.`)
-      resolve()
+  for (const [i, mmsis] of batches.entries()) {
+    let rows, charged
+    try {
+      ({ rows, charged } = await fetchPositions(mmsis))
+    } catch (err) {
+      console.error(`  ✗ batch ${i + 1}/${batches.length} failed: ${err.message}`)
+      continue
     }
+    if (charged != null) creditsSum += Number(charged) || 0
+    console.log(`  Batch ${i + 1}/${batches.length}: ${rows.length} position(s)${charged != null ? `, ${charged} credit(s)` : ''}.`)
 
-    // Stop-condition poller: hard cap + diminishing returns.
-    timers.push(setInterval(() => {
-      if (Date.now() >= deadline)              return finish(`hard cap ${Math.round(MAX_TOTAL_MS / 1000)}s reached`)
-      if (Date.now() - lastNewAt >= STALE_MS)  return finish(`no new ship in ${Math.round(STALE_MS / 1000)}s`)
-    }, 5_000))
+    for (const row of rows) {
+      const mmsi = String(row.mmsi ?? '').trim()
+      const lat  = row.lat
+      const lng  = row.lng
+      const ship = tracked.get(mmsi)
+      if (!ship || lat == null || lng == null) continue
 
-    // Progress heartbeat.
-    timers.push(setInterval(() => {
-      const remS = Math.max(0, Math.round((deadline - Date.now()) / 1000))
-      console.log(`  … heard ${heard.size}/${all.length}, ${remS}s until cap`)
-    }, 15_000))
-
-    const connect = () => {
-      if (stopping) return
-      const rem = remaining()
-      if (rem.length === 0) return finish('all ships heard')
-
-      ws = new WebSocket(AIS_URL)
-
-      ws.on('open', () => {
-        console.log(`  Connected — subscribed to ${rem.length} remaining MMSI(s).`)
-        ws.send(JSON.stringify({
-          APIKey:             AISSTREAM_API_KEY,
-          BoundingBoxes:      [[[-90, -180], [90, 180]]],
-          FiltersShipMMSI:    rem,
-          FilterMessageTypes: ['PositionReport'],
-        }))
-      })
-
-      ws.on('message', (raw) => {
-        let msg
-        try { msg = JSON.parse(raw) } catch { return }
-        if (msg.MessageType !== 'PositionReport') return
-
-        const mmsi = String(msg.MetaData?.MMSI ?? msg.Message?.PositionReport?.UserID ?? '')
-        const lat  = msg.Message?.PositionReport?.Latitude
-        const lng  = msg.Message?.PositionReport?.Longitude
-        if (!mmsi || lat == null || lng == null) return
-        if (!tracked.has(mmsi) || heard.has(mmsi)) return
-
-        heard.add(mmsi)
-        lastNewAt = Date.now()
-        const ship = tracked.get(mmsi)
-
-        // Incremental PATCH — persist progress immediately.
-        patchShip(ship.id, lat, lng)
-          .then(() => {
-            updated++
-            console.log(`  ✓ ${ship.name} (${mmsi}): ${lat.toFixed(5)}, ${lng.toFixed(5)}  [${heard.size}/${all.length}]`)
-          })
-          .catch(err => console.error(`  ✗ ${ship.name} (${mmsi}): ${err.message}`))
-
-        if (heard.size >= target) finish(`coverage target ${Math.round(TARGET_COVERAGE * 100)}% reached`)
-      })
-
-      // On an unexpected drop, reconnect with just the remaining ships (after a
-      // backoff, so we don't trip AISStream's reconnect rate limit → 429).
-      ws.on('close', () => {
-        if (stopping) return
-        console.log(`  Socket closed — reconnecting in ${Math.round(BACKOFF_MS / 1000)}s with ${remaining().length} remaining…`)
-        timers.push(setTimeout(connect, BACKOFF_MS))
-      })
-
-      ws.on('error', (err) => {
-        console.error(`  WebSocket error: ${err.message}`)
-        try { ws.close() } catch { /* 'close' handles reconnect */ }
-      })
+      heard++
+      try {
+        await patchShip(ship.id, lat, lng, row.received)
+        updated++
+        console.log(`  ✓ ${ship.name} (${mmsi}): ${Number(lat).toFixed(5)}, ${Number(lng).toFixed(5)}`)
+      } catch (err) {
+        console.error(`  ✗ ${ship.name} (${mmsi}): ${err.message}`)
+      }
     }
+  }
 
-    connect()
-  })
-
-  console.log(`Done. Heard ${heard.size}/${all.length}, updated ${updated} ship(s).`)
+  const missing = all.length - heard
+  console.log(
+    `\nDone. Positioned ${heard}/${all.length} ship(s), updated ${updated}` +
+    `${missing ? `, ${missing} had no recent position` : ''}` +
+    `${creditsSum ? `. Credits charged: ${creditsSum}` : ''}.`,
+  )
 }
 
 main().catch(err => {

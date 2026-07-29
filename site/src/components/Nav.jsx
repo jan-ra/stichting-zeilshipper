@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { NAV_SETTINGS, SITE_SETTINGS } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 
@@ -12,27 +12,19 @@ const NAV_LINK_KEYS = [
 ]
 
 export default function Nav({ currentPage, navigate }) {
-  const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const { lang, toggle, t, tc } = useLanguage()
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  const isHome = currentPage === 'home'
-  const needsSolid = !isHome || scrolled
-  const bg = needsSolid ? 'rgba(15,34,56,0.98)' : 'transparent'
-  const borderB = needsSolid ? '1px solid rgba(193,154,82,0.2)' : '1px solid transparent'
+  // Nav stays solid navy at all times (the pages beneath it are light).
+  const bg = 'rgba(15,34,56,0.98)'
+  const borderB = '1px solid rgba(193,154,82,0.2)'
 
   return (
     <nav style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
       background: bg, borderBottom: borderB,
       transition: 'background 0.5s ease, border-color 0.5s ease',
-      backdropFilter: needsSolid ? 'blur(12px)' : 'none',
+      backdropFilter: 'blur(12px)',
     }}>
       <div style={{
         maxWidth: 1280, margin: '0 auto', padding: '0 2rem',

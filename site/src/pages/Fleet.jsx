@@ -3,28 +3,59 @@ import { SHIPS, FLEET_PAGE } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import { asset } from '../utils/asset.js'
 
-const EASTER_EGGS = [
-  { id: 'bbz', name: 'BBZ', type: 'Organisatie', year: 1995, port: 'Amsterdam', address: 'Aambeeldstraat 20, Amsterdam', region: 'thuiswateren', lat: 52.399, lng: 4.895, isEasterEgg: true },
-  { id: 'ezs', name: 'Enkhuizer Zeevaartschool', type: 'Zeevaartschool', year: 1875, port: 'Enkhuizen', address: 'Kuipersdijk 15, Enkhuizen', region: 'thuiswateren', lat: 52.702, lng: 5.287, isEasterEgg: true },
+const ALL_ITEMS = SHIPS
+
+// Fold the many raw type variants (koftjalk, driemastklipper, lemsteraak, …) into
+// a handful of ship families. First match wins, so order matters (aak before
+// klipper so "klipperaak" lands under Aak; schoener before brik for "schoenerbrik").
+const TYPE_GROUPS = [
+  { label: 'Tjalk',   match: t => t.includes('tjalk') },
+  { label: 'Aak',     match: t => t.includes('aak') },
+  { label: 'Klipper', match: t => t.includes('klipper') },
+  { label: 'Schoener', match: t => t.includes('schoener') },
+  { label: 'Bark',    match: t => t.includes('bark') },
+  { label: 'Brik',    match: t => t.includes('brik') || t.includes('brigantijn') },
+  { label: 'Logger',  match: t => t.includes('logger') },
+  { label: 'Kotter',  match: t => t.includes('kotter') },
+  { label: 'Skûtsje', match: t => t.includes('skûtsje') || t.includes('skutsje') },
 ]
 
-const ALL_ITEMS = [...SHIPS, ...EASTER_EGGS]
+const OTHER = 'Overig'
 
-const TYPES = ['all', 'Tjalk', 'Klipper', 'Schoener', 'Galjas', 'Botter', 'Topzeilschoener', 'Volschip', 'Bark', 'Barkentijn', 'Schoenerbrik', 'Aak', 'Klipperaak', 'Stevenaak', 'Brig', 'easter-egg']
+// globe.gl uses a globe radius of 100; camera distance = (1 + altitude) * 100.
+// MIN_ALTITUDE is the closest the controls allow, so a selected ship zooms all the way in.
+const MIN_ALTITUDE = 0.2
+const MIN_DISTANCE = (1 + MIN_ALTITUDE) * 100
+
+const categoryOf = (type) => {
+  const t = (type || '').toLowerCase()
+  return TYPE_GROUPS.find(g => g.match(t))?.label ?? OTHER
+}
+
+const presentCats = new Set(SHIPS.map(s => categoryOf(s.type)))
+const TYPES = [
+  'all',
+  ...TYPE_GROUPS.map(g => g.label).filter(l => presentCats.has(l)),
+  ...(presentCats.has(OTHER) ? [OTHER] : []),
+]
 const REGIONS = ['all', 'thuiswateren', 'europa', 'wereld']
+
+const matchesSearch = (s, q) => {
+  if (!q) return true
+  const needle = q.trim().toLowerCase()
+  return [s.name, s.type, s.port].some(v => v && v.toLowerCase().includes(needle))
+}
 
 function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positionLabel }) {
   const containerRef = useRef(null)
   const globeRef = useRef(null)
   const filterRef = useRef(filter)
   const updatePointsRef = useRef(null)
-  const suppressRingsRef = useRef(null)
 
   const getFiltered = (f) => ALL_ITEMS.filter(s => {
-    if (f.type === 'easter-egg') return s.isEasterEgg
-    if (s.isEasterEgg) return f.type === 'all'
-    if (f.type !== 'all' && s.type !== f.type) return false
+    if (f.type !== 'all' && categoryOf(s.type) !== f.type) return false
     if (f.region !== 'all' && s.region !== f.region) return false
+    if (!matchesSearch(s, f.search)) return false
     return true
   })
 
@@ -50,12 +81,6 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positio
         .pointRadius(0.35)
         .pointAltitude(0.001)
         .pointResolution(8)
-        .ringsData(ALL_ITEMS)
-        .ringLat('lat').ringLng('lng')
-        .ringColor(() => t => `rgba(193,154,82,${Math.pow(1 - t, 1.5) * 0.9})`)
-        .ringMaxRadius(4)
-        .ringPropagationSpeed(1.5)
-        .ringRepeatPeriod(3000)
         .htmlElementsData(ALL_ITEMS)
         .htmlLat('lat').htmlLng('lng')
         .htmlAltitude(0.001)
@@ -94,32 +119,20 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positio
         globe
           .pointColor(d => filteredIds.has(d.id) ? '#c19a52' : 'rgba(193,154,82,0.15)')
           .pointRadius(d => (filteredIds.has(d.id) ? 0.35 : 0.18) * scale)
-          .ringColor(d => filteredIds.has(d.id)
-            ? t => `rgba(193,154,82,${Math.pow(1 - t, 1.5) * 0.9})`
-            : () => 'rgba(0,0,0,0)')
-          .ringMaxRadius(4 * scale)
       }
       updatePointsRef.current = updatePoints
-
-      let suppressTimer = null
-      const suppressRings = () => {
-        globe.ringsData([])
-        clearTimeout(suppressTimer)
-        suppressTimer = setTimeout(() => { globe.ringsData(ALL_ITEMS); updatePoints() }, 400)
-      }
-      suppressRingsRef.current = suppressRings
 
       let lastAlt = REF_ALT
       globe.controls().addEventListener('change', () => {
         const alt = globe.pointOfView().altitude
-        if (Math.abs(alt - lastAlt) > 0.001) { lastAlt = alt; updatePoints(); suppressRings() }
+        if (Math.abs(alt - lastAlt) > 0.0005) { lastAlt = alt; updatePoints() }
       })
 
       globe.controls().autoRotate = true
       globe.controls().autoRotateSpeed = 0.18
       globe.controls().enableZoom = true
       globe.controls().enablePan = false
-      globe.controls().minDistance = 120
+      globe.controls().minDistance = MIN_DISTANCE
       globe.controls().maxDistance = 380
       globe.controls().addEventListener('start', () => { globe.controls().autoRotate = false }, { once: true })
       globe.pointOfView({ lat: 52.5, lng: 5.0, altitude: 1.8 }, 0)
@@ -128,7 +141,7 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positio
     const ro = new ResizeObserver(entries => {
       const { width, height } = entries[0].contentRect
       if (!globe && width > 0 && height > 0) initGlobe(width, height)
-      else if (globe) { globe.width(width).height(height); suppressRingsRef.current?.() }
+      else if (globe) { globe.width(width).height(height); updatePointsRef.current?.() }
     })
     ro.observe(containerRef.current)
 
@@ -159,7 +172,7 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positio
   useEffect(() => {
     if (!globeRef.current) return
     if (selectedShip) {
-      globeRef.current.pointOfView({ lat: selectedShip.lat, lng: selectedShip.lng, altitude: 1.0 }, 1800)
+      globeRef.current.pointOfView({ lat: selectedShip.lat, lng: selectedShip.lng, altitude: MIN_ALTITUDE }, 1800)
     } else {
       globeRef.current.pointOfView({ lat: 52.5, lng: 5.0, altitude: 1.8 }, 1500)
     }
@@ -170,7 +183,7 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positio
 
 export default function FleetPage() {
   const [selected, setSelected] = useState(null)
-  const [filter, setFilter] = useState({ type: 'all', region: 'all' })
+  const [filter, setFilter] = useState({ type: 'all', region: 'all', search: '' })
   const [userInteracted, setUserInteracted] = useState(false)
   const [lightbox, setLightbox] = useState(null)
   const { t, tc } = useLanguage()
@@ -178,14 +191,13 @@ export default function FleetPage() {
   const regionLabels = t('fleet.regionLabels')
 
   const filtered = ALL_ITEMS.filter(s => {
-    if (filter.type === 'easter-egg') return s.isEasterEgg
-    if (s.isEasterEgg) return filter.type === 'all'
-    if (filter.type !== 'all' && s.type !== filter.type) return false
+    if (filter.type !== 'all' && categoryOf(s.type) !== filter.type) return false
     if (filter.region !== 'all' && s.region !== filter.region) return false
+    if (!matchesSearch(s, filter.search)) return false
     return true
   })
 
-  const shipCount = filtered.filter(s => !s.isEasterEgg).length
+  const shipCount = filtered.length
 
   const handleSelect = (item) => {
     setUserInteracted(true)
@@ -193,16 +205,16 @@ export default function FleetPage() {
   }
 
   return (
-    <div style={{ paddingTop: 68, height: '100vh', overflow: 'hidden', background: '#0f2238' }}>
+    <div style={{ paddingTop: 68, height: '100vh', overflow: 'hidden', background: '#f4ede1' }}>
 
       {/* ── Crew notice banner ── */}
-      <div style={{ background: 'linear-gradient(90deg, rgba(193,154,82,0.18) 0%, rgba(193,154,82,0.06) 60%, transparent 100%)', borderBottom: '1px solid rgba(193,154,82,0.25)', padding: '18px 40px', display: 'flex', alignItems: 'center', gap: 24 }}>
+      <div style={{ background: 'linear-gradient(90deg, rgba(193,154,82,0.22) 0%, rgba(193,154,82,0.08) 60%, transparent 100%)', borderBottom: '1px solid rgba(193,154,82,0.3)', padding: '18px 40px', display: 'flex', alignItems: 'center', gap: 24 }}>
         <div style={{ width: 1, height: 44, background: 'linear-gradient(to bottom, transparent, #c19a52, transparent)', flexShrink: 0 }} />
         <div>
-          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, color: '#f4ede1', fontWeight: 400, letterSpacing: '0.01em', marginBottom: 5 }}>
+          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, color: '#0f2238', fontWeight: 400, letterSpacing: '0.01em', marginBottom: 5 }}>
             {tc(FLEET_PAGE, 'bannerQuote')}
           </div>
-          <div style={{ fontSize: 12, color: 'rgba(244,237,225,0.45)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: 12, color: 'rgba(15,34,56,0.5)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
             {tc(FLEET_PAGE, 'bannerSub')}
           </div>
         </div>
@@ -211,34 +223,60 @@ export default function FleetPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '420px 1fr', height: 'calc(100vh - 68px - 59px)' }} className="fleet-grid">
 
         {/* ── Left: scrollable ship panel ── */}
-        <div style={{ overflowY: 'auto', background: '#0a1a2e', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ overflowY: 'auto', background: '#efe7d8', display: 'flex', flexDirection: 'column' }}>
 
           {/* Sticky header + filters */}
-          <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#0a1a2e', padding: '28px 24px 16px', borderBottom: '1px solid rgba(193,154,82,0.12)' }}>
-            <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 6 }}>{t('fleet.badge')}</div>
-            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: '#f4ede1', fontWeight: 400, marginBottom: 16 }}>
-              {shipCount} <span style={{ fontSize: 14, color: 'rgba(244,237,225,0.4)', fontFamily: 'inherit', fontWeight: 400 }}>{t('fleet.of')} {SHIPS.length} {t('fleet.ships')}</span>
+          <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#efe7d8', padding: '28px 24px 16px', borderBottom: '1px solid rgba(193,154,82,0.25)' }}>
+            <div style={{ fontSize: 10, color: '#a07d33', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 6 }}>{t('fleet.badge')}</div>
+            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: '#0f2238', fontWeight: 400, marginBottom: 16 }}>
+              {shipCount} <span style={{ fontSize: 14, color: 'rgba(15,34,56,0.45)', fontFamily: 'inherit', fontWeight: 400 }}>{t('fleet.of')} {SHIPS.length} {t('fleet.ships')}</span>
+            </div>
+            <div style={{ position: 'relative', marginBottom: 12 }}>
+              <input
+                type="text"
+                value={filter.search}
+                onChange={e => setFilter(f => ({ ...f, search: e.target.value }))}
+                placeholder={t('fleet.searchPlaceholder')}
+                style={{
+                  width: '100%', boxSizing: 'border-box',
+                  padding: '9px 30px 9px 12px',
+                  background: '#faf6ee', border: '1px solid rgba(193,154,82,0.35)',
+                  borderRadius: 2, fontSize: 13, color: '#0f2238',
+                  fontFamily: 'inherit', outline: 'none',
+                }}
+              />
+              {filter.search && (
+                <button
+                  onClick={() => setFilter(f => ({ ...f, search: '' }))}
+                  aria-label="clear search"
+                  style={{
+                    position: 'absolute', top: '50%', right: 8, transform: 'translateY(-50%)',
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: 'rgba(15,34,56,0.4)', fontSize: 15, lineHeight: 1, padding: 0,
+                  }}
+                >✕</button>
+              )}
             </div>
             <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap', marginBottom: 6 }}>
               {TYPES.map(o => (
                 <button key={o} onClick={() => setFilter(f => ({ ...f, type: o }))} style={{
-                  background: filter.type === o ? '#c19a52' : 'rgba(15,34,56,0.7)',
+                  background: filter.type === o ? '#c19a52' : 'rgba(15,34,56,0.06)',
                   border: 'none', cursor: 'pointer',
                   fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase',
-                  color: filter.type === o ? '#0f2238' : 'rgba(244,237,225,0.5)',
+                  color: filter.type === o ? '#0f2238' : 'rgba(15,34,56,0.55)',
                   padding: '5px 10px', borderRadius: 2, transition: 'all 0.2s', whiteSpace: 'nowrap',
                 }}>
-                  {o === 'all' ? t('fleet.allTypes') : o === 'easter-egg' ? '🥚 Easter Eggs' : o}
+                  {o === 'all' ? t('fleet.allTypes') : o === OTHER ? t('fleet.otherType') : o}
                 </button>
               ))}
             </div>
             <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
               {REGIONS.map(o => (
                 <button key={o} onClick={() => setFilter(f => ({ ...f, region: o }))} style={{
-                  background: filter.region === o ? '#c19a52' : 'rgba(15,34,56,0.7)',
+                  background: filter.region === o ? '#c19a52' : 'rgba(15,34,56,0.06)',
                   border: 'none', cursor: 'pointer',
                   fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase',
-                  color: filter.region === o ? '#0f2238' : 'rgba(244,237,225,0.5)',
+                  color: filter.region === o ? '#0f2238' : 'rgba(15,34,56,0.55)',
                   padding: '5px 10px', borderRadius: 2, transition: 'all 0.2s', whiteSpace: 'nowrap',
                 }}>
                   {regionLabels[o]}
@@ -247,9 +285,60 @@ export default function FleetPage() {
             </div>
           </div>
 
-          {/* Selected detail card */}
+          {/* List */}
+          <div style={{ padding: '12px 16px 24px', display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
+            {filtered.map(item => (
+              <div
+                key={item.id}
+                onClick={() => handleSelect(item)}
+                style={{
+                  background: selected?.id === item.id ? 'rgba(193,154,82,0.16)' : '#faf6ee',
+                  border: `1px solid ${selected?.id === item.id ? 'rgba(193,154,82,0.45)' : 'rgba(15,34,56,0.08)'}`,
+                  padding: '14px 18px', cursor: 'pointer', transition: 'all 0.2s',
+                }}
+                onMouseEnter={e => { if (selected?.id !== item.id) e.currentTarget.style.background = 'rgba(193,154,82,0.1)' }}
+                onMouseLeave={e => { if (selected?.id !== item.id) e.currentTarget.style.background = '#faf6ee' }}
+              >
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  {item.image && (
+                    <img src={asset(item.image)} alt={item.name} style={{ width: 52, height: 52, objectFit: 'cover', borderRadius: 2, flexShrink: 0 }} />
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontSize: 10, color: '#a07d33', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>{item.type} · {item.year}</div>
+                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 15, color: '#0f2238' }}>{item.name}</div>
+                      </div>
+                      <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#c19a52', boxShadow: '0 0 5px rgba(193,154,82,0.6)', flexShrink: 0, animation: 'pulse 2.5s ease-in-out infinite' }} />
+                    </div>
+                    <div style={{ marginTop: 6, fontSize: 11, color: 'rgba(15,34,56,0.5)', display: 'flex', gap: 14 }}>
+                      <span>{item.port}</span>
+                      <span>{item.passengers} pax</span>
+                    </div>
+                    {item.positionUpdatedAt && (
+                      <div style={{ marginTop: 4, fontSize: 10, color: 'rgba(15,34,56,0.55)' }}>
+                        {t('fleet.positionUpdated')}: {new Date(item.positionUpdatedAt).toLocaleString()}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {filtered.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: 'rgba(15,34,56,0.45)', fontSize: 14 }}>
+                {t('fleet.noShips')}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── Right: globe ── */}
+        <div style={{ background: '#f4ede1', position: 'relative' }}>
+          <FleetGlobe onShipClick={handleSelect} filter={filter} selectedShip={selected} userInteracted={userInteracted} positionLabel={t('fleet.positionUpdated')} />
+
+          {/* Selected detail card — overlaid top-right over the globe */}
           {selected && (
-            <div style={{ margin: '12px 16px 0', background: 'rgba(193,154,82,0.1)', border: '1px solid rgba(193,154,82,0.4)', borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: 20, right: 20, width: 320, maxWidth: 'calc(100% - 40px)', zIndex: 20, background: 'rgba(15,34,56,0.94)', border: '1px solid rgba(193,154,82,0.5)', borderRadius: 3, overflow: 'hidden', boxShadow: '0 12px 40px rgba(8,18,34,0.45)', backdropFilter: 'blur(4px)' }}>
               {selected.image && (
                 <div style={{ position: 'relative', cursor: 'zoom-in' }} onClick={() => setLightbox(asset(selected.image))}>
                   <img src={asset(selected.image)} alt={selected.name} style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }} />
@@ -259,101 +348,35 @@ export default function FleetPage() {
                 </div>
               )}
               <div style={{ padding: '16px 20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-                <div>
-                  <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>{selected.type} · {selected.year}</div>
-                  <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: '#f4ede1' }}>{selected.name}</div>
-                </div>
-                <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(244,237,225,0.4)', fontSize: 16, padding: 0, lineHeight: 1 }}>✕</button>
-              </div>
-              {selected.isEasterEgg ? (
-                <div style={{ fontSize: 13, color: 'rgba(244,237,225,0.55)', lineHeight: 1.6 }}>
-                  📍 {selected.address}
-                </div>
-              ) : (
-                <>
-                  <div style={{ display: 'flex', gap: 20, fontSize: 12, color: 'rgba(244,237,225,0.55)' }}>
-                    {[
-                      [t('fleet.port'), selected.port],
-                      [t('fleet.speed'), `${selected.speed} kn`],
-                      [t('fleet.passengers'), selected.passengers],
-                    ].map(([k, v]) => (
-                      <div key={k}>
-                        <div style={{ fontSize: 10, color: 'rgba(244,237,225,0.35)', marginBottom: 2 }}>{k}</div>
-                        <div style={{ color: '#f4ede1' }}>{v}</div>
-                      </div>
-                    ))}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+                  <div>
+                    <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>{selected.type} · {selected.year}</div>
+                    <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: '#f4ede1' }}>{selected.name}</div>
                   </div>
-                  {selected.positionUpdatedAt && (
-                    <div style={{ marginTop: 10, fontSize: 11, color: 'rgba(244,237,225,0.55)', letterSpacing: '0.02em' }}>
-                      {t('fleet.positionUpdated')}: {new Date(selected.positionUpdatedAt).toLocaleString()}
+                  <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(244,237,225,0.5)', fontSize: 16, padding: 0, lineHeight: 1 }}>✕</button>
+                </div>
+                <div style={{ display: 'flex', gap: 20, fontSize: 12, color: 'rgba(244,237,225,0.7)' }}>
+                  {[
+                    [t('fleet.port'), selected.port],
+                    [t('fleet.passengers'), selected.passengers],
+                  ].map(([k, v]) => (
+                    <div key={k}>
+                      <div style={{ fontSize: 10, color: 'rgba(244,237,225,0.45)', marginBottom: 2 }}>{k}</div>
+                      <div style={{ color: '#f4ede1' }}>{v}</div>
                     </div>
-                  )}
-                </>
-              )}
+                  ))}
+                </div>
+                {selected.positionUpdatedAt && (
+                  <div style={{ marginTop: 10, fontSize: 11, color: 'rgba(244,237,225,0.55)', letterSpacing: '0.02em' }}>
+                    {t('fleet.positionUpdated')}: {new Date(selected.positionUpdatedAt).toLocaleString()}
+                  </div>
+                )}
               </div>
             </div>
           )}
 
-          {/* List */}
-          <div style={{ padding: '12px 16px 24px', display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
-            {filtered.map(item => (
-              <div
-                key={item.id}
-                onClick={() => handleSelect(item)}
-                style={{
-                  background: selected?.id === item.id ? 'rgba(193,154,82,0.12)' : 'rgba(15,34,56,0.5)',
-                  border: `1px solid ${selected?.id === item.id ? 'rgba(193,154,82,0.4)' : 'rgba(255,255,255,0.04)'}`,
-                  padding: '14px 18px', cursor: 'pointer', transition: 'all 0.2s',
-                }}
-                onMouseEnter={e => { if (selected?.id !== item.id) e.currentTarget.style.background = 'rgba(193,154,82,0.07)' }}
-                onMouseLeave={e => { if (selected?.id !== item.id) e.currentTarget.style.background = 'rgba(15,34,56,0.5)' }}
-              >
-                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                  {item.image && (
-                    <img src={asset(item.image)} alt={item.name} style={{ width: 52, height: 52, objectFit: 'cover', borderRadius: 2, flexShrink: 0 }} />
-                  )}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>{item.type} · {item.year}</div>
-                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 15, color: '#f4ede1' }}>{item.name}</div>
-                      </div>
-                      <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#c19a52', boxShadow: '0 0 5px rgba(193,154,82,0.6)', flexShrink: 0, animation: 'pulse 2.5s ease-in-out infinite' }} />
-                    </div>
-                    <div style={{ marginTop: 6, fontSize: 11, color: 'rgba(244,237,225,0.38)', display: 'flex', gap: 14 }}>
-                      {item.isEasterEgg ? (
-                        <span>📍 {item.address}</span>
-                      ) : (
-                        <>
-                          <span>📍 {item.port}</span>
-                          <span>⚡ {item.speed} kn</span>
-                          <span>👥 {item.passengers}</span>
-                        </>
-                      )}
-                    </div>
-                    {!item.isEasterEgg && item.positionUpdatedAt && (
-                      <div style={{ marginTop: 4, fontSize: 10, color: 'rgba(244,237,225,0.55)' }}>
-                        {t('fleet.positionUpdated')}: {new Date(item.positionUpdatedAt).toLocaleString()}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-            {filtered.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '40px 0', color: 'rgba(244,237,225,0.35)', fontSize: 14 }}>
-                {t('fleet.noShips')}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ── Right: globe ── */}
-        <div style={{ background: '#0b1d30', position: 'relative' }}>
-          <FleetGlobe onShipClick={handleSelect} filter={filter} selectedShip={selected} userInteracted={userInteracted} positionLabel={t('fleet.positionUpdated')} />
           {!selected && (
-            <div style={{ position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', fontSize: 10, color: 'rgba(244,237,225,0.22)', letterSpacing: '0.15em', textTransform: 'uppercase', pointerEvents: 'none', whiteSpace: 'nowrap' }}>
+            <div style={{ position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', fontSize: 10, color: 'rgba(193,154,82,0.7)', letterSpacing: '0.15em', textTransform: 'uppercase', pointerEvents: 'none', whiteSpace: 'nowrap' }}>
               {t('fleet.clickHint')}
             </div>
           )}

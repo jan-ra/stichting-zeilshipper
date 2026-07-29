@@ -5,6 +5,7 @@ dist-ssr/
 .env
 .env.local
 .env.*.local
+.env.push
 *.local
 vite.config.js.timestamp-*
 

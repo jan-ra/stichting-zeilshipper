@@ -4,6 +4,7 @@
 .env.*.local
 *.local
 .env.pull
+.env.push
 
 # Logs
 logs/
