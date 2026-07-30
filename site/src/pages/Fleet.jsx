@@ -40,18 +40,49 @@ const TYPES = [
 ]
 const REGIONS = ['all', 'thuiswateren', 'europa', 'wereld']
 
+// Ships moored in the same harbour basin share ~the same coordinates. Group them
+// so the globe shows one stacked marker per spot instead of overlapping pins.
+const LOCATION_GROUPS = (() => {
+  const byLoc = new Map()
+  for (const s of ALL_ITEMS) {
+    if (s.lat == null || s.lng == null) continue
+    const key = s.lat.toFixed(3) + ',' + s.lng.toFixed(3)
+    if (!byLoc.has(key)) byLoc.set(key, { id: key, lat: s.lat, lng: s.lng, ships: [] })
+    byLoc.get(key).ships.push(s)
+  }
+  return [...byLoc.values()]
+})()
+
 const matchesSearch = (s, q) => {
   if (!q) return true
   const needle = q.trim().toLowerCase()
   return [s.name, s.type, s.port].some(v => v && v.toLowerCase().includes(needle))
 }
 
-function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positionLabel }) {
+const buildTipHtml = (group, positionLabel, shipsHereLabel) => {
+  if (group.ships.length === 1) {
+    const s = group.ships[0]
+    let html = s.image ? `<img src="${asset(s.image)}" style="width:160px;height:100px;object-fit:cover;display:block;margin-bottom:8px;border-radius:2px;" />` : ''
+    html += `<strong style="color:#f4ede1;font-size:14px">${s.name}</strong>`
+    html += `<br><span style="color:#c19a52;font-size:11px">${s.type}</span>`
+    html += `<br><span style="color:rgba(244,237,225,0.6);font-size:12px">${s.port}</span>`
+    if (s.positionUpdatedAt) html += `<br><span style="color:rgba(244,237,225,0.55);font-size:11px">${positionLabel}: ${new Date(s.positionUpdatedAt).toLocaleString()}</span>`
+    return html
+  }
+  let html = `<strong style="color:#f4ede1;font-size:13px">${group.ships.length} ${shipsHereLabel}</strong>`
+  html += '<div style="margin-top:6px;display:flex;flex-direction:column;gap:4px;">'
+  html += group.ships.map(s => `<div style="color:#f4ede1;font-size:12px">${s.name} <span style="color:rgba(244,237,225,0.5);font-size:10px">· ${s.type}</span></div>`).join('')
+  html += '</div>'
+  return html
+}
+
+function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positionLabel, shipsHereLabel, pickShipLabel }) {
   const containerRef = useRef(null)
   const globeRef = useRef(null)
   const filterRef = useRef(filter)
   const selectedRef = useRef(selectedShip)
   const updatePointsRef = useRef(null)
+  const closeAllPickersRef = useRef(null)
 
   const getFiltered = (f) => ALL_ITEMS.filter(s => {
     if (f.type !== 'all' && categoryOf(s.type) !== f.type) return false
@@ -76,11 +107,11 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positio
         .showAtmosphere(true)
         .atmosphereColor('#3a7abd')
         .atmosphereAltitude(0.22)
-        .pointsData(ALL_ITEMS)
+        .pointsData(LOCATION_GROUPS)
         .pointLat('lat').pointLng('lng')
         .pointColor(() => '#c19a52')
         .pointRadius(0.35)
-        .pointAltitude(d => d.id === selectedRef.current?.id ? 0.006 : 0.001)
+        .pointAltitude(0)
         .pointResolution(8)
         .ringsData([])
         .ringLat('lat').ringLng('lng')
@@ -88,33 +119,76 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positio
         .ringMaxRadius(2.8)
         .ringPropagationSpeed(1.4)
         .ringRepeatPeriod(2200)
-        .htmlElementsData(ALL_ITEMS)
+        .htmlElementsData(LOCATION_GROUPS)
         .htmlLat('lat').htmlLng('lng')
         .htmlAltitude(0.001)
         .htmlElement(d => {
           const tip = document.createElement('div')
           tip.className = '_ship-tip'
           tip.style.cssText = 'position:fixed;pointer-events:none;display:none;z-index:9999;background:rgba(15,34,56,0.95);border:1px solid rgba(193,154,82,0.5);padding:10px 14px;border-radius:3px;font-family:sans-serif;min-width:150px;'
-          {
-            let html = d.image ? `<img src="${asset(d.image)}" style="width:160px;height:100px;object-fit:cover;display:block;margin-bottom:8px;border-radius:2px;" />` : ''
-            html += `<strong style="color:#f4ede1;font-size:14px">${d.name}</strong>`
-            html += `<br><span style="color:#c19a52;font-size:11px">${d.type}</span>`
-            html += `<br><span style="color:rgba(244,237,225,0.6);font-size:12px">${d.port}</span>`
-            if (d.positionUpdatedAt) html += `<br><span style="color:rgba(244,237,225,0.55);font-size:11px">${positionLabel}: ${new Date(d.positionUpdatedAt).toLocaleString()}</span>`
-            tip.innerHTML = html
-          }
+          tip.innerHTML = buildTipHtml(d, positionLabel, shipsHereLabel)
           document.body.appendChild(tip)
 
+          let picker = null
+          if (d.ships.length > 1) {
+            picker = document.createElement('div')
+            picker.className = '_ship-picker'
+            picker.style.cssText = 'position:fixed;display:none;z-index:9999;background:rgba(15,34,56,0.97);border:1px solid rgba(193,154,82,0.5);border-radius:3px;font-family:sans-serif;min-width:190px;max-width:260px;max-height:240px;overflow-y:auto;box-shadow:0 12px 40px rgba(8,18,34,0.45);'
+            const header = document.createElement('div')
+            header.style.cssText = 'padding:8px 12px;color:rgba(244,237,225,0.5);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;border-bottom:1px solid rgba(193,154,82,0.25);'
+            header.textContent = pickShipLabel
+            picker.appendChild(header)
+            d.ships.forEach(s => {
+              const row = document.createElement('div')
+              row.style.cssText = 'padding:8px 12px;color:#f4ede1;font-size:12px;cursor:pointer;'
+              row.innerHTML = `${s.name} <span style="color:rgba(244,237,225,0.5);font-size:10px">· ${s.type}</span>`
+              row.addEventListener('mouseenter', () => { row.style.background = 'rgba(193,154,82,0.15)' })
+              row.addEventListener('mouseleave', () => { row.style.background = 'none' })
+              row.addEventListener('click', e => {
+                e.stopPropagation()
+                picker.style.display = 'none'
+                onShipClick(s)
+              })
+              picker.appendChild(row)
+            })
+            document.body.appendChild(picker)
+          }
+
           const el = document.createElement('div')
-          el.style.cssText = 'width:52px;height:52px;border-radius:50%;cursor:pointer;transform:translate(-50%,-50%);background:rgba(0,0,0,0.001);pointer-events:auto;'
-          el.addEventListener('mouseenter', () => { tip.style.display = 'block' })
-          el.addEventListener('mousemove', e => {
-            tip.style.left = (e.clientX + 16) + 'px'
-            tip.style.top = (e.clientY - 10) + 'px'
-          })
+          const size = Math.min(52 + (d.ships.length - 1) * 4, 84)
+          el.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;cursor:pointer;transform:translate(-50%,-50%);background:rgba(0,0,0,0.001);pointer-events:auto;`
+
+          // Anchor to the pin's actual screen position (its bounding-rect center),
+          // not the raw cursor — the hit circle is padded well beyond the dot itself.
+          const pinCenter = () => {
+            const rect = el.getBoundingClientRect()
+            return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+          }
+          const positionTip = () => {
+            const { x, y } = pinCenter()
+            tip.style.left = (x + size / 2 + 8) + 'px'
+            tip.style.top = (y - tip.offsetHeight / 2) + 'px'
+          }
+          el.addEventListener('mouseenter', () => { tip.style.display = 'block'; positionTip() })
+          el.addEventListener('mousemove', positionTip)
           el.addEventListener('mouseleave', () => { tip.style.display = 'none' })
-          el.addEventListener('click', () => onShipClick(d))
+          el.addEventListener('click', e => {
+            if (!picker) { onShipClick(d.ships[0]); return }
+            e.stopPropagation()
+            document.querySelectorAll('._ship-picker').forEach(p => { if (p !== picker) p.style.display = 'none' })
+            const opening = picker.style.display !== 'block'
+            if (opening) {
+              tip.style.display = 'none'
+              const { x, y } = pinCenter()
+              picker.style.left = (x + size / 2 + 8) + 'px'
+              picker.style.top = (y - 10) + 'px'
+              picker.style.display = 'block'
+            } else {
+              picker.style.display = 'none'
+            }
+          })
           el._tip = tip
+          el._picker = picker
           return el
         })
 
@@ -125,11 +199,22 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positio
         const filteredIds = new Set(getFiltered(filterRef.current).map(s => s.id))
         const selectedId = selectedRef.current?.id
         globe
-          .pointColor(d => d.id === selectedId ? '#ffd68c' : filteredIds.has(d.id) ? '#c19a52' : 'rgba(193,154,82,0.15)')
-          .pointRadius(d => (d.id === selectedId ? 0.6 : filteredIds.has(d.id) ? 0.35 : 0.18) * scale)
-          .pointAltitude(d => d.id === selectedId ? 0.006 : 0.001)
+          .pointColor(d => d.ships.some(s => s.id === selectedId) ? '#ffd68c' : d.ships.some(s => filteredIds.has(s.id)) ? '#c19a52' : 'rgba(193,154,82,0.15)')
+          .pointRadius(d => {
+            const isSelected = d.ships.some(s => s.id === selectedId)
+            const isMatch = d.ships.some(s => filteredIds.has(s.id))
+            const base = isSelected ? 0.6 : isMatch ? 0.35 : 0.18
+            const stackBoost = 1 + Math.min(d.ships.length - 1, 6) * 0.12
+            return base * stackBoost * scale
+          })
       }
       updatePointsRef.current = updatePoints
+
+      const closeAllPickers = () => {
+        document.querySelectorAll('._ship-picker').forEach(p => { p.style.display = 'none' })
+      }
+      document.addEventListener('click', closeAllPickers)
+      closeAllPickersRef.current = closeAllPickers
 
       let lastAlt = REF_ALT
       globe.controls().addEventListener('change', () => {
@@ -156,7 +241,9 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positio
 
     return () => {
       ro.disconnect()
+      if (closeAllPickersRef.current) document.removeEventListener('click', closeAllPickersRef.current)
       document.querySelectorAll('._ship-tip').forEach(el => el.remove())
+      document.querySelectorAll('._ship-picker').forEach(el => el.remove())
       try { globe?._destructor?.() } catch(e) {}
     }
   }, [])
@@ -346,7 +433,7 @@ export default function FleetPage() {
 
         {/* ── Right: globe ── */}
         <div style={{ background: '#f4ede1', position: 'relative', minWidth: 0, minHeight: 0 }}>
-          <FleetGlobe onShipClick={handleSelect} filter={filter} selectedShip={selected} userInteracted={userInteracted} positionLabel={t('fleet.positionUpdated')} />
+          <FleetGlobe onShipClick={handleSelect} filter={filter} selectedShip={selected} userInteracted={userInteracted} positionLabel={t('fleet.positionUpdated')} shipsHereLabel={t('fleet.shipsHere')} pickShipLabel={t('fleet.pickShip')} />
 
           {/* Selected detail card — overlaid top-right over the globe */}
           {selected && (

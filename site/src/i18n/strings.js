@@ -99,6 +99,8 @@ export const strings = {
       speed: 'Snelheid',
       passengers: 'Passagiers',
       positionUpdated: 'Positie bijgewerkt',
+      shipsHere: 'schepen op deze plek',
+      pickShip: 'Kies een schip',
       regionLabels: {
         all: "Alle regio's",
         thuiswateren: 'Nederland',
@@ -345,6 +347,8 @@ export const strings = {
       speed: 'Speed',
       passengers: 'Passengers',
       positionUpdated: 'Position updated',
+      shipsHere: 'ships at this spot',
+      pickShip: 'Pick a ship',
       regionLabels: {
         all: 'All regions',
         thuiswateren: 'Netherlands',
