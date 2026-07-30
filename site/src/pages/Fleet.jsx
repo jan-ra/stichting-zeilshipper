@@ -24,7 +24,7 @@ const OTHER = 'Overig'
 
 // globe.gl uses a globe radius of 100; camera distance = (1 + altitude) * 100.
 // MIN_ALTITUDE is the closest the controls allow, so a selected ship zooms all the way in.
-const MIN_ALTITUDE = 0.2
+const MIN_ALTITUDE = 0.12
 const MIN_DISTANCE = (1 + MIN_ALTITUDE) * 100
 
 const categoryOf = (type) => {
@@ -50,6 +50,7 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positio
   const containerRef = useRef(null)
   const globeRef = useRef(null)
   const filterRef = useRef(filter)
+  const selectedRef = useRef(selectedShip)
   const updatePointsRef = useRef(null)
 
   const getFiltered = (f) => ALL_ITEMS.filter(s => {
@@ -79,8 +80,14 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positio
         .pointLat('lat').pointLng('lng')
         .pointColor(() => '#c19a52')
         .pointRadius(0.35)
-        .pointAltitude(0.001)
+        .pointAltitude(d => d.id === selectedRef.current?.id ? 0.006 : 0.001)
         .pointResolution(8)
+        .ringsData([])
+        .ringLat('lat').ringLng('lng')
+        .ringColor(() => t => `rgba(255,214,140,${1 - t})`)
+        .ringMaxRadius(2.8)
+        .ringPropagationSpeed(1.4)
+        .ringRepeatPeriod(2200)
         .htmlElementsData(ALL_ITEMS)
         .htmlLat('lat').htmlLng('lng')
         .htmlAltitude(0.001)
@@ -116,9 +123,11 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positio
         const alt = globe.pointOfView().altitude
         const scale = alt / REF_ALT
         const filteredIds = new Set(getFiltered(filterRef.current).map(s => s.id))
+        const selectedId = selectedRef.current?.id
         globe
-          .pointColor(d => filteredIds.has(d.id) ? '#c19a52' : 'rgba(193,154,82,0.15)')
-          .pointRadius(d => (filteredIds.has(d.id) ? 0.35 : 0.18) * scale)
+          .pointColor(d => d.id === selectedId ? '#ffd68c' : filteredIds.has(d.id) ? '#c19a52' : 'rgba(193,154,82,0.15)')
+          .pointRadius(d => (d.id === selectedId ? 0.6 : filteredIds.has(d.id) ? 0.35 : 0.18) * scale)
+          .pointAltitude(d => d.id === selectedId ? 0.006 : 0.001)
       }
       updatePointsRef.current = updatePoints
 
@@ -170,7 +179,10 @@ function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positio
   }, [userInteracted])
 
   useEffect(() => {
+    selectedRef.current = selectedShip
     if (!globeRef.current) return
+    globeRef.current.ringsData(selectedShip ? [selectedShip] : [])
+    updatePointsRef.current?.()
     if (selectedShip) {
       globeRef.current.pointOfView({ lat: selectedShip.lat, lng: selectedShip.lng, altitude: MIN_ALTITUDE }, 1800)
     } else {
@@ -223,7 +235,7 @@ export default function FleetPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '420px 1fr', height: 'calc(100vh - 68px - 59px)' }} className="fleet-grid">
 
         {/* ── Left: scrollable ship panel ── */}
-        <div style={{ overflowY: 'auto', background: '#efe7d8', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ overflowY: 'auto', background: '#efe7d8', display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0 }}>
 
           {/* Sticky header + filters */}
           <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#efe7d8', padding: '28px 24px 16px', borderBottom: '1px solid rgba(193,154,82,0.25)' }}>
@@ -333,15 +345,15 @@ export default function FleetPage() {
         </div>
 
         {/* ── Right: globe ── */}
-        <div style={{ background: '#f4ede1', position: 'relative' }}>
+        <div style={{ background: '#f4ede1', position: 'relative', minWidth: 0, minHeight: 0 }}>
           <FleetGlobe onShipClick={handleSelect} filter={filter} selectedShip={selected} userInteracted={userInteracted} positionLabel={t('fleet.positionUpdated')} />
 
           {/* Selected detail card — overlaid top-right over the globe */}
           {selected && (
-            <div style={{ position: 'absolute', top: 20, right: 20, width: 320, maxWidth: 'calc(100% - 40px)', zIndex: 20, background: 'rgba(15,34,56,0.94)', border: '1px solid rgba(193,154,82,0.5)', borderRadius: 3, overflow: 'hidden', boxShadow: '0 12px 40px rgba(8,18,34,0.45)', backdropFilter: 'blur(4px)' }}>
+            <div style={{ position: 'absolute', top: 20, right: 20, width: 320, maxWidth: 'calc(100% - 40px)', maxHeight: 'calc(100% - 40px)', overflowY: 'auto', zIndex: 20, background: 'rgba(15,34,56,0.94)', border: '1px solid rgba(193,154,82,0.5)', borderRadius: 3, boxShadow: '0 12px 40px rgba(8,18,34,0.45)', backdropFilter: 'blur(4px)' }}>
               {selected.image && (
                 <div style={{ position: 'relative', cursor: 'zoom-in' }} onClick={() => setLightbox(asset(selected.image))}>
-                  <img src={asset(selected.image)} alt={selected.name} style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }} />
+                  <img src={asset(selected.image)} alt={selected.name} style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block', borderRadius: '3px 3px 0 0' }} />
                   <div style={{ position: 'absolute', bottom: 8, right: 8, background: 'rgba(8,18,34,0.7)', borderRadius: 2, padding: '3px 7px', fontSize: 11, color: 'rgba(244,237,225,0.7)', letterSpacing: '0.06em', pointerEvents: 'none' }}>
                     ⤢
                   </div>
