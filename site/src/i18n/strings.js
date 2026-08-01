@@ -101,6 +101,10 @@ export const strings = {
       positionUpdated: 'Positie bijgewerkt',
       shipsHere: 'schepen op deze plek',
       pickShip: 'Kies een schip',
+      zoomToSplit: 'Zoom in voor details',
+      noPosition: 'Geen positie bekend',
+      globeUnavailable: 'Kaart niet beschikbaar',
+      close: 'Sluiten',
       regionLabels: {
         all: "Alle regio's",
         thuiswateren: 'Nederland',
@@ -349,6 +353,10 @@ export const strings = {
       positionUpdated: 'Position updated',
       shipsHere: 'ships at this spot',
       pickShip: 'Pick a ship',
+      zoomToSplit: 'Zoom in for details',
+      noPosition: 'No position known',
+      globeUnavailable: 'Map unavailable',
+      close: 'Close',
       regionLabels: {
         all: 'All regions',
         thuiswateren: 'Netherlands',
