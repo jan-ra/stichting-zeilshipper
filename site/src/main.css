@@ -37,8 +37,6 @@ img { max-width: 100%; display: block; }
   }
 }
 
-.globe-gl-canvas-container canvas { outline: none; }
-
 /* Leaflet overrides */
 .leaflet-container { font-family: 'Source Sans 3', sans-serif !important; background: #0a1a2e !important; }
 .leaflet-control-zoom a {

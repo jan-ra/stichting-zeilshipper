@@ -1,14 +1,24 @@
-import { useState, useEffect, useRef, Fragment } from 'react'
+import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
 import { SHIPS, BLOG_POSTS, HOME_PAGE, UNESCO_STEPS } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import { asset } from '../utils/asset.js'
+import ShipGlobe from '../components/globe/ShipGlobe.jsx'
+import ShipCard from '../components/ShipCard.jsx'
+import { useIsTouch } from '../hooks/useMediaQuery.js'
 
+// Altitudes are Earth radii above the surface: visible height is roughly 53 * altitude
+// degrees. The located fleet spans 1.97 degrees around 52.48N 4.96E, so 0.065 frames
+// the Netherlands and every ship in it.
 const GLOBE_CHAPTERS = [
-  { lat: 53.0, lng: 5.0, altitude: 0.2, autoRotate: false, regionKey: 'thuiswateren' },
+  { lat: 52.48, lng: 4.96, altitude: 0.065, autoRotate: false, regionKey: 'thuiswateren' },
   { lat: 52.0, lng: 12.0, altitude: 2.0, autoRotate: false, regionKey: 'europa' },
   { lat: 20.0, lng: -5.0, altitude: 2.8, autoRotate: true, regionKey: 'wereld' },
-  { lat: 53.18, lng: 5.40, altitude: 0.2, autoRotate: false, regionKey: 'thuiswateren' },
+  // Chapter IV closes on Harlingen, the busiest basin (16 ships within a few hundred m).
+  { lat: 53.173, lng: 5.415, altitude: 0.012, autoRotate: false, regionKey: 'thuiswateren' },
 ]
+
+// Opens on the Netherlands rather than half of Europe; the chapters push in from here.
+const INITIAL_POV = { lat: 52.48, lng: 4.96, altitude: 0.35, ms: 0 }
 
 const CHAPTERS_STRUCT = [
   { index: 0, roman: 'I' },
@@ -16,142 +26,6 @@ const CHAPTERS_STRUCT = [
   { index: 2, roman: 'III' },
   { index: 3, roman: 'IV' },
 ]
-
-// ── Globe ──────────────────────────────────────────────────────────────────────
-function StickyGlobe({ chapter, onShipClick }) {
-  const ref = useRef(null)
-  const globeRef = useRef(null)
-
-  useEffect(() => {
-    if (!ref.current || !window.Globe) return
-    let g = null
-
-    const initGlobe = (w, h) => {
-      if (g) return
-      g = window.Globe()(ref.current)
-      globeRef.current = g
-      g.width(w).height(h)
-
-      g
-        .globeTileEngineUrl((x, y, l) => `https://a.basemaps.cartocdn.com/dark_nolabels/${l}/${x}/${y}.png`)
-        .backgroundColor('rgba(0,0,0,0)')
-        .showAtmosphere(true)
-        .atmosphereColor('#3a7abd')
-        .atmosphereAltitude(0.22)
-        .pointsData(SHIPS)
-        .pointLat('lat').pointLng('lng')
-        .pointColor(() => '#c19a52')
-        .pointRadius(0.35)
-        .pointAltitude(0.001)
-        .pointResolution(8)
-        .htmlElementsData(SHIPS)
-        .htmlLat('lat').htmlLng('lng')
-        .htmlAltitude(0.001)
-        .htmlElement(d => {
-          const tip = document.createElement('div')
-          tip.className = '_ship-tip-home'
-          tip.style.cssText = 'position:fixed;pointer-events:none;display:none;z-index:9999;background:rgba(15,34,56,0.95);border:1px solid rgba(193,154,82,0.5);padding:10px 14px;border-radius:3px;font-family:sans-serif;min-width:150px;'
-          {
-            const posLabel = t('home.shipPanel.positionUpdated')
-            let html = d.image ? `<img src="${asset(d.image)}" style="width:160px;height:100px;object-fit:cover;display:block;margin-bottom:8px;border-radius:2px;" />` : ''
-            html += `<strong style="color:#f4ede1;font-size:14px">${d.name}</strong>`
-            html += `<br><span style="color:#c19a52;font-size:11px">${d.type}</span>`
-            html += `<br><span style="color:rgba(244,237,225,0.6);font-size:12px">${d.port}</span>`
-            if (d.positionUpdatedAt) html += `<br><span style="color:rgba(244,237,225,0.55);font-size:11px">${posLabel}: ${new Date(d.positionUpdatedAt).toLocaleString()}</span>`
-            tip.innerHTML = html
-          }
-          document.body.appendChild(tip)
-
-          const el = document.createElement('div')
-          el.style.cssText = 'width:52px;height:52px;border-radius:50%;cursor:pointer;transform:translate(-50%,-50%);background:rgba(0,0,0,0.001);pointer-events:auto;'
-          el.addEventListener('mouseenter', () => { tip.style.display = 'block' })
-          el.addEventListener('mousemove', e => {
-            tip.style.left = (e.clientX + 16) + 'px'
-            tip.style.top = (e.clientY - 10) + 'px'
-          })
-          el.addEventListener('mouseleave', () => { tip.style.display = 'none' })
-          el.addEventListener('click', () => onShipClick(d))
-          el._tip = tip
-          return el
-        })
-
-      const REF_ALT = 1.8
-      g.controls().addEventListener('change', () => {
-        const scale = g.pointOfView().altitude / REF_ALT
-        g.pointRadius(0.35 * scale)
-      })
-
-      g.controls().autoRotate = true
-      g.controls().autoRotateSpeed = 0.3
-      g.controls().enableZoom = false
-      g.controls().enablePan = false
-      g.pointOfView({ lat: 52.0, lng: 10.0, altitude: 1.8 }, 0)
-    }
-
-    const ro = new ResizeObserver(entries => {
-      const { width, height } = entries[0].contentRect
-      if (!g && width > 0 && height > 0) initGlobe(width, height)
-      else if (g) g.width(width).height(height)
-    })
-    ro.observe(ref.current)
-
-    return () => {
-      ro.disconnect()
-      document.querySelectorAll('._ship-tip-home').forEach(el => el.remove())
-      try { g?._destructor?.() } catch(e) {}
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!globeRef.current || chapter === null) return
-    const ch = GLOBE_CHAPTERS[Math.min(chapter, GLOBE_CHAPTERS.length - 1)]
-    globeRef.current.controls().autoRotate = ch.autoRotate
-    globeRef.current.controls().autoRotateSpeed = ch.autoRotate ? 0.35 : 0
-    globeRef.current.pointOfView({ lat: ch.lat, lng: ch.lng, altitude: ch.altitude }, 2200)
-  }, [chapter])
-
-  return <div ref={ref} style={{ width: '100%', height: '100%' }} />
-}
-
-// ── Ship panel ────────────────────────────────────────────────────────────────
-function ShipPanel({ ship, onClose, t }) {
-  if (!ship) return null
-  return (
-    <div style={{
-      position: 'fixed', right: 0, top: 0, bottom: 0, width: 300, zIndex: 600,
-      background: 'rgba(248,243,234,0.98)', borderLeft: '1px solid rgba(193,154,82,0.4)',
-      padding: '80px 24px 24px', display: 'flex', flexDirection: 'column', gap: 18,
-      backdropFilter: 'blur(12px)', boxShadow: '-14px 0 40px rgba(15,34,56,0.12)',
-      animation: 'slideInRight 0.35s cubic-bezier(0.16,1,0.3,1)',
-    }}>
-      <style>{`@keyframes slideInRight { from { transform: translateX(60px); opacity: 0; } to { transform: none; opacity: 1; } }`}</style>
-      <button onClick={onClose} style={{ position: 'absolute', top: 80, right: 20, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(15,34,56,0.4)', fontSize: 20 }}>✕</button>
-      {ship.image && (
-        <img src={asset(ship.image)} alt={ship.name} style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 2, display: 'block' }} />
-      )}
-      <div style={{ fontSize: 11, color: '#a07d33', letterSpacing: '0.15em', textTransform: 'uppercase' }}>{ship.type} · {ship.year}</div>
-      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, color: '#0f2238', lineHeight: 1.2 }}>{ship.name}</h3>
-      <div style={{ height: 1, background: 'rgba(193,154,82,0.35)' }} />
-      {[
-        [t('home.shipPanel.port'), ship.port],
-        [t('home.shipPanel.speed'), `${ship.speed} kn`],
-        [t('home.shipPanel.yearBuilt'), ship.year],
-        [t('home.shipPanel.passengers'), ship.passengers],
-        [t('home.shipPanel.region'), ship.region],
-      ].map(([k, v]) => (
-        <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
-          <span style={{ color: 'rgba(15,34,56,0.45)' }}>{k}</span>
-          <span style={{ color: '#0f2238' }}>{v}</span>
-        </div>
-      ))}
-      {ship.positionUpdatedAt && (
-        <div style={{ fontSize: 11, color: 'rgba(15,34,56,0.55)' }}>
-          {t('home.shipPanel.positionUpdated')}: {new Date(ship.positionUpdatedAt).toLocaleString()}
-        </div>
-      )}
-    </div>
-  )
-}
 
 // ── Stat counter ──────────────────────────────────────────────────────────────
 function StatCounter({ value, label, suffix = '', prefix = '' }) {
@@ -197,7 +71,7 @@ function ChapterPanel({ ch, index, onVisible, chapterLabel }) {
   }, [ch.index, onVisible])
 
   return (
-    <div ref={ref} style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '48px 64px 48px 4rem', borderTop: '2px solid rgba(193,154,82,0.25)', background: '#efe7d8' }}>
+    <div ref={ref} className="hero-chapter" style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '48px 64px 48px 4rem', borderTop: '2px solid rgba(193,154,82,0.25)', background: '#efe7d8' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
         <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 13, color: '#c19a52', fontStyle: 'italic' }}>{ch.roman}</span>
         <div style={{ height: 1, width: 40, background: 'rgba(193,154,82,0.5)' }} />
@@ -222,6 +96,14 @@ export default function HomePage({ navigate }) {
   const [selectedShip, setSelectedShip] = useState(null)
   const [chapter, setChapter] = useState(null)
   const { t, tc } = useLanguage()
+  const isTouch = useIsTouch()
+
+  const activeChapter = chapter === null ? null : GLOBE_CHAPTERS[Math.min(chapter, GLOBE_CHAPTERS.length - 1)]
+  const pov = activeChapter
+    ? { lat: activeChapter.lat, lng: activeChapter.lng, altitude: activeChapter.altitude, ms: 2200 }
+    : INITIAL_POV
+
+  const handleShipClick = useCallback(ship => setSelectedShip(ship), [])
 
   const chapters = HOME_PAGE.chapters.map((ch, i) => ({
     ...CHAPTERS_STRUCT[i],
@@ -242,7 +124,7 @@ export default function HomePage({ navigate }) {
       <div style={{ position: 'relative', background: '#f4ede1' }}>
 
           {/* Scrolling photo strip — absolutely positioned, full-width, behind the globe */}
-          <div style={{ position: 'absolute', top: 68, left: 0, right: 0, height: 220, overflow: 'hidden', zIndex: 1 }}>
+          <div className="hero-photostrip" style={{ position: 'absolute', top: 68, left: 0, right: 0, height: 220, overflow: 'hidden', zIndex: 1 }}>
             <div className="photo-scroll-track" style={{ display: 'flex', height: '100%', gap: 3 }}>
               {HOME_PAGE.scrollPhotos.length > 0
                 ? [...HOME_PAGE.scrollPhotos, ...HOME_PAGE.scrollPhotos].map((photo, i) => (
@@ -257,9 +139,52 @@ export default function HomePage({ navigate }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '100vh' }} className="hero-grid">
 
-          {/* LEFT: scrollable text */}
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', padding: '312px 64px 80px 4rem', position: 'relative' }}>
+          {/* Globe first in DOM order: at <=900px .hero-grid becomes `display: block`,
+              which puts the globe above the chapters and — unlike a single-column grid,
+              where a sticky item unsticks at the end of its own row — lets it stay
+              pinned while the chapters scroll past and fly the camera. */}
+          <div className="hero-globe" style={{ gridColumn: 2, gridRow: 1, position: 'sticky', top: 0, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
+            <div style={{ position: 'absolute', bottom: 40, left: '50%', transform: 'translateX(-50%)', textAlign: 'center', zIndex: 10, pointerEvents: 'none' }}>
+              <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.25em', textTransform: 'uppercase', opacity: 0.9 }}>
+                {chapter !== null && t(`regions.${GLOBE_CHAPTERS[chapter]?.regionKey}`)}
+              </div>
+            </div>
+            {/* Both sit top/bottom-right, where the ship card opens — hide them while
+                one is showing rather than stacking chrome on top of chrome. */}
+            {!selectedShip && (
+              <>
+                <div className="hero-shipcount" style={{ position: 'absolute', top: 90, right: 24, zIndex: 10, background: 'rgba(10,22,40,0.82)', border: '1px solid rgba(193,154,82,0.4)', padding: '12px 16px', borderRadius: 3, backdropFilter: 'blur(8px)', textAlign: 'center', pointerEvents: 'none' }}>
+                  <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, color: '#f4ede1', lineHeight: 1 }}>{SHIPS.length}</div>
+                  <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 4 }}>{t('home.shipCount')}</div>
+                </div>
+                <div className="hero-clickhint" style={{ position: 'absolute', bottom: 64, right: 24, zIndex: 10, fontSize: 10, color: 'rgba(193,154,82,0.6)', letterSpacing: '0.1em', textTransform: 'uppercase', writingMode: 'vertical-rl', pointerEvents: 'none' }}>
+                  {t('home.clickShip')}
+                </div>
+              </>
+            )}
+            <ShipGlobe
+              ships={SHIPS}
+              selectedShip={selectedShip}
+              onSelectShip={handleShipClick}
+              pov={pov}
+              /* Only the "the world" chapter spins. Now that the hero opens framed on
+                 the Netherlands, auto-rotating would just drift off it. */
+              autoRotate={activeChapter ? activeChapter.autoRotate : false}
+              autoRotateSpeed={0.35}
+              enableZoom={false}
+              /* On touch the hero has to stay scrollable — OrbitControls would
+                 otherwise swallow every vertical swipe. Markers stay tappable. */
+              enableRotate={!isTouch}
+            />
+
+            {/* Same card the fleet map uses — the sticky globe column is positioned,
+                so it anchors over the globe here just as it does there. */}
+            <ShipCard ship={selectedShip} onClose={() => setSelectedShip(null)} />
+          </div>
+
+          {/* Scrolling text + chapters */}
+          <div className="hero-text-col" style={{ gridColumn: 1, gridRow: 1, display: 'flex', flexDirection: 'column' }}>
+            <div className="hero-intro" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', padding: '312px 64px 80px 4rem', position: 'relative' }}>
 
               <div style={{ fontSize: 10, color: '#a07d33', letterSpacing: '0.28em', textTransform: 'uppercase', marginBottom: 24 }}>
                 {tc(HOME_PAGE, 'heroBadge')}
@@ -284,7 +209,7 @@ export default function HomePage({ navigate }) {
                 </button>
               </div>
 
-              <div style={{ position: 'absolute', bottom: 36, left: '4rem', display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div className="hero-scrollhint" style={{ position: 'absolute', bottom: 36, left: '4rem', display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ width: 32, height: 1, background: 'rgba(193,154,82,0.5)' }} />
                 <span style={{ fontSize: 10, color: 'rgba(15,34,56,0.4)', letterSpacing: '0.2em', textTransform: 'uppercase' }}>{tc(HOME_PAGE, 'scrollHint')}</span>
               </div>
@@ -302,23 +227,6 @@ export default function HomePage({ navigate }) {
                 )}
               </Fragment>
             ))}
-          </div>
-
-          {/* RIGHT: sticky globe — zIndex: 2 renders it in front of the photo strip (zIndex: 1) */}
-          <div style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', zIndex: 2 }}>
-            <div style={{ position: 'absolute', bottom: 40, left: '50%', transform: 'translateX(-50%)', textAlign: 'center', zIndex: 10, pointerEvents: 'none' }}>
-              <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.25em', textTransform: 'uppercase', opacity: 0.9 }}>
-                {chapter !== null && t(`regions.${GLOBE_CHAPTERS[chapter]?.regionKey}`)}
-              </div>
-            </div>
-            <div style={{ position: 'absolute', top: 90, right: 24, zIndex: 10, background: 'rgba(10,22,40,0.82)', border: '1px solid rgba(193,154,82,0.4)', padding: '12px 16px', borderRadius: 3, backdropFilter: 'blur(8px)', textAlign: 'center' }}>
-              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, color: '#f4ede1', lineHeight: 1 }}>{SHIPS.length}</div>
-              <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 4 }}>{t('home.shipCount')}</div>
-            </div>
-            <div style={{ position: 'absolute', bottom: 64, right: 24, zIndex: 10, fontSize: 10, color: 'rgba(193,154,82,0.6)', letterSpacing: '0.1em', textTransform: 'uppercase', writingMode: 'vertical-rl' }}>
-              {t('home.clickShip')}
-            </div>
-            <StickyGlobe chapter={chapter} onShipClick={setSelectedShip} />
           </div>
         </div>
       </div>
@@ -508,8 +416,6 @@ export default function HomePage({ navigate }) {
         </div>
       </div>
 
-      <ShipPanel ship={selectedShip} onClose={() => setSelectedShip(null)} t={t} />
-
       <style>{`
         @keyframes photoScroll {
           from { transform: translateX(0); }
@@ -521,8 +427,31 @@ export default function HomePage({ navigate }) {
         .photo-scroll-track:hover {
           animation-play-state: paused;
         }
+        /* The globe column is sticky at the viewport top, so it runs behind the fixed
+           68px nav — push the ship card below it. */
+        .hero-globe { --sz-shipcard-top: 88px; }
         @media (max-width: 900px) {
-          .hero-grid { grid-template-columns: 1fr !important; }
+          /* block, not a single-column grid: a sticky grid item unsticks at the end of
+             its own row, so the globe would scroll away before the first chapter. In
+             normal flow both children share the hero's containing block and the globe
+             stays pinned for the whole narrative. */
+          .hero-grid { display: block !important; }
+          .hero-globe {
+            position: sticky !important;
+            top: 68px !important;
+            height: 48dvh !important;
+            z-index: 3 !important;
+            /* Pinned below the nav here, so the card needs no extra offset. */
+            --sz-shipcard-top: 20px;
+          }
+          /* The 312px top padding only ever existed to clear the photo strip. */
+          .hero-photostrip { display: none !important; }
+          .hero-intro { padding: 32px 24px 72px !important; min-height: 0 !important; }
+          .hero-chapter { padding: 40px 24px !important; min-height: 52vh !important; }
+          .hero-shipcount { top: 12px !important; right: 12px !important; padding: 8px 12px !important; }
+          .hero-clickhint { display: none !important; }
+          .hero-scrollhint { left: 24px !important; bottom: 24px !important; }
+
           .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
           .grid-2 { grid-template-columns: 1fr !important; }
         }

@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { SHIPS, FLEET_PAGE } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import { asset } from '../utils/asset.js'
+import ShipGlobe from '../components/globe/ShipGlobe.jsx'
+import ShipCard from '../components/ShipCard.jsx'
 
 const ALL_ITEMS = SHIPS
 
@@ -22,10 +24,19 @@ const TYPE_GROUPS = [
 
 const OTHER = 'Overig'
 
-// globe.gl uses a globe radius of 100; camera distance = (1 + altitude) * 100.
-// MIN_ALTITUDE is the closest the controls allow, so a selected ship zooms all the way in.
-const MIN_ALTITUDE = 0.12
-const MIN_DISTANCE = (1 + MIN_ALTITUDE) * 100
+// globe.gl uses a globe radius of 100, so altitude 1 is one Earth radius (6371 km) up
+// and camera distance = (1 + altitude) * 100.
+//
+// The old floor of 0.12 sat 764 km up at ~890 m/px, which is why every harbour stayed
+// a single lump no matter how far you zoomed. 0.0004 is ~2.5 km up at ~3 m/px, where
+// ships more than about 90 m apart resolve into separate markers; anything closer than
+// that shares a berth and bottoms out into the picker list instead.
+const MIN_ALTITUDE = 0.0004
+const MAX_ALTITUDE = 2.8
+// Selecting a ship frames its harbour rather than slamming to the zoom floor — at
+// ~25 km up you can still see where in the country you are.
+const SELECT_ALTITUDE = 0.004
+const DEFAULT_POV = { lat: 52.5, lng: 5.0, altitude: 1.8, ms: 1500 }
 
 const categoryOf = (type) => {
   const t = (type || '').toLowerCase()
@@ -40,274 +51,91 @@ const TYPES = [
 ]
 const REGIONS = ['all', 'thuiswateren', 'europa', 'wereld']
 
-// Ships moored in the same harbour basin share ~the same coordinates. Group them
-// so the globe shows one stacked marker per spot instead of overlapping pins.
-const LOCATION_GROUPS = (() => {
-  const byLoc = new Map()
-  for (const s of ALL_ITEMS) {
-    if (s.lat == null || s.lng == null) continue
-    const key = s.lat.toFixed(3) + ',' + s.lng.toFixed(3)
-    if (!byLoc.has(key)) byLoc.set(key, { id: key, lat: s.lat, lng: s.lng, ships: [] })
-    byLoc.get(key).ships.push(s)
-  }
-  return [...byLoc.values()]
-})()
-
 const matchesSearch = (s, q) => {
   if (!q) return true
   const needle = q.trim().toLowerCase()
   return [s.name, s.type, s.port].some(v => v && v.toLowerCase().includes(needle))
 }
 
-const buildTipHtml = (group, positionLabel, shipsHereLabel) => {
-  if (group.ships.length === 1) {
-    const s = group.ships[0]
-    let html = s.image ? `<img src="${asset(s.image)}" style="width:160px;height:100px;object-fit:cover;display:block;margin-bottom:8px;border-radius:2px;" />` : ''
-    html += `<strong style="color:#f4ede1;font-size:14px">${s.name}</strong>`
-    html += `<br><span style="color:#c19a52;font-size:11px">${s.type}</span>`
-    html += `<br><span style="color:rgba(244,237,225,0.6);font-size:12px">${s.port}</span>`
-    if (s.positionUpdatedAt) html += `<br><span style="color:rgba(244,237,225,0.55);font-size:11px">${positionLabel}: ${new Date(s.positionUpdatedAt).toLocaleString()}</span>`
-    return html
+// Camera framing that fits a set of ships. Visible angular height is roughly
+// 53 * altitude degrees, so span / 30 leaves a comfortable margin around the group.
+function fitPov(list) {
+  const pts = list.filter(s => s.lat != null && s.lng != null)
+  if (pts.length === 0) return DEFAULT_POV
+
+  let minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity
+  for (const s of pts) {
+    if (s.lat < minLat) minLat = s.lat
+    if (s.lat > maxLat) maxLat = s.lat
+    if (s.lng < minLng) minLng = s.lng
+    if (s.lng > maxLng) maxLng = s.lng
   }
-  let html = `<strong style="color:#f4ede1;font-size:13px">${group.ships.length} ${shipsHereLabel}</strong>`
-  html += '<div style="margin-top:6px;display:flex;flex-direction:column;gap:4px;">'
-  html += group.ships.map(s => `<div style="color:#f4ede1;font-size:12px">${s.name} <span style="color:rgba(244,237,225,0.5);font-size:10px">· ${s.type}</span></div>`).join('')
-  html += '</div>'
-  return html
-}
-
-function FleetGlobe({ onShipClick, filter, selectedShip, userInteracted, positionLabel, shipsHereLabel, pickShipLabel }) {
-  const containerRef = useRef(null)
-  const globeRef = useRef(null)
-  const filterRef = useRef(filter)
-  const selectedRef = useRef(selectedShip)
-  const updatePointsRef = useRef(null)
-  const closeAllPickersRef = useRef(null)
-
-  const getFiltered = (f) => ALL_ITEMS.filter(s => {
-    if (f.type !== 'all' && categoryOf(s.type) !== f.type) return false
-    if (f.region !== 'all' && s.region !== f.region) return false
-    if (!matchesSearch(s, f.search)) return false
-    return true
-  })
-
-  useEffect(() => {
-    if (!containerRef.current || !window.Globe) return
-    let globe = null
-
-    const initGlobe = (w, h) => {
-      if (globe) return
-      globe = window.Globe()(containerRef.current)
-      globeRef.current = globe
-      globe.width(w).height(h)
-
-      globe
-        .globeTileEngineUrl((x, y, l) => `https://a.basemaps.cartocdn.com/dark_nolabels/${l}/${x}/${y}.png`)
-        .backgroundColor('rgba(0,0,0,0)')
-        .showAtmosphere(true)
-        .atmosphereColor('#3a7abd')
-        .atmosphereAltitude(0.22)
-        .pointsData(LOCATION_GROUPS)
-        .pointLat('lat').pointLng('lng')
-        .pointColor(() => '#c19a52')
-        .pointRadius(0.35)
-        .pointAltitude(0)
-        .pointResolution(8)
-        .ringsData([])
-        .ringLat('lat').ringLng('lng')
-        .ringColor(() => t => `rgba(255,214,140,${1 - t})`)
-        .ringMaxRadius(2.8)
-        .ringPropagationSpeed(1.4)
-        .ringRepeatPeriod(2200)
-        .htmlElementsData(LOCATION_GROUPS)
-        .htmlLat('lat').htmlLng('lng')
-        .htmlAltitude(0.001)
-        .htmlElement(d => {
-          const tip = document.createElement('div')
-          tip.className = '_ship-tip'
-          tip.style.cssText = 'position:fixed;pointer-events:none;display:none;z-index:9999;background:rgba(15,34,56,0.95);border:1px solid rgba(193,154,82,0.5);padding:10px 14px;border-radius:3px;font-family:sans-serif;min-width:150px;'
-          tip.innerHTML = buildTipHtml(d, positionLabel, shipsHereLabel)
-          document.body.appendChild(tip)
-
-          let picker = null
-          if (d.ships.length > 1) {
-            picker = document.createElement('div')
-            picker.className = '_ship-picker'
-            picker.style.cssText = 'position:fixed;display:none;z-index:9999;background:rgba(15,34,56,0.97);border:1px solid rgba(193,154,82,0.5);border-radius:3px;font-family:sans-serif;min-width:190px;max-width:260px;max-height:240px;overflow-y:auto;box-shadow:0 12px 40px rgba(8,18,34,0.45);'
-            const header = document.createElement('div')
-            header.style.cssText = 'padding:8px 12px;color:rgba(244,237,225,0.5);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;border-bottom:1px solid rgba(193,154,82,0.25);'
-            header.textContent = pickShipLabel
-            picker.appendChild(header)
-            d.ships.forEach(s => {
-              const row = document.createElement('div')
-              row.style.cssText = 'padding:8px 12px;color:#f4ede1;font-size:12px;cursor:pointer;'
-              row.innerHTML = `${s.name} <span style="color:rgba(244,237,225,0.5);font-size:10px">· ${s.type}</span>`
-              row.addEventListener('mouseenter', () => { row.style.background = 'rgba(193,154,82,0.15)' })
-              row.addEventListener('mouseleave', () => { row.style.background = 'none' })
-              row.addEventListener('click', e => {
-                e.stopPropagation()
-                picker.style.display = 'none'
-                onShipClick(s)
-              })
-              picker.appendChild(row)
-            })
-            document.body.appendChild(picker)
-          }
-
-          const el = document.createElement('div')
-          const size = Math.min(52 + (d.ships.length - 1) * 4, 84)
-          el.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;cursor:pointer;transform:translate(-50%,-50%);background:rgba(0,0,0,0.001);pointer-events:auto;`
-
-          // Anchor to the pin's actual screen position (its bounding-rect center),
-          // not the raw cursor — the hit circle is padded well beyond the dot itself.
-          const pinCenter = () => {
-            const rect = el.getBoundingClientRect()
-            return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
-          }
-          const positionTip = () => {
-            const { x, y } = pinCenter()
-            tip.style.left = (x + size / 2 + 8) + 'px'
-            tip.style.top = (y - tip.offsetHeight / 2) + 'px'
-          }
-          el.addEventListener('mouseenter', () => { tip.style.display = 'block'; positionTip() })
-          el.addEventListener('mousemove', positionTip)
-          el.addEventListener('mouseleave', () => { tip.style.display = 'none' })
-          el.addEventListener('click', e => {
-            if (!picker) { onShipClick(d.ships[0]); return }
-            e.stopPropagation()
-            document.querySelectorAll('._ship-picker').forEach(p => { if (p !== picker) p.style.display = 'none' })
-            const opening = picker.style.display !== 'block'
-            if (opening) {
-              tip.style.display = 'none'
-              const { x, y } = pinCenter()
-              picker.style.left = (x + size / 2 + 8) + 'px'
-              picker.style.top = (y - 10) + 'px'
-              picker.style.display = 'block'
-            } else {
-              picker.style.display = 'none'
-            }
-          })
-          el._tip = tip
-          el._picker = picker
-          return el
-        })
-
-      const REF_ALT = 1.8
-      const updatePoints = () => {
-        const alt = globe.pointOfView().altitude
-        const scale = alt / REF_ALT
-        const filteredIds = new Set(getFiltered(filterRef.current).map(s => s.id))
-        const selectedId = selectedRef.current?.id
-        globe
-          .pointColor(d => d.ships.some(s => s.id === selectedId) ? '#ffd68c' : d.ships.some(s => filteredIds.has(s.id)) ? '#c19a52' : 'rgba(193,154,82,0.15)')
-          .pointRadius(d => {
-            const isSelected = d.ships.some(s => s.id === selectedId)
-            const isMatch = d.ships.some(s => filteredIds.has(s.id))
-            const base = isSelected ? 0.6 : isMatch ? 0.35 : 0.18
-            const stackBoost = 1 + Math.min(d.ships.length - 1, 6) * 0.12
-            return base * stackBoost * scale
-          })
-      }
-      updatePointsRef.current = updatePoints
-
-      const closeAllPickers = () => {
-        document.querySelectorAll('._ship-picker').forEach(p => { p.style.display = 'none' })
-      }
-      document.addEventListener('click', closeAllPickers)
-      closeAllPickersRef.current = closeAllPickers
-
-      let lastAlt = REF_ALT
-      globe.controls().addEventListener('change', () => {
-        const alt = globe.pointOfView().altitude
-        if (Math.abs(alt - lastAlt) > 0.0005) { lastAlt = alt; updatePoints() }
-      })
-
-      globe.controls().autoRotate = true
-      globe.controls().autoRotateSpeed = 0.18
-      globe.controls().enableZoom = true
-      globe.controls().enablePan = false
-      globe.controls().minDistance = MIN_DISTANCE
-      globe.controls().maxDistance = 380
-      globe.controls().addEventListener('start', () => { globe.controls().autoRotate = false }, { once: true })
-      globe.pointOfView({ lat: 52.5, lng: 5.0, altitude: 1.8 }, 0)
-    }
-
-    const ro = new ResizeObserver(entries => {
-      const { width, height } = entries[0].contentRect
-      if (!globe && width > 0 && height > 0) initGlobe(width, height)
-      else if (globe) { globe.width(width).height(height); updatePointsRef.current?.() }
-    })
-    ro.observe(containerRef.current)
-
-    return () => {
-      ro.disconnect()
-      if (closeAllPickersRef.current) document.removeEventListener('click', closeAllPickersRef.current)
-      document.querySelectorAll('._ship-tip').forEach(el => el.remove())
-      document.querySelectorAll('._ship-picker').forEach(el => el.remove())
-      try { globe?._destructor?.() } catch(e) {}
-    }
-  }, [])
-
-  useEffect(() => {
-    filterRef.current = filter
-    updatePointsRef.current?.()
-  }, [filter])
-
-  useEffect(() => {
-    if (!globeRef.current) return
-    if (filter.region === 'thuiswateren') {
-      globeRef.current.pointOfView({ lat: 52.9, lng: 5.2, altitude: 0.2 }, 1800)
-    }
-  }, [filter.region])
-
-  useEffect(() => {
-    if (!globeRef.current) return
-    globeRef.current.controls().autoRotate = false
-  }, [userInteracted])
-
-  useEffect(() => {
-    selectedRef.current = selectedShip
-    if (!globeRef.current) return
-    globeRef.current.ringsData(selectedShip ? [selectedShip] : [])
-    updatePointsRef.current?.()
-    if (selectedShip) {
-      globeRef.current.pointOfView({ lat: selectedShip.lat, lng: selectedShip.lng, altitude: MIN_ALTITUDE }, 1800)
-    } else {
-      globeRef.current.pointOfView({ lat: 52.5, lng: 5.0, altitude: 1.8 }, 1500)
-    }
-  }, [selectedShip])
-
-  return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+  const lat = (minLat + maxLat) / 2
+  const lng = (minLng + maxLng) / 2
+  const span = Math.max(maxLat - minLat, (maxLng - minLng) * Math.cos((lat * Math.PI) / 180))
+  const altitude = Math.min(MAX_ALTITUDE, Math.max(MIN_ALTITUDE, span / 30))
+  return { lat, lng, altitude, ms: 1800 }
 }
 
 export default function FleetPage() {
   const [selected, setSelected] = useState(null)
   const [filter, setFilter] = useState({ type: 'all', region: 'all', search: '' })
   const [userInteracted, setUserInteracted] = useState(false)
-  const [lightbox, setLightbox] = useState(null)
+  const [pov, setPov] = useState(DEFAULT_POV)
   const { t, tc } = useLanguage()
 
   const regionLabels = t('fleet.regionLabels')
 
-  const filtered = ALL_ITEMS.filter(s => {
+  const filtered = useMemo(() => ALL_ITEMS.filter(s => {
     if (filter.type !== 'all' && categoryOf(s.type) !== filter.type) return false
     if (filter.region !== 'all' && s.region !== filter.region) return false
     if (!matchesSearch(s, filter.search)) return false
     return true
-  })
+  }), [filter])
+
+  // Non-matching markers stay on the globe for context but are dimmed and inert.
+  // `null` means "no filter active", which lets ShipMarkers skip the check entirely.
+  const matchedIds = useMemo(() => {
+    const noFilter = filter.type === 'all' && filter.region === 'all' && !filter.search
+    return noFilter ? null : new Set(filtered.map(s => s.id))
+  }, [filtered, filter])
 
   const shipCount = filtered.length
 
-  const handleSelect = (item) => {
+  const handleSelect = useCallback((item) => {
     setUserInteracted(true)
-    setSelected(prev => prev?.id === item.id ? null : item)
-  }
+    setSelected(prev => (prev?.id === item.id ? null : item))
+  }, [])
+
+  const handleUserInteract = useCallback(() => setUserInteracted(true), [])
+
+  // Every camera command gets a sequence number so re-issuing the same one still flies.
+  const povSeq = useRef(0)
+  const flyTo = useCallback(next => setPov({ ...next, seq: ++povSeq.current }), [])
+
+  // Selecting a ship pans to it and, if the camera is further out than harbour level,
+  // moves closer. Deselecting leaves the camera exactly where it is: clicking a ship —
+  // including clicking the selected one again to close it — must never zoom out.
+  useEffect(() => {
+    if (selected && selected.lat != null && selected.lng != null) {
+      flyTo({ lat: selected.lat, lng: selected.lng, altitude: SELECT_ALTITUDE, zoomInOnly: true, ms: 1800 })
+    }
+  }, [selected, flyTo])
+
+  // Switching region re-frames the globe around whatever that region contains. This is
+  // a filter action rather than a ship click, so it may zoom out.
+  const firstRegionRun = useRef(true)
+  useEffect(() => {
+    if (firstRegionRun.current) { firstRegionRun.current = false; return }
+    if (selected) return
+    flyTo(fitPov(ALL_ITEMS.filter(s => filter.region === 'all' || s.region === filter.region)))
+  }, [filter.region])
 
   return (
-    <div style={{ paddingTop: 68, height: '100vh', overflow: 'hidden', background: '#f4ede1' }}>
+    <div className="fleet-shell">
 
       {/* ── Crew notice banner ── */}
-      <div style={{ background: 'linear-gradient(90deg, rgba(193,154,82,0.22) 0%, rgba(193,154,82,0.08) 60%, transparent 100%)', borderBottom: '1px solid rgba(193,154,82,0.3)', padding: '18px 40px', display: 'flex', alignItems: 'center', gap: 24 }}>
+      <div className="fleet-banner">
         <div style={{ width: 1, height: 44, background: 'linear-gradient(to bottom, transparent, #c19a52, transparent)', flexShrink: 0 }} />
         <div>
           <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, color: '#0f2238', fontWeight: 400, letterSpacing: '0.01em', marginBottom: 5 }}>
@@ -319,10 +147,10 @@ export default function FleetPage() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '420px 1fr', height: 'calc(100vh - 68px - 59px)' }} className="fleet-grid">
+      <div className="fleet-grid">
 
-        {/* ── Left: scrollable ship panel ── */}
-        <div style={{ overflowY: 'auto', background: '#efe7d8', display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0 }}>
+        {/* ── Ship list ── */}
+        <div className="fleet-list">
 
           {/* Sticky header + filters */}
           <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#efe7d8', padding: '28px 24px 16px', borderBottom: '1px solid rgba(193,154,82,0.25)' }}>
@@ -356,7 +184,7 @@ export default function FleetPage() {
                 >✕</button>
               )}
             </div>
-            <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap', marginBottom: 6 }}>
+            <div className="fleet-chips" style={{ marginBottom: 6 }}>
               {TYPES.map(o => (
                 <button key={o} onClick={() => setFilter(f => ({ ...f, type: o }))} style={{
                   background: filter.type === o ? '#c19a52' : 'rgba(15,34,56,0.06)',
@@ -369,7 +197,7 @@ export default function FleetPage() {
                 </button>
               ))}
             </div>
-            <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+            <div className="fleet-chips">
               {REGIONS.map(o => (
                 <button key={o} onClick={() => setFilter(f => ({ ...f, region: o }))} style={{
                   background: filter.region === o ? '#c19a52' : 'rgba(15,34,56,0.06)',
@@ -408,17 +236,23 @@ export default function FleetPage() {
                         <div style={{ fontSize: 10, color: '#a07d33', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>{item.type} · {item.year}</div>
                         <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 15, color: '#0f2238' }}>{item.name}</div>
                       </div>
-                      <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#c19a52', boxShadow: '0 0 5px rgba(193,154,82,0.6)', flexShrink: 0, animation: 'pulse 2.5s ease-in-out infinite' }} />
+                      {item.lat != null ? (
+                        <div title={t('fleet.positionUpdated')} style={{ width: 7, height: 7, borderRadius: '50%', background: '#c19a52', boxShadow: '0 0 5px rgba(193,154,82,0.6)', flexShrink: 0, animation: 'pulse 2.5s ease-in-out infinite' }} />
+                      ) : (
+                        <div title={t('fleet.noPosition')} style={{ width: 7, height: 7, borderRadius: '50%', border: '1px solid rgba(15,34,56,0.25)', flexShrink: 0 }} />
+                      )}
                     </div>
                     <div style={{ marginTop: 6, fontSize: 11, color: 'rgba(15,34,56,0.5)', display: 'flex', gap: 14 }}>
                       <span>{item.port}</span>
                       <span>{item.passengers} pax</span>
                     </div>
-                    {item.positionUpdatedAt && (
-                      <div style={{ marginTop: 4, fontSize: 10, color: 'rgba(15,34,56,0.55)' }}>
-                        {t('fleet.positionUpdated')}: {new Date(item.positionUpdatedAt).toLocaleString()}
-                      </div>
-                    )}
+                    <div style={{ marginTop: 4, fontSize: 10, color: 'rgba(15,34,56,0.55)' }}>
+                      {item.lat == null
+                        ? t('fleet.noPosition')
+                        : item.positionUpdatedAt
+                          ? `${t('fleet.positionUpdated')}: ${new Date(item.positionUpdatedAt).toLocaleString()}`
+                          : null}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -431,87 +265,105 @@ export default function FleetPage() {
           </div>
         </div>
 
-        {/* ── Right: globe ── */}
-        <div style={{ background: '#f4ede1', position: 'relative', minWidth: 0, minHeight: 0 }}>
-          <FleetGlobe onShipClick={handleSelect} filter={filter} selectedShip={selected} userInteracted={userInteracted} positionLabel={t('fleet.positionUpdated')} shipsHereLabel={t('fleet.shipsHere')} pickShipLabel={t('fleet.pickShip')} />
+        {/* ── Globe ── */}
+        <div className="fleet-map">
+          <ShipGlobe
+            ships={ALL_ITEMS}
+            matchedIds={matchedIds}
+            selectedShip={selected}
+            onSelectShip={handleSelect}
+            pov={pov}
+            autoRotate={!userInteracted}
+            autoRotateSpeed={0.18}
+            enableZoom
+            minAltitude={MIN_ALTITUDE}
+            maxAltitude={MAX_ALTITUDE}
+            onUserInteract={handleUserInteract}
+          />
 
-          {/* Selected detail card — overlaid top-right over the globe */}
-          {selected && (
-            <div style={{ position: 'absolute', top: 20, right: 20, width: 320, maxWidth: 'calc(100% - 40px)', maxHeight: 'calc(100% - 40px)', overflowY: 'auto', zIndex: 20, background: 'rgba(15,34,56,0.94)', border: '1px solid rgba(193,154,82,0.5)', borderRadius: 3, boxShadow: '0 12px 40px rgba(8,18,34,0.45)', backdropFilter: 'blur(4px)' }}>
-              {selected.image && (
-                <div style={{ position: 'relative', cursor: 'zoom-in' }} onClick={() => setLightbox(asset(selected.image))}>
-                  <img src={asset(selected.image)} alt={selected.name} style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block', borderRadius: '3px 3px 0 0' }} />
-                  <div style={{ position: 'absolute', bottom: 8, right: 8, background: 'rgba(8,18,34,0.7)', borderRadius: 2, padding: '3px 7px', fontSize: 11, color: 'rgba(244,237,225,0.7)', letterSpacing: '0.06em', pointerEvents: 'none' }}>
-                    ⤢
-                  </div>
-                </div>
-              )}
-              <div style={{ padding: '16px 20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-                  <div>
-                    <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4 }}>{selected.type} · {selected.year}</div>
-                    <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: '#f4ede1' }}>{selected.name}</div>
-                  </div>
-                  <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(244,237,225,0.5)', fontSize: 16, padding: 0, lineHeight: 1 }}>✕</button>
-                </div>
-                <div style={{ display: 'flex', gap: 20, fontSize: 12, color: 'rgba(244,237,225,0.7)' }}>
-                  {[
-                    [t('fleet.port'), selected.port],
-                    [t('fleet.passengers'), selected.passengers],
-                  ].map(([k, v]) => (
-                    <div key={k}>
-                      <div style={{ fontSize: 10, color: 'rgba(244,237,225,0.45)', marginBottom: 2 }}>{k}</div>
-                      <div style={{ color: '#f4ede1' }}>{v}</div>
-                    </div>
-                  ))}
-                </div>
-                {selected.positionUpdatedAt && (
-                  <div style={{ marginTop: 10, fontSize: 11, color: 'rgba(244,237,225,0.55)', letterSpacing: '0.02em' }}>
-                    {t('fleet.positionUpdated')}: {new Date(selected.positionUpdatedAt).toLocaleString()}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+          {/* Selected detail — shared with the home hero */}
+          <ShipCard ship={selected} onClose={() => setSelected(null)} />
 
           {!selected && (
-            <div style={{ position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', fontSize: 10, color: 'rgba(193,154,82,0.7)', letterSpacing: '0.15em', textTransform: 'uppercase', pointerEvents: 'none', whiteSpace: 'nowrap' }}>
-              {t('fleet.clickHint')}
-            </div>
+            <div className="fleet-hint">{t('fleet.clickHint')}</div>
           )}
         </div>
       </div>
 
-      {lightbox && (
-        <div
-          onClick={() => setLightbox(null)}
-          style={{
-            position: 'fixed', inset: 0, zIndex: 2000,
-            background: 'rgba(0,0,0,0.92)', display: 'flex',
-            alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out',
-          }}
-        >
-          <img
-            src={lightbox}
-            alt=""
-            style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain', borderRadius: 2 }}
-            onClick={e => e.stopPropagation()}
-          />
-          <button
-            onClick={() => setLightbox(null)}
-            style={{
-              position: 'absolute', top: 20, right: 24,
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: 'rgba(244,237,225,0.6)', fontSize: 28, lineHeight: 1,
-            }}
-          >✕</button>
-        </div>
-      )}
-
       <style>{`
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        /* Flex column rather than a calc() on the viewport height: the banner is free
+           to wrap to any height without pushing the grid past the bottom edge. */
+        .fleet-shell {
+          padding-top: 68px;
+          height: 100vh;
+          height: 100dvh;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          background: #f4ede1;
+        }
+        .fleet-banner {
+          flex: none;
+          display: flex;
+          align-items: center;
+          gap: 24px;
+          padding: 18px 40px;
+          background: linear-gradient(90deg, rgba(193,154,82,0.22) 0%, rgba(193,154,82,0.08) 60%, transparent 100%);
+          border-bottom: 1px solid rgba(193,154,82,0.3);
+        }
+        .fleet-grid {
+          flex: 1;
+          min-height: 0;
+          display: grid;
+          grid-template-columns: 420px 1fr;
+        }
+        .fleet-list {
+          overflow-y: auto;
+          background: #efe7d8;
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+          min-height: 0;
+        }
+        .fleet-map {
+          position: relative;
+          min-width: 0;
+          min-height: 0;
+          background: #f4ede1;
+        }
+        .fleet-chips { display: flex; gap: 2px; flex-wrap: wrap; }
+        .fleet-hint {
+          position: absolute;
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 10px;
+          color: rgba(193,154,82,0.7);
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          pointer-events: none;
+          white-space: nowrap;
+        }
+
         @media (max-width: 768px) {
-          .fleet-grid { grid-template-columns: 1fr !important; grid-template-rows: 1fr 1fr; }
+          /* Reclaim the banner's vertical budget — on a phone it costs a fifth of the
+             screen and the same text is on the page above the fold anyway. */
+          .fleet-banner { display: none; }
+          .fleet-grid {
+            grid-template-columns: 1fr;
+            grid-template-rows: 42dvh 1fr;
+          }
+          .fleet-map  { grid-row: 1; }
+          .fleet-list { grid-row: 2; }
+          /* 15 chips wrapping would eat most of the screen; scroll them instead. */
+          .fleet-chips {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 2px;
+          }
+          .fleet-chips::-webkit-scrollbar { display: none; }
+          .fleet-hint { bottom: 10px; }
         }
       `}</style>
     </div>
