@@ -24,18 +24,21 @@ jobs:
           flyctl machine start "$MACHINE_ID" -a "$APP" || true
 
           # Wait until flyctl considers the machine started.
-          flyctl machine wait "$MACHINE_ID" -a "$APP" --state started --timeout 120
+          flyctl machine wait "$MACHINE_ID" -a "$APP" --state started --wait-timeout 2m
 
           # Wait until Payload itself is accepting requests (Next.js can take ~20s to boot).
           echo "Waiting for Payload health check..."
           for i in $(seq 1 30); do
             if curl -sf "https://${APP}.fly.dev/api/access" -o /dev/null; then
               echo "Payload is up."
-              break
+              exit 0
             fi
             echo "  attempt $i/30 — retrying in 5s"
             sleep 5
           done
+
+          echo "Payload did not become healthy within 150s." >&2
+          exit 1
 
       - name: Snapshot SQLite on Fly
         env:
