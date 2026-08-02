@@ -27,7 +27,7 @@ export const MediaItems: CollectionConfig = {
     { name: 'description', type: 'textarea', localized: true },
     { name: 'category', type: 'text' },
     { name: 'tag', type: 'text', localized: true },
-    { name: 'format', type: 'text', admin: { description: 'e.g. MP4, ZIP, PDF, MP3.' } },
+    { name: 'format', type: 'text', admin: { description: 'e.g. MP4, ZIP, PDF, Spotify.' } },
     { name: 'file', type: 'upload', relationTo: 'media', admin: { description: 'Upload to the Media library.' } },
     { name: 'externalUrl', type: 'text', label: 'External URL', admin: { description: 'Use this when the asset lives off-platform (Vimeo, Spotify, R2…).' } },
   ],

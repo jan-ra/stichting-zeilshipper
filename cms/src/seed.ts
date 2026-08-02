@@ -537,13 +537,13 @@ const mediaItems = [
     type: 'podcast',
     title: 'Roefgesprekken',
     title_en: 'Roefgesprekken',
-    description: 'Podcast met verhalen van zeevarenden: kapiteins, stuurmannen en vrouwen, schepenskoks, matrozen en anderen werkzaam op een schip. Een initiatief van Peter Fokkens voor Stichting Zeilschipper.',
-    description_en: 'Podcast featuring stories from seafarers: captains, mates, ship cooks, sailors and others who work aboard a ship. An initiative by Peter Fokkens for Stichting Zeilschipper.',
+    description: 'Podcast met verhalen van zeevarenden: kapiteins, stuurmannen en vrouwen, schepenskoks, matrozen en anderen werkzaam op een schip. Een initiatief van Lisa Bloemers voor Stichting Zeilschipper.',
+    description_en: 'Podcast featuring stories from seafarers: captains, mates, ship cooks, sailors and others who work aboard a ship. An initiative by Lisa Bloemers for Stichting Zeilschipper.',
     category: 'podcast',
     tag: 'Podcast',
     tag_en: 'Podcast',
-    format: 'MP3',
-    externalUrl: 'https://www.stichtingzeilschipper.nl/podcasts/roefgesprekken/',
+    format: 'Spotify',
+    externalUrl: 'https://open.spotify.com/show/53OFpNfrF8cWpgZPOH1zgS',
   },
 ]
 

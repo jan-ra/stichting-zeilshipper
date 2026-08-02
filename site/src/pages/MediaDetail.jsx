@@ -3,6 +3,12 @@ import { useLanguage } from '../context/LanguageContext.jsx'
 
 const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉', project: '◈' }
 
+// Turn a public Spotify show/episode link into its embeddable player URL.
+function spotifyEmbedUrl(url) {
+  const m = /^https:\/\/open\.spotify\.com\/(show|episode)\/([A-Za-z0-9]+)/.exec(url || '')
+  return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}?utm_source=generator` : null
+}
+
 export default function MediaDetailPage({ navigate, mediaItemId }) {
   const { t, tc } = useLanguage()
   const item = MEDIA_ITEMS.find(i => i.id === mediaItemId) || MEDIA_ITEMS.find(i => i.type === 'video') || MEDIA_ITEMS[0]
@@ -23,6 +29,7 @@ export default function MediaDetailPage({ navigate, mediaItemId }) {
   const isVideo   = item.type === 'video'
   const isPodcast = item.type === 'podcast'
   const typeLabel = t('mediaDetail.typeLabels')[item.type] || item.type
+  const spotifyEmbed = spotifyEmbedUrl(item.url)
 
   return (
     <div style={{ paddingTop: 68 }}>
@@ -97,14 +104,28 @@ export default function MediaDetailPage({ navigate, mediaItemId }) {
               padding: '56px 48px', display: 'flex', flexDirection: 'column',
               alignItems: 'center', gap: 28, textAlign: 'center',
             }}>
-              <div style={{
-                width: 80, height: 80, borderRadius: '50%',
-                background: 'rgba(193,154,82,0.1)', border: '1px solid rgba(193,154,82,0.3)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 36, color: '#c19a52',
-              }}>
-                {TYPE_ICONS[item.type] || '◈'}
-              </div>
+              {spotifyEmbed ? (
+                <iframe
+                  title={tc(item, 'title')}
+                  src={spotifyEmbed}
+                  width="100%"
+                  height="352"
+                  frameBorder="0"
+                  allowFullScreen
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
+                  style={{ borderRadius: 12, border: 'none', display: 'block', alignSelf: 'stretch', width: '100%' }}
+                />
+              ) : (
+                <div style={{
+                  width: 80, height: 80, borderRadius: '50%',
+                  background: 'rgba(193,154,82,0.1)', border: '1px solid rgba(193,154,82,0.3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 36, color: '#c19a52',
+                }}>
+                  {TYPE_ICONS[item.type] || '◈'}
+                </div>
+              )}
               <div>
                 <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: '#f4ede1', marginBottom: 10 }}>
                   {tc(item, 'title')}
