@@ -13,12 +13,13 @@ const GLOBE_CHAPTERS = [
   { lat: 52.48, lng: 4.96, altitude: 0.065, autoRotate: false, regionKey: 'thuiswateren' },
   { lat: 52.0, lng: 12.0, altitude: 2.0, autoRotate: false, regionKey: 'europa' },
   { lat: 20.0, lng: -5.0, altitude: 2.8, autoRotate: true, regionKey: 'wereld' },
-  // Chapter IV closes on Harlingen, the busiest basin (16 ships within a few hundred m).
-  { lat: 53.173, lng: 5.415, altitude: 0.012, autoRotate: false, regionKey: 'thuiswateren' },
+  // Chapter IV closes on Harlingen, the busiest basin (16 ships within a few hundred m),
+  // at the same country-wide altitude as chapter I — pushing in further reads as a slam.
+  { lat: 53.173, lng: 5.415, altitude: 0.065, autoRotate: false, regionKey: 'thuiswateren' },
 ]
 
-// Opens on the Netherlands rather than half of Europe; the chapters push in from here.
-const INITIAL_POV = { lat: 52.48, lng: 4.96, altitude: 0.35, ms: 0 }
+// Opens on the whole globe, slowly turning; the chapters push in from here.
+const INITIAL_POV = { lat: 20.0, lng: 4.96, altitude: 2.5, ms: 0 }
 
 const CHAPTERS_STRUCT = [
   { index: 0, roman: 'I' },
@@ -167,9 +168,9 @@ export default function HomePage({ navigate }) {
               selectedShip={selectedShip}
               onSelectShip={handleShipClick}
               pov={pov}
-              /* Only the "the world" chapter spins. Now that the hero opens framed on
-                 the Netherlands, auto-rotating would just drift off it. */
-              autoRotate={activeChapter ? activeChapter.autoRotate : false}
+              /* The hero opens on the full globe turning; once the chapters take over
+                 only "the world" one spins, since the closer framings would drift off. */
+              autoRotate={activeChapter ? activeChapter.autoRotate : true}
               autoRotateSpeed={0.35}
               enableZoom={false}
               /* On touch the hero has to stay scrollable — OrbitControls would

@@ -32,6 +32,11 @@ const isFrontFacing = (lat, lng, cam) => {
 
 function placeMarkers(globe, clusters, nodes) {
   const cam = globe.camera().position
+  // The overlay cannot clip with `overflow: hidden` — that would cut off tooltips and
+  // pickers, which are allowed to hang over the edge. So markers projecting outside the
+  // canvas box are hidden instead of drawn on top of the rest of the page.
+  const w = globe.width()
+  const h = globe.height()
   for (const c of clusters) {
     const node = nodes.get(c.id)
     if (!node) continue
@@ -40,6 +45,10 @@ function placeMarkers(globe, clusters, nodes) {
       continue
     }
     const { x, y } = globe.getScreenCoords(c.lat, c.lng, 0)
+    if (x < 0 || y < 0 || x > w || y > h) {
+      node.style.visibility = 'hidden'
+      continue
+    }
     node.style.visibility = 'visible'
     node.style.transform = `translate3d(${x}px, ${y}px, 0)`
   }
