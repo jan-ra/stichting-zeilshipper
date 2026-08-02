@@ -1,18 +1,20 @@
 import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react'
 import { asset } from '../../utils/asset.js'
 import { clusterScreenPoints, clusterSignature, clusterBounds, assignmentOf } from './clusterScreenPoints.js'
-import { polar2Cartesian } from './useGlobeEngine.js'
 
-// Ship markers are plain DOM on top of the canvas, not a globe.gl points layer.
-// three-globe draws points as cylinders with a hard `Math.max(alt * R, 0.1)` floor on
-// their height, so they can never be flat — zoomed in they turn into spikes. Drawing
-// them ourselves also means real z-index (a selected marker can be forced on top),
-// hit areas we control, and pointer events that work on touch.
+// Ship markers are plain DOM on top of the canvas, not a MapLibre symbol layer or a
+// pool of maplibregl.Marker instances: it buys real z-index (a selected marker can be
+// forced on top), hit areas we control, pointer events that work on touch, and — the
+// reason it started this way — clustering that reacts to the camera at 60Hz.
+//
+// Nothing here talks to MapLibre directly. Everything goes through the `view` adapter
+// from useMapEngine.js, which is exactly two primitives wide: project and visible.
 
 const RECLUSTER_MS = 110      // membership does not need 60Hz; positions do
-const REF_ALT = 1.8           // the default framing altitude on both pages
+const REF_ZOOM = 1.7          // the default framing zoom on both pages
 const DOT_SCALE_MIN = 0.85
 const DOT_SCALE_MAX = 1.3
+const DOT_SCALE_PER_ZOOM = 0.15
 const TIP_MAX_NAMES = 6
 
 // ── Spotlight timings (home hero only) ───────────────────────────────────────
@@ -39,36 +41,27 @@ const TAG_BOX_BELOW = 4
 // where the card actually is.
 const CARD_SELECTOR = '.sz-shipcard'
 
-// Visible angular height is roughly 53 * altitude degrees; aiming for the cluster to
-// fill ~60% of that gives span / 32. Round it off to 30.
-const SPLIT_DIVISOR = 30
+// Breathing room left around a cluster when the camera dives into it to split it up.
+const SPLIT_PADDING_PX = 70
 
 const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v)
 const discSize = n => Math.round(20 + Math.min(n, 24) * 0.75)
 const countLabel = n => (n > 99 ? '99+' : String(n))
 
-// A point on the sphere faces the camera when its surface normal (which, for a globe
-// centred on the origin, is just its own position) points camera-ward.
-const isFrontFacing = (lat, lng, cam) => {
-  const p = polar2Cartesian(lat, lng)
-  return p.x * (cam.x - p.x) + p.y * (cam.y - p.y) + p.z * (cam.z - p.z) > 0
-}
-
-function placeMarkers(globe, clusters, nodes) {
-  const cam = globe.camera().position
+function placeMarkers(view, clusters, nodes) {
   // The overlay cannot clip with `overflow: hidden` — that would cut off tooltips and
   // pickers, which are allowed to hang over the edge. So markers projecting outside the
   // canvas box are hidden instead of drawn on top of the rest of the page.
-  const w = globe.width()
-  const h = globe.height()
+  const w = view.width()
+  const h = view.height()
   for (const c of clusters) {
     const node = nodes.get(c.id)
     if (!node) continue
-    if (!isFrontFacing(c.lat, c.lng, cam)) {
+    if (!view.visible(c.lat, c.lng)) {
       node.style.visibility = 'hidden'
       continue
     }
-    const { x, y } = globe.getScreenCoords(c.lat, c.lng, 0)
+    const { x, y } = view.project(c.lat, c.lng)
     if (x < 0 || y < 0 || x > w || y > h) {
       node.style.visibility = 'hidden'
       continue
@@ -96,13 +89,12 @@ function cardBox(svg) {
   return { left: c.left - s.left, right: c.right - s.left, top: c.top - s.top, bottom: c.bottom - s.top }
 }
 
-function placeRoute(globe, route, refs) {
+function placeRoute(view, route, refs) {
   const { path, dots, tags, svg } = refs
   if (!path || route.length < 2) return
 
-  const cam = globe.camera().position
-  const w = globe.width()
-  const h = globe.height()
+  const w = view.width()
+  const h = view.height()
   let d = ''
   let penDown = false
   const onScreen = []
@@ -111,8 +103,8 @@ function placeRoute(globe, route, refs) {
     const p = route[i]
     const dot = dots[i]
 
-    if (isFrontFacing(p.lat, p.lng, cam)) {
-      const { x, y } = globe.getScreenCoords(p.lat, p.lng, 0)
+    if (view.visible(p.lat, p.lng)) {
+      const { x, y } = view.project(p.lat, p.lng)
       d += `${penDown ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`
       penDown = true
       const inBox = x >= 0 && y >= 0 && x <= w && y <= h
@@ -176,15 +168,15 @@ function placeRoute(globe, route, refs) {
 // group marker while that ship is clustered with others, and its own dot once the
 // cluster splits. Looked up per frame rather than pinned at pick time, so the card
 // keeps pointing at the right thing while the globe turns.
-function placeSpot(globe, shipId, node, clusters) {
+function placeSpot(view, shipId, node, clusters) {
   if (!node || shipId == null) return
   const cluster = clusters.find(c => c.ships.some(s => s.id === shipId))
-  if (!cluster || !isFrontFacing(cluster.lat, cluster.lng, globe.camera().position)) {
+  if (!cluster || !view.visible(cluster.lat, cluster.lng)) {
     node.style.visibility = 'hidden'
     return
   }
-  const { x, y } = globe.getScreenCoords(cluster.lat, cluster.lng, 0)
-  if (x < 0 || y < 0 || x > globe.width() || y > globe.height()) {
+  const { x, y } = view.project(cluster.lat, cluster.lng)
+  if (x < 0 || y < 0 || x > view.width() || y > view.height()) {
     node.style.visibility = 'hidden'
     return
   }
@@ -193,7 +185,7 @@ function placeSpot(globe, shipId, node, clusters) {
 }
 
 export default function ShipMarkers({
-  globeRef,
+  viewRef,
   ready,
   ships,
   matchedIds,        // Set of ship ids matching the current filter, or null for "all"
@@ -203,7 +195,7 @@ export default function ShipMarkers({
   clusterRadiusPx,
   isTouch,
   canZoom,
-  minAltitude,
+  maxZoom,
   labels,
   spotlight = false,  // cycle a floating card through random ships (home hero only)
   onSelectShip,
@@ -248,12 +240,11 @@ export default function ShipMarkers({
     sigRef.current = ''
     assignRef.current = null
 
-    const recluster = globe => {
-      const cam = globe.camera().position
+    const recluster = view => {
       const points = []
       for (const s of ships) {
-        if (!isFrontFacing(s.lat, s.lng, cam)) continue
-        const { x, y } = globe.getScreenCoords(s.lat, s.lng, 0)
+        if (!view.visible(s.lat, s.lng)) continue
+        const { x, y } = view.project(s.lat, s.lng)
         points.push({ x, y, ship: s })
       }
       const next = clusterScreenPoints(points, clusterRadiusPx, assignRef.current)
@@ -268,13 +259,10 @@ export default function ShipMarkers({
 
     const tick = now => {
       raf = requestAnimationFrame(tick)
-      const globe = globeRef.current
-      if (!globe) return
+      const view = viewRef.current
+      if (!view) return
 
-      // Screen coordinates depend on the canvas box as well as the camera, so a
-      // window resize has to invalidate the cache even when the camera is still.
-      const cam = globe.camera().position
-      const key = `${cam.x.toFixed(3)},${cam.y.toFixed(3)},${cam.z.toFixed(3)},${globe.width()},${globe.height()}`
+      const key = view.key()
       if (key === lastKey) return
       lastKey = key
 
@@ -282,35 +270,38 @@ export default function ShipMarkers({
       // overlay, so it costs one style write per frame regardless of marker count —
       // and never a tween, which is what made the old points layer lag a full second
       // behind the gesture.
-      const altitude = Math.hypot(cam.x, cam.y, cam.z) / 100 - 1
-      const scale = clamp(DOT_SCALE_MAX - 0.45 * (altitude / REF_ALT), DOT_SCALE_MIN, DOT_SCALE_MAX)
+      const scale = clamp(
+        DOT_SCALE_MIN + (view.zoom() - REF_ZOOM) * DOT_SCALE_PER_ZOOM,
+        DOT_SCALE_MIN,
+        DOT_SCALE_MAX
+      )
       overlayRef.current?.style.setProperty('--sz-dot-scale', scale.toFixed(3))
 
       if (now - lastClusterAt > RECLUSTER_MS) {
         lastClusterAt = now
-        recluster(globe)
+        recluster(view)
       }
-      placeMarkers(globe, clustersRef.current, nodes)
-      placeSpot(globe, spotShipRef.current, spotNodeRef.current, clustersRef.current)
-      placeRoute(globe, routeRef.current.route ?? [], routeRef.current)
+      placeMarkers(view, clustersRef.current, nodes)
+      placeSpot(view, spotShipRef.current, spotNodeRef.current, clustersRef.current)
+      placeRoute(view, routeRef.current.route ?? [], routeRef.current)
     }
 
     // Seed synchronously so markers appear on the first paint rather than one frame in.
-    const globe = globeRef.current
-    if (globe) recluster(globe)
+    const view = viewRef.current
+    if (view) recluster(view)
 
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [ready, ships, clusterRadiusPx, globeRef])
+  }, [ready, ships, clusterRadiusPx, viewRef])
 
   // Place freshly mounted marker nodes before the browser paints them. Markers start
   // hidden, and the rAF loop only repaints when the camera moves — so without this a
   // cluster created on the last frame of a fly-to would stay invisible until the next
   // camera change.
   useLayoutEffect(() => {
-    const globe = globeRef.current
-    if (globe) placeMarkers(globe, clusters, nodesRef.current)
-  }, [clusters, globeRef])
+    const view = viewRef.current
+    if (view) placeMarkers(view, clusters, nodesRef.current)
+  }, [clusters, viewRef])
 
   // Same reason for the track: selecting a ship on a page that does not fly the camera
   // (the home hero) leaves the rAF loop with nothing to react to.
@@ -318,9 +309,9 @@ export default function ShipMarkers({
     routeRef.current.route = route
     routeRef.current.dots.length = route.length
     routeRef.current.tags.length = route.length
-    const globe = globeRef.current
-    if (globe) placeRoute(globe, route, routeRef.current)
-  }, [route, globeRef])
+    const view = viewRef.current
+    if (view) placeRoute(view, route, routeRef.current)
+  }, [route, viewRef])
 
   // ── Spotlight ──────────────────────────────────────────────────────────────
   // Anything the user is actually looking at outranks the showcase: a hovered
@@ -386,9 +377,9 @@ export default function ShipMarkers({
   // Same reason as the markers above: place the card before its first paint, since
   // the rAF loop only writes when the camera moves.
   useLayoutEffect(() => {
-    const globe = globeRef.current
-    if (globe) placeSpot(globe, spotShipRef.current, spotNodeRef.current, clustersRef.current)
-  }, [spot, globeRef])
+    const view = viewRef.current
+    if (view) placeSpot(view, spotShipRef.current, spotNodeRef.current, clustersRef.current)
+  }, [spot, viewRef])
 
   // Close any open popover when the selection changes from elsewhere (a list click).
   useEffect(() => { setPicker(null) }, [selectedId])
@@ -432,19 +423,14 @@ export default function ShipMarkers({
     // cluster would be showing two answers to the same question.
     if (selectedId != null) onDeselect?.()
 
-    const globe = globeRef.current
-    if (globe && canZoom) {
-      const b = clusterBounds(cluster)
-      // Longitude degrees shrink toward the poles; weight them so the span is in
-      // comparable units before turning it into an altitude.
-      const lngWeight = Math.cos((cluster.lat * Math.PI) / 180)
-      const span = Math.max(b.spanLat, b.spanLng * lngWeight)
-      const altitude = globe.pointOfView().altitude
-      const target = Math.max(minAltitude, Math.min(span / SPLIT_DIVISOR, altitude * 0.85))
-      if (target < altitude - 1e-4) {
+    const view = viewRef.current
+    if (view && canZoom) {
+      // Framing the cluster's own box is what pulls it apart; MapLibre works out the
+      // zoom for it. Returns false once there is no room left to move in.
+      const moved = view.zoomIntoBounds(clusterBounds(cluster), { padding: SPLIT_PADDING_PX, maxZoom })
+      if (moved) {
         setPicker(null)
         setHover(null)
-        globe.pointOfView({ lat: cluster.lat, lng: cluster.lng, altitude: target }, 700)
         return
       }
     }

@@ -1,29 +1,35 @@
 import { useRef, useEffect, useMemo } from 'react'
-import { useGlobeEngine, GLOBE_RADIUS } from './useGlobeEngine.js'
-import { BASEMAP_ATTRIBUTION } from '../../utils/basemap.js'
+import { useMapEngine } from './useMapEngine.js'
 import ShipMarkers from './ShipMarkers.jsx'
 import { useLanguage } from '../../context/LanguageContext.jsx'
 import { useIsTouch } from '../../hooks/useMediaQuery.js'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import './globe.css'
 
 const CLUSTER_RADIUS_MOUSE = 28
 const CLUSTER_RADIUS_TOUCH = 34
 
+const NO_PADDING = { top: 0, right: 0, bottom: 0, left: 0 }
+
+// How long after a gesture ends before autorotate may take the camera back — long
+// enough for MapLibre's drag inertia to play out.
+const GESTURE_COOLDOWN_MS = 900
+
 // The one globe used by both the home hero and the fleet page. It owns the camera and
-// the tiled sphere; ShipMarkers owns everything the user actually points at.
+// the vector basemap on its sphere; ShipMarkers owns everything the user points at.
 export default function ShipGlobe({
   ships,
   matchedIds = null,
   selectedShip = null,
   onSelectShip,
   onDeselect,                // clicking a group drops the open ship
-  pov,                       // { lat, lng, altitude, ms } — flies when it changes
+  view,                      // { lat, lng, zoom, padding, ms } — flies when it changes
   autoRotate = false,
-  autoRotateSpeed = 0.2,
+  autoRotateSpeed = 3,       // degrees of longitude per second
   enableZoom = false,
   enableRotate = true,
-  minAltitude = 0.0004,
-  maxAltitude = 2.8,
+  minZoom = 1.1,
+  maxZoom = 14,
   spotlight = false,         // rotating showcase card — the home hero only
   showRoute = false,         // draw the selected ship's track — the fleet map only
   onUserInteract,
@@ -31,53 +37,120 @@ export default function ShipGlobe({
   const containerRef = useRef(null)
   const { t, lang } = useLanguage()
   const isTouch = useIsTouch()
+  // Autorotate drives the camera itself, so it has to stand down while a flight of ours
+  // is running — setCenter would cancel the flyTo mid-animation.
+  const flyingRef = useRef(false)
+  // True while the visitor is working the camera, plus a short tail for drag inertia.
+  const gestureRef = useRef(false)
+  const gestureTimer = useRef(0)
 
   const located = useMemo(
     () => ships.filter(s => s.lat != null && s.lng != null).sort((a, b) => a.id - b.id),
     [ships]
   )
 
-  const { globeRef, ready, failed } = useGlobeEngine(containerRef, {
-    minDistance: (1 + minAltitude) * GLOBE_RADIUS,
-    maxDistance: (1 + maxAltitude) * GLOBE_RADIUS,
-    initialPov: pov ?? { lat: 52.5, lng: 5.0, altitude: 1.8 },
+  const { mapRef, viewRef, ready, failed } = useMapEngine(containerRef, {
+    minZoom,
+    maxZoom,
+    initialView: view ?? { lat: 52.5, lng: 5.0, zoom: 1.7 },
   })
 
-  // Controls that the pages toggle over time. `enableRotate` is forced off on touch
+  // Handlers that the pages toggle over time. `enableRotate` is forced off on touch
   // where the page needs one-finger swipes for scrolling (the home hero); the fleet
   // page passes it through since that screen does not scroll.
   useEffect(() => {
-    const globe = globeRef.current
-    if (!globe) return
-    const c = globe.controls()
-    c.autoRotate = autoRotate
-    c.autoRotateSpeed = autoRotate ? autoRotateSpeed : 0
-    c.enableZoom = enableZoom
-    c.enableRotate = enableRotate
-  }, [ready, autoRotate, autoRotateSpeed, enableZoom, enableRotate, globeRef])
+    const map = mapRef.current
+    if (!map) return
+    const toggle = (handler, on) => (on ? handler.enable() : handler.disable())
+    toggle(map.dragPan, enableRotate)
+    toggle(map.keyboard, enableRotate || enableZoom)
+    toggle(map.scrollZoom, enableZoom)
+    toggle(map.doubleClickZoom, enableZoom)
+    toggle(map.touchZoomRotate, enableZoom)
+  }, [ready, enableZoom, enableRotate, mapRef])
 
+  // Interaction is read off the raw input events rather than MapLibre's `movestart`.
+  // While autorotate is running the map is *already* moving, so a drag does not start a
+  // new move and `movestart` never arrives carrying an `originalEvent` — which left the
+  // fleet globe inert until something else marked it as touched.
   useEffect(() => {
-    const globe = globeRef.current
-    if (!globe || !onUserInteract) return
-    const c = globe.controls()
-    c.addEventListener('start', onUserInteract)
-    return () => c.removeEventListener('start', onUserInteract)
-  }, [ready, onUserInteract, globeRef])
+    const map = mapRef.current
+    if (!map) return
+    const canvas = map.getCanvas()
+
+    const begin = () => { gestureRef.current = true; onUserInteract?.() }
+    // Inertia keeps the camera gliding after the finger lifts, so hold the rotation off
+    // a little longer rather than fighting the throw.
+    const end = () => {
+      clearTimeout(gestureTimer.current)
+      gestureTimer.current = setTimeout(() => { gestureRef.current = false }, GESTURE_COOLDOWN_MS)
+    }
+    const wheel = () => { onUserInteract?.(); begin(); end() }
+
+    canvas.addEventListener('pointerdown', begin)
+    canvas.addEventListener('pointerup', end)
+    canvas.addEventListener('pointercancel', end)
+    canvas.addEventListener('wheel', wheel, { passive: true })
+    return () => {
+      clearTimeout(gestureTimer.current)
+      canvas.removeEventListener('pointerdown', begin)
+      canvas.removeEventListener('pointerup', end)
+      canvas.removeEventListener('pointercancel', end)
+      canvas.removeEventListener('wheel', wheel)
+    }
+  }, [ready, onUserInteract, mapRef])
+
+  // MapLibre has no equivalent of globe.gl's controls.autoRotate, so the hero drives it
+  // itself: nudge the centre longitude westward each frame. It stands down while the
+  // user is dragging and while one of our own flights is running, so it never competes
+  // for the camera. The home hero lets it pick back up afterwards; the fleet page turns
+  // it off for good the first time the visitor touches the globe.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !ready || !autoRotate) return
+
+    let raf = 0
+    let last = 0
+    const step = now => {
+      raf = requestAnimationFrame(step)
+      const dt = last ? (now - last) / 1000 : 0
+      last = now
+      if (!dt || flyingRef.current || gestureRef.current) return
+      const c = map.getCenter()
+      map.setCenter([c.lng + autoRotateSpeed * dt, c.lat])
+    }
+    raf = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(raf)
+  }, [ready, autoRotate, autoRotateSpeed, mapRef])
 
   // `seq` lets a page re-issue the same flight (re-selecting a ship it already flew to);
   // without it an identical key would be a no-op.
-  const povKey = pov ? `${pov.seq ?? ''}:${pov.lat},${pov.lng},${pov.altitude}` : ''
+  const viewKey = view ? `${view.seq ?? ''}:${view.lat},${view.lng},${view.zoom}` : ''
   useEffect(() => {
-    const globe = globeRef.current
-    if (!globe || !pov) return
+    const map = mapRef.current
+    if (!map || !view) return
     // `zoomInOnly` flights may pan and move closer, never further away — pulling the
     // camera back out from under someone who has already zoomed in is disorienting.
-    const altitude = pov.zoomInOnly
-      ? Math.min(pov.altitude, globe.pointOfView().altitude)
-      : pov.altitude
-    globe.pointOfView({ lat: pov.lat, lng: pov.lng, altitude }, pov.ms ?? 1500)
-    // povKey rather than pov: the pages rebuild the object on unrelated renders.
-  }, [ready, povKey])
+    const zoom = view.zoomInOnly ? Math.max(view.zoom, map.getZoom()) : view.zoom
+    flyingRef.current = true
+    map.flyTo({
+      center: [view.lng, view.lat],
+      zoom,
+      // Padding keeps the target clear of the ship card. It sticks to the map, so every
+      // flight has to state it — otherwise the last selection's offset lingers.
+      padding: view.padding ?? NO_PADDING,
+      duration: view.ms ?? 1500,
+    })
+    // viewKey rather than view: the pages rebuild the object on unrelated renders.
+  }, [ready, viewKey])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+    const done = () => { flyingRef.current = false }
+    map.on('moveend', done)
+    return () => { map.off('moveend', done) }
+  }, [ready, mapRef])
 
   const labels = useMemo(() => ({
     positionUpdated: t('fleet.positionUpdated'),
@@ -96,7 +169,7 @@ export default function ShipGlobe({
       <div className="sz-globe__canvas" ref={containerRef} />
       {failed && <div className="sz-globe__status">{t('fleet.globeUnavailable')}</div>}
       <ShipMarkers
-        globeRef={globeRef}
+        viewRef={viewRef}
         ready={ready}
         ships={located}
         matchedIds={matchedIds}
@@ -106,15 +179,12 @@ export default function ShipGlobe({
         clusterRadiusPx={isTouch ? CLUSTER_RADIUS_TOUCH : CLUSTER_RADIUS_MOUSE}
         isTouch={isTouch}
         canZoom={enableZoom}
-        minAltitude={minAltitude}
+        maxZoom={maxZoom}
         labels={labels}
         spotlight={spotlight}
         onSelectShip={onSelectShip}
         onDeselect={onDeselect}
       />
-      {/* Tile-provider credit, required by the basemap licence. Rendered only once the
-          globe is actually up, so a failed WebGL mount does not credit tiles nobody saw. */}
-      {ready && <div className="sz-globe__credit">{BASEMAP_ATTRIBUTION}</div>}
     </div>
   )
 }

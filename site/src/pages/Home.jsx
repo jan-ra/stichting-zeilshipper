@@ -7,20 +7,20 @@ import ShipCard from '../components/ShipCard.jsx'
 import { useIsTouch } from '../hooks/useMediaQuery.js'
 import { useShips } from '../hooks/useShips.js'
 
-// Altitudes are Earth radii above the surface: visible height is roughly 53 * altitude
-// degrees. The located fleet spans 1.97 degrees around 52.48N 4.96E, so 0.065 frames
-// the Netherlands and every ship in it.
+// MapLibre zoom levels: zoom 1.1 is the whole planet in the pane, and each step halves
+// what you see. The located fleet spans 1.97 degrees around 52.48N 4.96E, so zoom 6.6
+// frames the Netherlands and every ship in it.
 const GLOBE_CHAPTERS = [
-  { lat: 52.48, lng: 4.96, altitude: 0.065, autoRotate: false, regionKey: 'thuiswateren' },
-  { lat: 52.0, lng: 12.0, altitude: 2.0, autoRotate: false, regionKey: 'europa' },
-  { lat: 20.0, lng: -5.0, altitude: 2.8, autoRotate: true, regionKey: 'wereld' },
+  { lat: 52.48, lng: 4.96, zoom: 6.6, autoRotate: false, regionKey: 'thuiswateren' },
+  { lat: 52.0, lng: 12.0, zoom: 1.55, autoRotate: false, regionKey: 'europa' },
+  { lat: 20.0, lng: -5.0, zoom: 1.1, autoRotate: true, regionKey: 'wereld' },
   // Chapter IV closes on Harlingen, the busiest basin (16 ships within a few hundred m),
-  // at the same country-wide altitude as chapter I — pushing in further reads as a slam.
-  { lat: 53.173, lng: 5.415, altitude: 0.065, autoRotate: false, regionKey: 'thuiswateren' },
+  // at the same country-wide zoom as chapter I — pushing in further reads as a slam.
+  { lat: 53.173, lng: 5.415, zoom: 6.6, autoRotate: false, regionKey: 'thuiswateren' },
 ]
 
 // Opens on the whole globe, slowly turning; the chapters push in from here.
-const INITIAL_POV = { lat: 20.0, lng: 4.96, altitude: 2.5, ms: 0 }
+const INITIAL_VIEW = { lat: 20.0, lng: 4.96, zoom: 1.3, ms: 0 }
 
 const CHAPTERS_STRUCT = [
   { index: 0, roman: 'I' },
@@ -103,9 +103,9 @@ export default function HomePage({ navigate }) {
   const ships = useShips()
 
   const activeChapter = chapter === null ? null : GLOBE_CHAPTERS[Math.min(chapter, GLOBE_CHAPTERS.length - 1)]
-  const pov = activeChapter
-    ? { lat: activeChapter.lat, lng: activeChapter.lng, altitude: activeChapter.altitude, ms: 2200 }
-    : INITIAL_POV
+  const view = activeChapter
+    ? { lat: activeChapter.lat, lng: activeChapter.lng, zoom: activeChapter.zoom, ms: 2200 }
+    : INITIAL_VIEW
 
   const handleShipClick = useCallback(ship => setSelectedShip(ship), [])
   const handleDeselect = useCallback(() => setSelectedShip(null), [])
@@ -172,16 +172,16 @@ export default function HomePage({ navigate }) {
               selectedShip={selectedShip}
               onSelectShip={handleShipClick}
               onDeselect={handleDeselect}
-              pov={pov}
+              view={view}
               /* The hero opens on the full globe turning; once the chapters take over
                  only "the world" one spins, since the closer framings would drift off. */
               autoRotate={activeChapter ? activeChapter.autoRotate : true}
-              autoRotateSpeed={0.35}
+              autoRotateSpeed={3}
               enableZoom={false}
               /* Rotating showcase: one random ship's card floats beside its marker
                  for a few seconds at a time. Home only. */
               spotlight
-              /* On touch the hero has to stay scrollable — OrbitControls would
+              /* On touch the hero has to stay scrollable — the map's drag handler would
                  otherwise swallow every vertical swipe. Markers stay tappable. */
               enableRotate={!isTouch}
             />

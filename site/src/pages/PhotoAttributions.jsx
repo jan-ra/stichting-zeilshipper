@@ -16,7 +16,7 @@ const CREDITS = [
   {
     section: 'Overig / Other',
     items: [
-      { description: 'Kaartmateriaal / Map tiles', credit: '© Stadia Maps, © Stamen Design, © OpenMapTiles, © OpenStreetMap contributors', license: 'CC BY 4.0 / ODbL' },
+      { description: 'Kaartmateriaal / Map tiles', credit: 'OpenFreeMap © OpenMapTiles, data © OpenStreetMap contributors', license: 'ODbL 1.0' },
       { description: 'Lettertypen / Typefaces', credit: 'Playfair Display — Google Fonts (Claus Eggers Sørensen)', license: 'SIL Open Font License 1.1' },
       { description: 'Lettertypen / Typefaces', credit: 'Source Sans 3 — Google Fonts (Paul D. Hunt)', license: 'SIL Open Font License 1.1' },
     ],
