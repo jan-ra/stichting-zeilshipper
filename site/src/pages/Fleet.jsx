@@ -23,28 +23,29 @@ const TYPE_GROUPS = [
 
 const OTHER = 'Overig'
 
-// globe.gl uses a globe radius of 100, so altitude 1 is one Earth radius (6371 km) up
-// and camera distance = (1 + altitude) * 100.
-//
-// The old floor of 0.12 sat 764 km up at ~890 m/px, which is why every harbour stayed
-// a single lump no matter how far you zoomed. 0.0004 is ~2.5 km up at ~3 m/px, where
-// ships more than about 90 m apart resolve into separate markers; anything closer than
-// that shares a berth and bottoms out into the picker list instead.
-const MIN_ALTITUDE = 0.0004
-const MAX_ALTITUDE = 2.8
+// MapLibre zoom levels. The ceiling of 14 is ~3 m/px, where ships more than about 90 m
+// apart resolve into separate markers; anything closer than that shares a berth and
+// bottoms out into the picker list instead. Note the globe flattens into Mercator
+// around zoom 12, so the deepest part of a dive lands on a flat map — which is the
+// right reading of a harbour anyway.
+const MIN_ZOOM = 1.1        // the whole planet in the pane
+const MAX_ZOOM = 14
 // Selecting a ship frames its harbour rather than slamming to the zoom floor — at
 // ~25 km up you can still see where in the country you are.
-const SELECT_ALTITUDE = 0.004
+const SELECT_ZOOM = 10.7
 
-// Visible angular height is roughly 53 * altitude degrees — the same relationship the
-// globe framing above is built on.
-const VISIBLE_DEG_PER_ALTITUDE = 53
 const CARD_MARGIN_PX = 20   // breathing room around the card when reserving space
 const CARD_MAX_RESERVE = 0.45
 
-// Aiming south to clear a bottom sheet must not send the camera over a pole.
-const clampLat = v => (v < -85 ? -85 : v > 85 ? 85 : v)
-const DEFAULT_POV = { lat: 52.5, lng: 5.0, altitude: 1.8, ms: 1500 }
+const DEFAULT_VIEW = { lat: 52.5, lng: 5.0, zoom: 1.7, ms: 1500 }
+
+// The zoom at which `spanDeg` degrees of latitude fill `fill` of a pane `heightPx` tall.
+// MapLibre lays the world out in 512px tiles, so at zoom z one pixel is
+// 360 * cos(lat) / (512 * 2^z) degrees.
+function zoomForSpanDeg(spanDeg, lat, heightPx, fill) {
+  const visibleDeg = Math.max(spanDeg, 1e-6) / fill
+  return Math.log2((heightPx * 360 * Math.cos((lat * Math.PI) / 180)) / (512 * visibleDeg))
+}
 
 const categoryOf = (type) => {
   const t = (type || '').toLowerCase()
@@ -65,13 +66,12 @@ const matchesSearch = (s, q) => {
   return [s.name, s.type, s.port].some(v => v && v.toLowerCase().includes(needle))
 }
 
-// Camera framing that fits a set of ships. Visible angular height is roughly
-// 53 * altitude degrees, so span / 30 leaves a comfortable margin around the group.
-// A smaller divisor pulls the camera back further; fitRoute uses one to keep a track
-// clear of the detail card, which covers the top-right of the globe pane.
-function fitPov(list, divisor = 30) {
+// Camera framing that fits a set of ships, leaving a comfortable margin around the
+// group. A smaller `fill` pulls the camera back further; fitRoute uses one to give a
+// track room to breathe.
+function fitView(list, pane, fill = 0.56) {
   const pts = list.filter(s => s.lat != null && s.lng != null)
-  if (pts.length === 0) return DEFAULT_POV
+  if (pts.length === 0) return DEFAULT_VIEW
 
   let minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity
   for (const s of pts) {
@@ -83,23 +83,31 @@ function fitPov(list, divisor = 30) {
   const lat = (minLat + maxLat) / 2
   const lng = (minLng + maxLng) / 2
   const span = Math.max(maxLat - minLat, (maxLng - minLng) * Math.cos((lat * Math.PI) / 180))
-  const altitude = Math.min(MAX_ALTITUDE, Math.max(MIN_ALTITUDE, span / divisor))
-  return { lat, lng, altitude, ms: 1800 }
+  const zoom = clampZoom(zoomForSpanDeg(span, lat, pane?.height ?? 800, fill))
+  return { lat, lng, zoom, ms: 1800 }
 }
+
+const clampZoom = z => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z))
 
 // Camera framing for a selected ship: the whole stored track on screen, not just where
 // the ship happens to be now. Unlike a plain marker click this flight may zoom *out* —
 // a week of sailing can easily be wider than the current view, and half a track off
 // screen is worse than a wider shot.
 //
-// SELECT_ALTITUDE acts as the floor so a ship that barely moved gets a harbour-level
-// view with context, rather than the camera slamming to the zoom limit on a 200 m track.
+// SELECT_ZOOM acts as the ceiling so a ship that barely moved gets a harbour-level view
+// with context, rather than the camera slamming to the zoom limit on a 200 m track.
+//
+// The ship card covers part of the pane whenever something is selected, so zooming to
+// fit is not enough on its own — half the track can end up behind it. That is what
+// `padding` is for: MapLibre frames the target inside what is left of the pane, which
+// replaces the hand-rolled zoom-out-and-aim-off-centre this used to do.
 function fitRoute(ship, pane) {
+  const padding = pane?.padding ?? null
   const pts = (ship.history ?? []).filter(p => p.lat != null && p.lng != null)
 
   if (pts.length < 2) {
-    if (ship.lat == null || ship.lng == null) return DEFAULT_POV
-    return { lat: ship.lat, lng: ship.lng, altitude: SELECT_ALTITUDE, zoomInOnly: true, ms: 1800 }
+    if (ship.lat == null || ship.lng == null) return DEFAULT_VIEW
+    return { lat: ship.lat, lng: ship.lng, zoom: SELECT_ZOOM, zoomInOnly: true, padding, ms: 1800 }
   }
 
   // Unwrap longitudes relative to the first point, so a track crossing the antimeridian
@@ -107,43 +115,30 @@ function fitRoute(ship, pane) {
   const base = pts[0].lng
   const unwrapped = pts.map(p => ({ lat: p.lat, lng: p.lng - 360 * Math.round((p.lng - base) / 360) }))
   // Wider margin than a plain group fit — a track wants breathing room around it.
-  const pov = fitPov(unwrapped, 18)
+  const view = fitView(unwrapped, pane, 0.34)
 
-  let { lat, lng } = pov
-  let altitude = Math.max(pov.altitude, SELECT_ALTITUDE)
-
-  // The ship card covers part of the pane whenever something is selected, so zooming to
-  // fit is not enough on its own — half the track can end up behind it. Pull back to
-  // make room, then aim off-centre so the track slides into the clear part: east of it
-  // when the card is the floating panel on the right, south when it is a bottom sheet.
-  const reserved = Math.max(pane?.reservedX ?? 0, pane?.reservedY ?? 0)
-  if (reserved > 0) {
-    altitude = Math.min(MAX_ALTITUDE, altitude / (1 - reserved))
-    const visibleLatDeg = VISIBLE_DEG_PER_ALTITUDE * altitude
-    if (pane.reservedX > 0) {
-      const visibleLngDeg = visibleLatDeg * pane.aspect
-      lng += (pane.reservedX / 2) * visibleLngDeg / Math.cos((lat * Math.PI) / 180)
-    } else {
-      lat = clampLat(lat - (pane.reservedY / 2) * visibleLatDeg)
-    }
+  return {
+    lat: view.lat,
+    lng: ((view.lng + 540) % 360) - 180,
+    zoom: Math.min(view.zoom, SELECT_ZOOM),
+    padding,
+    ms: 1800,
   }
-
-  return { lat, lng: ((lng + 540) % 360) - 180, altitude, ms: 1800 }
 }
 
-// How much of the globe pane the ship card takes out of play, plus the pane's aspect —
-// both needed to frame a track around it.
+// The pane's height (for turning a span into a zoom) and the padding that keeps the
+// ship card clear of whatever the camera is framing.
 //
 // The card is measured rather than assumed, because it has two quite different shapes:
 // a 320px panel floating over the top-right on wide screens, and a full-width bottom
-// sheet below 1000px (see ShipCard.css). One reserves width, the other height, and the
+// sheet below 1000px (see ShipCard.css). One eats width, the other height, and the
 // switch point is a CSS concern that JS should not be repeating.
 function paneMetrics(paneEl) {
   if (!paneEl) return null
   const p = paneEl.getBoundingClientRect()
   if (p.width <= 0 || p.height <= 0) return null
 
-  const metrics = { aspect: p.width / p.height, reservedX: 0, reservedY: 0 }
+  const metrics = { height: p.height, padding: { top: 0, right: 0, bottom: 0, left: 0 } }
 
   const card = document.querySelector('.sz-shipcard')
   if (!card) return metrics
@@ -160,9 +155,9 @@ function paneMetrics(paneEl) {
   const overlapH = Math.max(0, Math.min(p.bottom, c.bottom) - Math.max(p.top, c.top))
   if (overlapW <= 0 || overlapH <= 0) return metrics   // card is clear of the globe
 
-  const cap = v => Math.min(CARD_MAX_RESERVE, v)
-  if (sheet) metrics.reservedY = cap((overlapH + CARD_MARGIN_PX) / p.height)
-  else metrics.reservedX = cap((overlapW + CARD_MARGIN_PX) / p.width)
+  // MapLibre refuses padding that leaves no room, so cap it well short of the pane.
+  if (sheet) metrics.padding.bottom = Math.min(p.height * CARD_MAX_RESERVE, overlapH + CARD_MARGIN_PX)
+  else metrics.padding.right = Math.min(p.width * CARD_MAX_RESERVE, overlapW + CARD_MARGIN_PX)
 
   return metrics
 }
@@ -171,7 +166,7 @@ export default function FleetPage() {
   const [selectedId, setSelectedId] = useState(null)
   const [filter, setFilter] = useState({ type: 'all', region: 'all', search: '' })
   const [userInteracted, setUserInteracted] = useState(false)
-  const [pov, setPov] = useState(DEFAULT_POV)
+  const [view, setView] = useState(DEFAULT_VIEW)
   const { t, tc } = useLanguage()
 
   // Baked CMS fields merged with the positions fetched from the media bucket.
@@ -220,8 +215,8 @@ export default function FleetPage() {
   const handleUserInteract = useCallback(() => setUserInteracted(true), [])
 
   // Every camera command gets a sequence number so re-issuing the same one still flies.
-  const povSeq = useRef(0)
-  const flyTo = useCallback(next => setPov({ ...next, seq: ++povSeq.current }), [])
+  const viewSeq = useRef(0)
+  const flyTo = useCallback(next => setView({ ...next, seq: ++viewSeq.current }), [])
 
   // Selecting a ship frames its whole track (see fitRoute). Deselecting leaves the
   // camera exactly where it is — closing the card must not move the globe.
@@ -241,7 +236,10 @@ export default function FleetPage() {
   useEffect(() => {
     if (firstRegionRun.current) { firstRegionRun.current = false; return }
     if (selected) return
-    flyTo(fitPov(allItems.filter(s => filter.region === 'all' || s.region === filter.region)))
+    flyTo(fitView(
+      allItems.filter(s => filter.region === 'all' || s.region === filter.region),
+      paneMetrics(mapRef.current)
+    ))
   }, [filter.region])
 
   return (
@@ -386,12 +384,12 @@ export default function FleetPage() {
             selectedShip={selected}
             onSelectShip={handleSelect}
             onDeselect={handleDeselect}
-            pov={pov}
+            view={view}
             autoRotate={!userInteracted}
-            autoRotateSpeed={0.18}
+            autoRotateSpeed={1.6}
             enableZoom
-            minAltitude={MIN_ALTITUDE}
-            maxAltitude={MAX_ALTITUDE}
+            minZoom={MIN_ZOOM}
+            maxZoom={MAX_ZOOM}
             /* The track only makes sense here: this is the globe you can zoom, and the
                only one that frames the camera around a selected ship's route. */
             showRoute

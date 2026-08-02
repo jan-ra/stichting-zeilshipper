@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import 'leaflet/dist/leaflet.css'
 import './main.css'
 import App from './App.jsx'
 import { LanguageProvider } from './context/LanguageContext.jsx'

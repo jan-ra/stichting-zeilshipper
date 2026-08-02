@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import L from 'leaflet'
+import { STYLE_URL, loadMapLibre } from '../components/globe/useMapEngine.js'
 import { HARBOURS, INFO_BOARDS_PAGE } from '../data/content.js'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import { useLanguage } from '../context/LanguageContext.jsx'
-import { RASTER_TILE_URL, BASEMAP_ATTRIBUTION_HTML } from '../utils/basemap.js'
 
 const STATUS_COLORS = {
   afgerond: '#4a9e6a',
@@ -12,8 +12,9 @@ const STATUS_COLORS = {
 
 export default function InformatiebPage() {
   const mapRef = useRef(null)
-  const leafletRef = useRef(null)
+  const mapObjRef = useRef(null)
   const markersRef = useRef([])
+  const glRef = useRef(null)   // the lazily imported maplibre-gl namespace
   const [selected, setSelected] = useState(null)
   const [filter, setFilter] = useState('all')
   const { t, tc } = useLanguage()
@@ -25,33 +26,63 @@ export default function InformatiebPage() {
     const data = filterVal === 'all' ? HARBOURS : HARBOURS.filter(h => h.status === filterVal)
     data.forEach(h => {
       const color = STATUS_COLORS[h.status]
-      const icon = L.divIcon({
-        className: '',
-        html: `<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid rgba(244,237,225,0.7);box-shadow:0 0 8px ${color};cursor:pointer;"></div>`,
-        iconSize: [14, 14],
-        iconAnchor: [7, 7],
-      })
-      const marker = L.marker([h.lat, h.lng], { icon }).addTo(map)
-      marker.on('click', () => setSelected(h))
+      const el = document.createElement('div')
+      el.style.cssText = `width:14px;height:14px;border-radius:50%;background:${color};border:2px solid rgba(244,237,225,0.7);box-shadow:0 0 8px ${color};cursor:pointer;`
+      el.addEventListener('click', () => setSelected(h))
+      const marker = new glRef.current.Marker({ element: el }).setLngLat([h.lng, h.lat]).addTo(map)
       markersRef.current.push(marker)
     })
   }
 
+  // The filter can change before the lazy import below resolves, so the mount reads it
+  // through a ref rather than trusting the value it started with.
+  const filterRef = useRef(filter)
+  filterRef.current = filter
+
+  // MapLibre is imported lazily, the same way the fleet globe does it, so visitors who
+  // never open a map page do not download it.
   useEffect(() => {
-    if (!mapRef.current || leafletRef.current) return
-    const map = L.map(mapRef.current, { center: [52.5, 5.3], zoom: 7, minZoom: 7, zoomControl: true, attributionControl: false })
-    L.tileLayer(RASTER_TILE_URL, {
-      maxZoom: 18, attribution: BASEMAP_ATTRIBUTION_HTML,
-    }).addTo(map)
-    L.control.attribution({ prefix: false, position: 'bottomright' }).addTo(map)
-    leafletRef.current = map
-    addMarkers(map, 'all')
-    return () => { map.remove(); leafletRef.current = null }
+    if (!mapRef.current || mapObjRef.current) return
+    let cancelled = false
+
+    const mount = async () => {
+      const maplibregl = await loadMapLibre()
+      if (cancelled || !mapRef.current) return
+      glRef.current = maplibregl
+
+      // Same library, style and tile source as the fleet globe — see useMapEngine.js.
+      // Labels stay on here: this map is about named harbours. It also stays flat, since
+      // the whole thing fits inside the Netherlands.
+      const map = new maplibregl.Map({
+        container: mapRef.current,
+        style: STYLE_URL,
+        center: [5.3, 52.5],
+        zoom: 7,
+        minZoom: 7,
+        maxZoom: 18,
+        attributionControl: false,
+        dragRotate: false,
+        pitchWithRotate: false,
+        touchPitch: false,
+      })
+      map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-left')
+      map.addControl(new maplibregl.AttributionControl({ compact: true }))
+      mapObjRef.current = map
+      addMarkers(map, filterRef.current)
+    }
+
+    mount()
+
+    return () => {
+      cancelled = true
+      mapObjRef.current?.remove()
+      mapObjRef.current = null
+    }
   }, [])
 
   useEffect(() => {
-    if (!leafletRef.current) return
-    addMarkers(leafletRef.current, filter)
+    if (!mapObjRef.current) return
+    addMarkers(mapObjRef.current, filter)
   }, [filter])
 
   const counts = {

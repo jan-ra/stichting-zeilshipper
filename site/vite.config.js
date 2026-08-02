@@ -12,6 +12,10 @@ const POSITIONS_URL = process.env.VITE_POSITIONS_URL || `${MEDIA}/data/positions
 export default defineConfig({
   plugins: [react()],
   base: '/',
+  // MapLibre v6 spawns its tile-parsing worker with `{ type: 'module' }`, so the worker
+  // bundle Vite builds for it has to be an ES module too — the default IIFE output is
+  // rejected. See loadMapLibre() in useMapEngine.js.
+  worker: { format: 'es' },
   define: {
     'import.meta.env.VITE_POSITIONS_URL': JSON.stringify(POSITIONS_URL),
   },

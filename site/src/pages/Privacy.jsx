@@ -100,7 +100,7 @@ function NlContent({ settings, navigate }) {
         <p>Onze website maakt gebruik van de volgende externe diensten, die eigen privacybeleid hanteren:</p>
         <ul style={{ marginTop: 8, paddingLeft: 24 }}>
           <li style={{ marginBottom: 8 }}><strong>Google Fonts</strong> — lettertypen worden geladen van Google-servers. Google kan hierbij uw IP-adres registreren.</li>
-          <li><strong>Stadia Maps</strong> — kaart- en globetegels worden geladen van Stadia Maps-servers voor de kaartweergave. Stadia Maps kan hierbij uw IP-adres registreren.</li>
+          <li><strong>OpenFreeMap</strong> — kaart- en globetegels worden geladen van OpenFreeMap-servers voor de kaartweergave. OpenFreeMap werkt zonder registratie, API-sleutels of cookies; uw IP-adres is wel zichtbaar voor de server die de tegels levert.</li>
         </ul>
       </Section>
 
@@ -183,7 +183,7 @@ function EnContent({ settings, navigate }) {
         <p>Our website uses the following external services, each with their own privacy policies:</p>
         <ul style={{ marginTop: 8, paddingLeft: 24 }}>
           <li style={{ marginBottom: 8 }}><strong>Google Fonts</strong> — typefaces are loaded from Google servers. Google may log your IP address in this process.</li>
-          <li><strong>Stadia Maps</strong> — map and globe tiles are loaded from Stadia Maps servers for the map views. Stadia Maps may log your IP address in the process.</li>
+          <li><strong>OpenFreeMap</strong> — map and globe tiles are loaded from OpenFreeMap servers for the map views. OpenFreeMap operates without registration, API keys or cookies, though your IP address is visible to the server delivering the tiles.</li>
         </ul>
       </Section>
 
