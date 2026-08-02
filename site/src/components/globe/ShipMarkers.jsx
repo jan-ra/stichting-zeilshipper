@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useLayoutEffect } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react'
 import { asset } from '../../utils/asset.js'
 import { clusterScreenPoints, clusterSignature, clusterBounds, assignmentOf } from './clusterScreenPoints.js'
 import { polar2Cartesian } from './useGlobeEngine.js'
@@ -22,6 +22,22 @@ const SPOT_OUT_MS = 600       // must match the CSS transition in globe.css
 const SPOT_GAP_MS = 1000      // dark pause between two cards
 const SPOT_COOLDOWN_MS = 30000 // silence after the user last pointed at a marker
 const SPOT_EDGE_PX = 90       // keep the anchor clear of the canvas edges
+
+// Route date tags: offset clear of the dot, and the box a neighbouring tag has to stay
+// out of for both to be drawn.
+const TAG_OFFSET_X = 9
+const TAG_OFFSET_Y = -8
+const TAG_MIN_GAP_X = 54
+const TAG_MIN_GAP_Y = 15
+const TAG_EST_W = 52       // rough drawn width of "27 jul" — enough to test for overlap
+const TAG_BOX_ABOVE = 10
+const TAG_BOX_BELOW = 4
+
+// The detail card floats over the globe while a ship is selected, and how much of the
+// pane it covers swings from ~30% on a wide monitor to ~50% on a small laptop — too
+// much for a fixed threshold. Measured directly instead, so tags flip or drop based on
+// where the card actually is.
+const CARD_SELECTOR = '.sz-shipcard'
 
 // Visible angular height is roughly 53 * altitude degrees; aiming for the cluster to
 // fill ~60% of that gives span / 32. Round it off to 30.
@@ -62,6 +78,100 @@ function placeMarkers(globe, clusters, nodes) {
   }
 }
 
+// The selected ship's track: one dot per stored position, joined by a line, projected
+// in screen space every frame like the markers are. Attributes are written directly
+// rather than through React — this runs at 60Hz and must not re-render.
+//
+// The line breaks at the horizon rather than at the viewport edge: a segment whose ends
+// straddle the far side of the globe would otherwise be drawn as a chord straight
+// through it. Running off the edge is fine, the SVG viewport clips that itself.
+// The ship card's box in overlay-local coordinates, or null when nothing is covering
+// the globe. One layout read per placement pass, and only while a track is on screen.
+function cardBox(svg) {
+  const el = document.querySelector(CARD_SELECTOR)
+  if (!el || !svg) return null
+  const c = el.getBoundingClientRect()
+  if (c.width === 0 || c.height === 0) return null
+  const s = svg.getBoundingClientRect()
+  return { left: c.left - s.left, right: c.right - s.left, top: c.top - s.top, bottom: c.bottom - s.top }
+}
+
+function placeRoute(globe, route, refs) {
+  const { path, dots, tags, svg } = refs
+  if (!path || route.length < 2) return
+
+  const cam = globe.camera().position
+  const w = globe.width()
+  const h = globe.height()
+  let d = ''
+  let penDown = false
+  const onScreen = []
+
+  for (let i = 0; i < route.length; i++) {
+    const p = route[i]
+    const dot = dots[i]
+
+    if (isFrontFacing(p.lat, p.lng, cam)) {
+      const { x, y } = globe.getScreenCoords(p.lat, p.lng, 0)
+      d += `${penDown ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`
+      penDown = true
+      const inBox = x >= 0 && y >= 0 && x <= w && y <= h
+      onScreen[i] = inBox ? { x, y } : null
+      if (dot) {
+        dot.setAttribute('cx', x.toFixed(1))
+        dot.setAttribute('cy', y.toFixed(1))
+        dot.style.visibility = inBox ? 'visible' : 'hidden'
+      }
+    } else {
+      penDown = false
+      onScreen[i] = null
+      if (dot) dot.style.visibility = 'hidden'
+    }
+  }
+
+  path.setAttribute('d', d)
+
+  // Date tags are dropped rather than allowed to overlap: on a ship that barely moved,
+  // seven of them land on top of each other and the whole track becomes unreadable.
+  // Walked newest first, so when two points are too close it is the older tag that goes.
+  const card = cardBox(svg)
+  const placed = []
+
+  for (let i = route.length - 1; i >= 0; i--) {
+    const tag = tags[i]
+    if (!tag) continue
+    const pt = onScreen[i]
+
+    const clear = pt && placed.every(q => Math.abs(q.x - pt.x) > TAG_MIN_GAP_X || Math.abs(q.y - pt.y) > TAG_MIN_GAP_Y)
+    if (!clear) {
+      tag.style.visibility = 'hidden'
+      continue
+    }
+
+    // fitRoute keeps the route's *points* clear of the card, but a tag reaches ~50px
+    // past the dot it belongs to. Read it leftwards if that would put it under the
+    // card, and drop it if neither side is clear.
+    const ty = pt.y + TAG_OFFSET_Y
+    const hitsCard = (x0, x1) =>
+      card && x1 > card.left && x0 < card.right &&
+      ty + TAG_BOX_BELOW > card.top && ty - TAG_BOX_ABOVE < card.bottom
+
+    const rightX = pt.x + TAG_OFFSET_X
+    const leftX = pt.x - TAG_OFFSET_X
+    const flip = hitsCard(rightX, rightX + TAG_EST_W)
+    if (flip && hitsCard(leftX - TAG_EST_W, leftX)) {
+      tag.style.visibility = 'hidden'
+      continue
+    }
+
+    placed.push(pt)
+    tag.setAttribute('x', (flip ? leftX : rightX).toFixed(1))
+    tag.setAttribute('y', ty.toFixed(1))
+    tag.setAttribute('text-anchor', flip ? 'end' : 'start')
+    tag.style.visibility = 'visible'
+  }
+}
+
 // The spotlight card rides the marker its ship currently belongs to — which is the
 // group marker while that ship is clustered with others, and its own dot once the
 // cluster splits. Looked up per frame rather than pinned at pick time, so the card
@@ -88,6 +198,8 @@ export default function ShipMarkers({
   ships,
   matchedIds,        // Set of ship ids matching the current filter, or null for "all"
   selectedId,
+  selectedRoute,     // the selected ship's stored positions, oldest first
+  routeLocale = 'nl-NL',
   clusterRadiusPx,
   isTouch,
   canZoom,
@@ -95,6 +207,7 @@ export default function ShipMarkers({
   labels,
   spotlight = false,  // cycle a floating card through random ships (home hero only)
   onSelectShip,
+  onDeselect,
 }) {
   const overlayRef = useRef(null)
   const nodesRef = useRef(new Map())
@@ -103,6 +216,21 @@ export default function ShipMarkers({
   const assignRef = useRef(null)
   const spotNodeRef = useRef(null)
   const spotShipRef = useRef(null)
+  const routeRef = useRef({ svg: null, path: null, dots: [], tags: [] })
+
+  // A single stored position is not a track, so it draws nothing — the ship's own
+  // marker already says where it is.
+  const route = useMemo(() => {
+    const pts = (selectedRoute ?? []).filter(p => p && p.lat != null && p.lng != null)
+    if (pts.length < 2) return []
+    // Day and month only: these are nightly fixes, so the year is the same across a
+    // track and the time of day says nothing a visitor would act on.
+    const fmt = new Intl.DateTimeFormat(routeLocale, { day: 'numeric', month: 'short' })
+    return pts.map(p => {
+      const d = p.at ? new Date(p.at) : null
+      return { ...p, label: d && !Number.isNaN(d.getTime()) ? fmt.format(d) : '' }
+    })
+  }, [selectedRoute, routeLocale])
 
   const [clusters, setClusters] = useState([])
   const [hover, setHover] = useState(null)    // { id, flip }
@@ -164,6 +292,7 @@ export default function ShipMarkers({
       }
       placeMarkers(globe, clustersRef.current, nodes)
       placeSpot(globe, spotShipRef.current, spotNodeRef.current, clustersRef.current)
+      placeRoute(globe, routeRef.current.route ?? [], routeRef.current)
     }
 
     // Seed synchronously so markers appear on the first paint rather than one frame in.
@@ -182,6 +311,16 @@ export default function ShipMarkers({
     const globe = globeRef.current
     if (globe) placeMarkers(globe, clusters, nodesRef.current)
   }, [clusters, globeRef])
+
+  // Same reason for the track: selecting a ship on a page that does not fly the camera
+  // (the home hero) leaves the rAF loop with nothing to react to.
+  useLayoutEffect(() => {
+    routeRef.current.route = route
+    routeRef.current.dots.length = route.length
+    routeRef.current.tags.length = route.length
+    const globe = globeRef.current
+    if (globe) placeRoute(globe, route, routeRef.current)
+  }, [route, globeRef])
 
   // ── Spotlight ──────────────────────────────────────────────────────────────
   // Anything the user is actually looking at outranks the showcase: a hovered
@@ -288,6 +427,11 @@ export default function ShipMarkers({
       return
     }
 
+    // Going after a group means the visitor has moved on from whatever single ship was
+    // open — leaving its card and track up while the camera dives into a different
+    // cluster would be showing two answers to the same question.
+    if (selectedId != null) onDeselect?.()
+
     const globe = globeRef.current
     if (globe && canZoom) {
       const b = clusterBounds(cluster)
@@ -329,7 +473,44 @@ export default function ShipMarkers({
 
   return (
     <>
-      <div className="sz-globe__overlay" ref={overlayRef}>
+      <div
+        className={'sz-globe__overlay' + (selectedId != null ? ' has-selection' : '')}
+        ref={overlayRef}
+      >
+        {/* The track sits under the markers, so the ship's own dot stays on top of the
+            newest point it shares a position with. Keyed by ship so switching selection
+            gets fresh nodes rather than reusing another ship's. */}
+        {route.length > 1 && (
+          <svg className="sz-route" key={selectedId} ref={el => { routeRef.current.svg = el }}>
+            <path className="sz-route__line" ref={el => { routeRef.current.path = el }} />
+            {route.map((p, i) => {
+              const newest = i === route.length - 1
+              const ratio = i / (route.length - 1)
+              return (
+                <g key={p.at ?? i}>
+                  <circle
+                    className={'sz-route__dot' + (newest ? ' is-newest' : '')}
+                    // Oldest reads faintest and smallest, so the direction of travel is
+                    // legible even where the date tags had to be dropped.
+                    r={3 + ratio * 2.5}
+                    style={{ opacity: 0.45 + ratio * 0.55 }}
+                    ref={el => { routeRef.current.dots[i] = el }}
+                  />
+                  {p.label && (
+                    <text
+                      className={'sz-route__tag' + (newest ? ' is-newest' : '')}
+                      style={{ opacity: 0.55 + ratio * 0.45 }}
+                      ref={el => { routeRef.current.tags[i] = el }}
+                    >
+                      {p.label}
+                    </text>
+                  )}
+                </g>
+              )
+            })}
+          </svg>
+        )}
+
         {clusters.map(c => {
           const count = c.ships.length
           const isSelected = selectedId != null && c.ships.some(s => s.id === selectedId)

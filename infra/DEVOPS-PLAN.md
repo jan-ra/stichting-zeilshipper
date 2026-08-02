@@ -129,6 +129,64 @@ it loads the new `push:false` config.
 
 ---
 
+## Ship positions live on R2, not in Payload ✅
+
+Positions are machine-written and change nightly, so they are kept out of the CMS
+database entirely. Two JSON objects on the media bucket carry them:
+
+| Key | Written by | Read by |
+|---|---|---|
+| `data/ships-roster.json` | Ships `afterChange`/`afterDelete` hook ([publishShipRoster.ts](../cms/src/hooks/publishShipRoster.ts)), debounced 5 s | the nightly job |
+| `data/positions.json` | [update-positions.yml](../.github/workflows/update-positions.yml), nightly 02:00 UTC | the browser at runtime, and the site build as a fallback snapshot |
+
+Why it is shaped this way:
+
+- The nightly job reads and writes **only R2**. It never calls Payload, so the Fly
+  machine stays asleep and no site rebuild is triggered. Editing a ship in the CMS
+  still reaches the tracker, via the roster hook.
+- The SPA fetches `positions.json` on mount ([useShipPositions.js](../site/src/hooks/useShipPositions.js))
+  and merges it over the baked ship data ([useShips.js](../site/src/hooks/useShips.js)).
+  A new position is live within the 300 s cache TTL — no deploy.
+- `load-from-payload.mjs` bakes a snapshot of the same file into `ships.json`, so the
+  globe still renders if the runtime fetch fails. Failure degrades to stale positions,
+  never to an empty map.
+- `positions.json` keeps the **last 7 daily fixes** per ship under `history`, deduped on
+  the AIS fix timestamp so a stationary ship does not flush the week's track. Selecting a
+  ship draws that track on the globe and frames the camera around all of its points
+  (`fitRoute` in [Fleet.jsx](../site/src/pages/Fleet.jsx), drawn by
+  [ShipMarkers.jsx](../site/src/components/globe/ShipMarkers.jsx)) — so a ship with only
+  one stored fix shows no line, which is why the backfill above matters.
+
+**One-time bucket config:** the site fetches this cross-origin (images do not, being
+`<img>` loads), so `zeilshipper-media` needs a CORS rule allowing `GET`/`HEAD` from the
+site origin and `http://localhost:4173`. MinIO allows all origins by default, so local
+works without setup.
+
+**Seeding a new environment** (once, before the first nightly run):
+
+```
+cd cms
+npm run publish-roster        # ships → data/ships-roster.json  (hook maintains it after this)
+npm run backfill-positions    # database lat/lng → data/positions.json
+```
+
+Skipping the backfill leaves every ship unpositioned until MyShipTracking happens to
+hear it — which for a boat that has not moved in months may be never. It fills gaps
+only, so it is safe to re-run; `--force` overwrites from the database instead.
+
+Testing the history logic without spending credits — note `--fixture=synthetic` writes
+**fabricated** positions that drift from whatever is stored, so restore real data
+afterwards:
+
+```
+npm run update-positions -- --fixture=synthetic --at=2026-08-01T02:00:00Z
+npm run update-positions -- --fixture=synthetic --at=2026-08-02T02:00:00Z   # history grows
+npm run update-positions -- --fixture=synthetic --at=2026-08-02T02:00:00Z   # same fix: no-op
+npm run backfill-positions -- --force                                       # back to real data
+```
+
+---
+
 ## Backups & restore ✅
 
 - Nightly `.backup` snapshot → R2 `db-backups/`, 7-day lifecycle ([backup-db.yml](../.github/workflows/backup-db.yml)).
@@ -143,8 +201,8 @@ it loads the new `push:false` config.
 |---|---|---|
 | Seed full demo dataset | `npm run seed` | **local only** (wipes collections) |
 | Import curated ships | `node scripts/import-ships.mjs` | 🔜 non-destructive upsert via a manual pipeline |
-| Provision local position bot | `scripts/provision-position-bot.mjs` | **local only** |
 | Nightly AIS positions | [update-positions.yml](../.github/workflows/update-positions.yml) | GitHub Actions cron (prod) ✅ |
+| Republish the tracking roster | `npm run publish-roster` | anywhere (read-only against Payload) |
 
 ---
 
@@ -157,3 +215,10 @@ it loads the new `push:false` config.
 - 🔜 **Prod guards** on `seed.ts` / `import-ships.mjs` (`ALLOW_DESTRUCTIVE=1`), and
   `import-ships` rewritten as a non-destructive upsert exposed as `workflow_dispatch`.
 - 🔜 **Hardening**: populate `csrf` allowlist + scope `cors` in the Payload config.
+- 🔜 **Retire the Payload position columns.** `ships.lat` / `lng` / `position_updated_at`
+  are no longer read or written by anything — R2 owns positions now. Once the R2 path has
+  a week of green nights in prod: drop the three fields from `Ships.ts`, `npm run
+  migrate:create`, `npm run generate:types`, then delete the `position-bot` user, the
+  `POSITION_BOT_API_KEY` Fly secret, and `cms/scripts/provision-position-bot.mjs`. Take a
+  manual backup first (`gh workflow run backup-db.yml`) — this is the one irreversible
+  step in the migration.

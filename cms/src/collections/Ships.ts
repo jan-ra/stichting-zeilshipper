@@ -2,12 +2,18 @@ import type { CollectionConfig } from 'payload'
 
 import { isAdminOrEditor } from '../access'
 import { collectionRebuildHooks } from '../hooks/triggerRebuild'
+import { publishShipRosterAfterChange, publishShipRosterAfterDelete } from '../hooks/publishShipRoster'
 
 export const Ships: CollectionConfig = {
   slug: 'ships',
   admin: { useAsTitle: 'name', defaultColumns: ['name', 'image', 'type', 'port', 'region'] },
   access: { read: () => true, create: isAdminOrEditor, update: isAdminOrEditor, delete: isAdminOrEditor },
-  hooks: collectionRebuildHooks,
+  // Rebuild the site on edit, and re-publish the tracking roster to R2 so the
+  // nightly position job picks up MMSI / autoTrack changes.
+  hooks: {
+    afterChange: [...collectionRebuildHooks.afterChange, publishShipRosterAfterChange],
+    afterDelete: [...collectionRebuildHooks.afterDelete, publishShipRosterAfterDelete],
+  },
   fields: [
     { name: 'name', type: 'text', required: true },
     { name: 'type', type: 'text' },
@@ -32,13 +38,25 @@ export const Ships: CollectionConfig = {
         },
       },
     },
-    { name: 'lat', type: 'number' },
-    { name: 'lng', type: 'number' },
+    // Positions are no longer stored here — the nightly job owns them on R2
+    // (data/positions.json) and the site fetches them at runtime. These two are
+    // kept read-only as a rollback safety net and will be dropped once the R2
+    // path has proven itself in production. Editing them has no effect.
+    {
+      name: 'lat',
+      type: 'number',
+      admin: { readOnly: true, description: 'Unused — positions come from AIS via R2.' },
+    },
+    {
+      name: 'lng',
+      type: 'number',
+      admin: { readOnly: true, description: 'Unused — positions come from AIS via R2.' },
+    },
     {
       name: 'mmsi',
       type: 'text',
       admin: {
-        description: '9-digit AIS MMSI for nightly position tracking. Look it up by ship name on marinetraffic.com or vesselfinder.com.',
+        description: '9-digit AIS MMSI for nightly position tracking. Look it up by ship name on marinetraffic.com or vesselfinder.com. Saving this ship republishes the tracking list; the position itself refreshes overnight.',
       },
     },
     {
@@ -52,7 +70,7 @@ export const Ships: CollectionConfig = {
       type: 'date',
       admin: {
         readOnly: true,
-        description: 'Last time the position was refreshed from AIS.',
+        description: 'Unused — the live value lives in data/positions.json on the media bucket.',
       },
     },
     { name: 'speed', type: 'number', label: 'Speed (kn)' },
