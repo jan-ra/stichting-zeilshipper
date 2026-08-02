@@ -173,6 +173,9 @@ export default function HomePage({ navigate }) {
               autoRotate={activeChapter ? activeChapter.autoRotate : true}
               autoRotateSpeed={0.35}
               enableZoom={false}
+              /* Rotating showcase: one random ship's card floats beside its marker
+                 for a few seconds at a time. Home only. */
+              spotlight
               /* On touch the hero has to stay scrollable — OrbitControls would
                  otherwise swallow every vertical swipe. Markers stay tappable. */
               enableRotate={!isTouch}

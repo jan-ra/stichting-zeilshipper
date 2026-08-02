@@ -22,6 +22,7 @@ export default function ShipGlobe({
   enableRotate = true,
   minAltitude = 0.0004,
   maxAltitude = 2.8,
+  spotlight = false,         // rotating showcase card — the home hero only
   onUserInteract,
 }) {
   const containerRef = useRef(null)
@@ -102,6 +103,7 @@ export default function ShipGlobe({
         canZoom={enableZoom}
         minAltitude={minAltitude}
         labels={labels}
+        spotlight={spotlight}
         onSelectShip={onSelectShip}
       />
     </div>
