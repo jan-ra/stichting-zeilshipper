@@ -353,3 +353,151 @@
   font-size: 14px;
   border-bottom: 1px solid rgba(193, 154, 82, 0.12);
 }
+
+/* ── Spotlight card ─────────────────────────────────────────────────────────
+   The home hero's rotating showcase: a random ship's card floating beside the
+   marker it belongs to, tethered by a short line. Positioned by ShipMarkers with
+   the same per-frame translate3d as a marker, so it travels with the globe.
+   Purely decorative — pointer events stay with the marker underneath, and
+   pointing at any marker retires the card (see SPOT_COOLDOWN_MS). */
+
+.sz-spot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  visibility: hidden;
+  z-index: 6;
+  will-change: transform;
+}
+
+/* Tether: a 46px hairline leaving the marker up and to the right, drawn from the
+   marker outwards so the card reads as hanging off that point. Rotated the long
+   way round when the card sits on the other side. */
+.sz-spot__line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 46px;
+  height: 1px;
+  background: linear-gradient(to right, rgba(193, 154, 82, 0.15), rgba(193, 154, 82, 0.75));
+  transform-origin: 0 50%;
+  transform: rotate(-35deg) scaleX(1);
+  animation: sz-spot-line-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sz-spot.is-flipped .sz-spot__line {
+  transform: rotate(215deg) scaleX(1);
+  animation-name: sz-spot-line-in-flipped;
+}
+
+.sz-spot__card {
+  position: absolute;
+  left: 34px;
+  bottom: 22px;
+  width: 190px;
+  overflow: hidden;
+  background: rgba(15, 34, 56, 0.94);
+  border: 1px solid rgba(193, 154, 82, 0.5);
+  border-radius: 3px;
+  box-shadow: 0 10px 30px rgba(8, 18, 34, 0.45);
+  backdrop-filter: blur(4px);
+  transform-origin: 0 100%;
+  animation: sz-spot-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sz-spot.is-flipped .sz-spot__card {
+  left: auto;
+  right: 34px;
+  transform-origin: 100% 100%;
+}
+
+.sz-spot.is-out .sz-spot__card {
+  animation: sz-spot-out 0.5s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+.sz-spot.is-out .sz-spot__line {
+  animation: sz-spot-line-out 0.5s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+.sz-spot.is-out.is-flipped .sz-spot__line {
+  animation-name: sz-spot-line-out-flipped;
+}
+
+@keyframes sz-spot-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.94); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes sz-spot-out {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translateY(4px) scale(0.96); }
+}
+
+@keyframes sz-spot-line-in {
+  from { transform: rotate(-35deg) scaleX(0); opacity: 0; }
+  to   { transform: rotate(-35deg) scaleX(1); opacity: 1; }
+}
+
+@keyframes sz-spot-line-in-flipped {
+  from { transform: rotate(215deg) scaleX(0); opacity: 0; }
+  to   { transform: rotate(215deg) scaleX(1); opacity: 1; }
+}
+
+@keyframes sz-spot-line-out {
+  from { transform: rotate(-35deg) scaleX(1); opacity: 1; }
+  to   { transform: rotate(-35deg) scaleX(0); opacity: 0; }
+}
+
+@keyframes sz-spot-line-out-flipped {
+  from { transform: rotate(215deg) scaleX(1); opacity: 1; }
+  to   { transform: rotate(215deg) scaleX(0); opacity: 0; }
+}
+
+.sz-spot__img {
+  width: 100%;
+  height: 84px;
+  object-fit: cover;
+  display: block;
+}
+
+.sz-spot__body { padding: 8px 12px 10px; }
+
+.sz-spot__kicker {
+  font-size: 9px;
+  color: #c19a52;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.sz-spot__name {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.2;
+  color: #f4ede1;
+}
+
+.sz-spot__meta {
+  margin-top: 4px;
+  font-size: 11px;
+  color: rgba(244, 237, 225, 0.55);
+}
+
+/* Small panes cannot spare 190px of globe. */
+@media (max-width: 600px) {
+  .sz-spot__card { width: 150px; }
+  .sz-spot__img { height: 62px; }
+  .sz-spot__name { font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sz-spot__card,
+  .sz-spot__line,
+  .sz-spot.is-out .sz-spot__card,
+  .sz-spot.is-out .sz-spot__line {
+    animation-duration: 0.01ms;
+  }
+}
