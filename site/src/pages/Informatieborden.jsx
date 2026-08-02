@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import L from 'leaflet'
 import { HARBOURS, INFO_BOARDS_PAGE } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
+import { RASTER_TILE_URL, BASEMAP_ATTRIBUTION_HTML } from '../utils/basemap.js'
 
 const STATUS_COLORS = {
   afgerond: '#4a9e6a',
@@ -39,8 +40,8 @@ export default function InformatiebPage() {
   useEffect(() => {
     if (!mapRef.current || leafletRef.current) return
     const map = L.map(mapRef.current, { center: [52.5, 5.3], zoom: 7, minZoom: 7, zoomControl: true, attributionControl: false })
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 18, attribution: '© OpenStreetMap © CARTO',
+    L.tileLayer(RASTER_TILE_URL, {
+      maxZoom: 18, attribution: BASEMAP_ATTRIBUTION_HTML,
     }).addTo(map)
     L.control.attribution({ prefix: false, position: 'bottomright' }).addTo(map)
     leafletRef.current = map

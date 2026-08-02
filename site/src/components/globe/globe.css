@@ -38,6 +38,22 @@
   --sz-dot-scale: 1;
 }
 
+/* Basemap credit. Sits above the canvas but below the overlay's markers and tooltips,
+   takes no pointer events, and stays deliberately quiet — legible against both the dark
+   sea and a lit coastline, without competing with the fleet. */
+.sz-globe__credit {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  z-index: 2;
+  pointer-events: none;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: rgba(244, 237, 225, 0.45);
+  text-shadow: 0 1px 3px rgba(8, 18, 34, 0.9);
+  user-select: none;
+}
+
 .sz-globe__status {
   position: absolute;
   inset: 0;
