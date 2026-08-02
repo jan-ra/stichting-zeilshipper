@@ -1,5 +1,6 @@
 import { useRef, useEffect, useMemo } from 'react'
 import { useGlobeEngine, GLOBE_RADIUS } from './useGlobeEngine.js'
+import { BASEMAP_ATTRIBUTION } from '../../utils/basemap.js'
 import ShipMarkers from './ShipMarkers.jsx'
 import { useLanguage } from '../../context/LanguageContext.jsx'
 import { useIsTouch } from '../../hooks/useMediaQuery.js'
@@ -111,6 +112,9 @@ export default function ShipGlobe({
         onSelectShip={onSelectShip}
         onDeselect={onDeselect}
       />
+      {/* Tile-provider credit, required by the basemap licence. Rendered only once the
+          globe is actually up, so a failed WebGL mount does not credit tiles nobody saw. */}
+      {ready && <div className="sz-globe__credit">{BASEMAP_ATTRIBUTION}</div>}
     </div>
   )
 }
