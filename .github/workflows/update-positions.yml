@@ -1,0 +1,40 @@
+name: Update ship positions on R2
+
+# Nightly AIS position refresh. Reads data/ships-roster.json from R2, asks
+# MyShipTracking for current positions, and writes data/positions.json back.
+#
+# Deliberately does NOT touch Fly or Cloudflare: the CMS stays asleep and the
+# site is not rebuilt. The SPA fetches positions.json at runtime.
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # 02:00 UTC daily — an hour before the DB backup.
+  workflow_dispatch:
+
+jobs:
+  update-positions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: cms/package-lock.json
+
+      - name: Install CMS dependencies
+        run: npm ci
+        working-directory: cms
+
+      - name: Refresh positions
+        working-directory: cms
+        env:
+          MYSHIPTRACKING_API_KEY: ${{ secrets.MYSHIPTRACKING_API_KEY }}
+          S3_ENDPOINT:            https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+          S3_BUCKET:              zeilshipper-media
+          S3_REGION:              auto
+          S3_ACCESS_KEY_ID:       ${{ secrets.R2_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY:   ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: node scripts/update-positions.mjs

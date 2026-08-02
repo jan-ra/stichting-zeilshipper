@@ -7,6 +7,8 @@ Two-package monorepo:
 
 The site is fully static. At build time, `site/scripts/load-from-payload.mjs` fetches every collection from the running Payload instance and writes JSON into `site/src/data/generated/`, which Vite then inlines. There are no runtime CMS calls from the browser.
 
+**Ship positions are the one exception.** They are not editorial content and change nightly, so they live on the media bucket at `data/positions.json` rather than in Payload. A GitHub Actions cron refreshes that file without waking the CMS or rebuilding the site, and the browser fetches it on mount — so a new position is live in minutes, not a deploy. The build bakes a snapshot of the same file as a fallback. See [infra/DEVOPS-PLAN.md](infra/DEVOPS-PLAN.md) § Ship positions.
+
 ## Reproduce production locally (two commands)
 
 Prereqs: Node 20+, Docker, `flyctl` authenticated (`flyctl auth login`).
@@ -73,6 +75,30 @@ npm run dev                         # http://localhost:5173
 ```
 
 Re-run `load-from-payload` whenever you change content in the CMS.
+
+### 3. Ship positions (optional)
+
+The globe needs `data/positions.json` on the local MinIO bucket. Seed it from the
+coordinates already in your database — no API key, no credits:
+
+```sh
+cd cms
+npm run publish-roster                       # ships → data/ships-roster.json
+npm run backfill-positions                   # database lat/lng → data/positions.json
+```
+
+Positions appear on a page reload without rebuilding the site.
+
+To exercise the 7-day history without calling MyShipTracking, add synthetic fixes on
+top. These are **fabricated** — each one drifts a few km from the stored position, so
+the map stops showing real locations until you re-run `backfill-positions --force`:
+
+```sh
+npm run update-positions -- --fixture=synthetic --at=2026-08-01T02:00:00Z
+npm run update-positions -- --fixture=synthetic --at=2026-08-02T02:00:00Z   # history grows
+npm run update-positions -- --fixture=synthetic --at=2026-08-02T02:00:00Z   # same fix: no-op
+npm run backfill-positions -- --force                                       # back to real data
+```
 
 ## Production builds
 

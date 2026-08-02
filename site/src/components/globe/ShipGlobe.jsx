@@ -15,6 +15,7 @@ export default function ShipGlobe({
   matchedIds = null,
   selectedShip = null,
   onSelectShip,
+  onDeselect,                // clicking a group drops the open ship
   pov,                       // { lat, lng, altitude, ms } — flies when it changes
   autoRotate = false,
   autoRotateSpeed = 0.2,
@@ -23,10 +24,11 @@ export default function ShipGlobe({
   minAltitude = 0.0004,
   maxAltitude = 2.8,
   spotlight = false,         // rotating showcase card — the home hero only
+  showRoute = false,         // draw the selected ship's track — the fleet map only
   onUserInteract,
 }) {
   const containerRef = useRef(null)
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const isTouch = useIsTouch()
 
   const located = useMemo(
@@ -98,6 +100,8 @@ export default function ShipGlobe({
         ships={located}
         matchedIds={matchedIds}
         selectedId={selectedShip?.id ?? null}
+        selectedRoute={showRoute ? selectedShip?.history ?? null : null}
+        routeLocale={lang === 'en' ? 'en-GB' : 'nl-NL'}
         clusterRadiusPx={isTouch ? CLUSTER_RADIUS_TOUCH : CLUSTER_RADIUS_MOUSE}
         isTouch={isTouch}
         canZoom={enableZoom}
@@ -105,6 +109,7 @@ export default function ShipGlobe({
         labels={labels}
         spotlight={spotlight}
         onSelectShip={onSelectShip}
+        onDeselect={onDeselect}
       />
     </div>
   )

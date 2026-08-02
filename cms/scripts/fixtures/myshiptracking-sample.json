@@ -1,0 +1,18 @@
+{
+  "_comment": [
+    "Canned MyShipTracking /vessel/bulk?response=simple response, for testing",
+    "update-positions.mjs without spending credits:",
+    "  node --env-file=.env scripts/update-positions.mjs --fixture=scripts/fixtures/myshiptracking-sample.json",
+    "Only rows whose mmsi is in data/ships-roster.json are used, so swap in MMSIs",
+    "from your own local DB if these ships are not there. For a fix covering every",
+    "ship in the roster, use --fixture=synthetic instead."
+  ],
+  "status": "success",
+  "data": [
+    { "mmsi": "244670166", "lat": 53.0626, "lng": 5.34352, "received": "2026-08-01T02:10:00Z" },
+    { "mmsi": "244770584", "lat": 53.17224, "lng": 5.41113, "received": "2026-08-01T02:11:00Z" },
+    { "mmsi": "244700687", "lat": 52.51792, "lng": 5.43702, "received": "2026-08-01T02:12:00Z" },
+    { "mmsi": "244250699", "lat": 53.1974, "lng": 5.78227, "received": "2026-08-01T02:13:00Z" },
+    { "mmsi": "244770920", "lat": 53.19774, "lng": 5.14318, "received": "2026-08-01T02:14:00Z" }
+  ]
+}

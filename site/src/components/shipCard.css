@@ -107,9 +107,14 @@
 
 .sz-shipcard__meta:empty { display: none; }
 
-/* Bottom sheet on phones. Fixed rather than absolute so it clears a short globe pane
-   instead of covering it. */
-@media (max-width: 768px) {
+/* Bottom sheet on phones and narrow laptops. Fixed rather than absolute so it clears a
+   short globe pane instead of covering it.
+
+   The cut-off is 1000px, not the usual 768: the card is a fixed 320px, and between those
+   two widths the fleet map keeps its two-column layout with a pane only 360-500px wide —
+   so a floating card covered 74-89% of the globe. A sheet takes the bottom band instead
+   and leaves a usable map above it. */
+@media (max-width: 1000px) {
   .sz-shipcard {
     position: fixed;
     inset: auto 0 0 0;

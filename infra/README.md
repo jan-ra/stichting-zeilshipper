@@ -125,6 +125,9 @@ directory" now lives in [site/wrangler.toml](../site/wrangler.toml) under the
    - `PAYLOAD_PUBLIC_URL=https://admin.<your-domain>`
    - `MEDIA_BASE_URL=https://media.<your-domain>`
    - `BAKE_MAX_BYTES=2097152`
+
+   Live ship positions need no variable of their own — `site/vite.config.js` derives the
+   URL from `MEDIA_BASE_URL`.
 4. **Custom domain**: Worker → Settings → Domains & Routes → add `<your-domain>` (apex) and/or `www.<your-domain>`.
 5. **Deploy hook**: Worker → Settings → Builds → Deploy hooks → "Add deploy hook" named `cms-trigger`. Copy the URL.
 6. Wire the deploy hook into Fly so a CMS save triggers a rebuild:
@@ -135,7 +138,7 @@ directory" now lives in [site/wrangler.toml](../site/wrangler.toml) under the
    "Workers Builds" — it's just a POST URL, and renaming would churn the Fly
    secret and the hook code in [cms/src/hooks/triggerRebuild.ts](../cms/src/hooks/triggerRebuild.ts).
 
-## 4. GitHub backup workflow
+## 4. GitHub workflows (backup + positions)
 
 Set these repo secrets (Settings → Secrets and variables → Actions):
 
@@ -144,6 +147,7 @@ gh secret set FLY_API_TOKEN < <(flyctl tokens create deploy --app stichting-zeil
 gh secret set R2_ACCESS_KEY_ID
 gh secret set R2_SECRET_ACCESS_KEY
 gh secret set R2_ACCOUNT_ID
+gh secret set MYSHIPTRACKING_API_KEY   # for update-positions.yml
 ```
 
 Trigger a manual run to verify: `gh workflow run backup-db.yml`. Then list snapshots:
@@ -154,6 +158,35 @@ AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY \
 aws s3 ls s3://zeilshipper-media/db-backups/ \
   --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
 ```
+
+### 4b. Ship positions
+
+Positions live on R2, not in Payload — see [DEVOPS-PLAN.md](DEVOPS-PLAN.md) § Ship
+positions for the design. Three one-time setup items:
+
+1. **Bucket CORS.** The site fetches `data/positions.json` cross-origin. In the
+   Cloudflare dashboard → R2 → `zeilshipper-media` → Settings → CORS policy:
+
+   ```json
+   [{ "AllowedOrigins": ["https://<your-domain>", "http://localhost:4173", "http://localhost:5173"],
+      "AllowedMethods": ["GET", "HEAD"], "AllowedHeaders": ["*"], "MaxAgeSeconds": 3600 }]
+   ```
+
+2. **Seed both files** once. The roster is kept current after that by the Ships save
+   hook; the positions backfill carries the coordinates already in the database onto R2
+   so no ship sits unpositioned waiting to be heard by AIS:
+
+   ```bash
+   cd cms
+   PAYLOAD_API_URL=https://admin.<your-domain> npm run publish-roster
+   PAYLOAD_API_URL=https://admin.<your-domain> npm run backfill-positions
+   ```
+
+   `backfill-positions` only fills gaps, so re-running it never overwrites fresher AIS
+   data already on R2.
+
+Verify: `gh workflow run update-positions.yml`, then
+`curl -s https://media.<your-domain>/data/positions.json | head`.
 
 ## 5. End-to-end smoke test
 
@@ -179,6 +212,7 @@ aws s3 ls s3://zeilshipper-media/db-backups/ \
 | `MEDIA_BASE_URL` | Fly secret **and** Workers env var | `https://media.<your-domain>` |
 | `CF_PAGES_DEPLOY_HOOK` | Fly secret | Worker → Settings → Builds → Deploy hooks → create |
 | `PAYLOAD_API_URL` | Workers env var | `https://admin.<your-domain>` |
+| `MYSHIPTRACKING_API_KEY` | GitHub repo secret | myshiptracking.com → account → API key |
 | `BAKE_MAX_BYTES` | CF Pages env var | `2097152` |
 | `FLY_API_TOKEN` | GitHub repo secret | `flyctl tokens create deploy --app stichting-zeilshipper-cms` |
 | `R2_ACCESS_KEY_ID` | GitHub repo secret | R2 API token (same as Fly) |

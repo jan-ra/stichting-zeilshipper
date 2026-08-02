@@ -5,7 +5,8 @@
  * Source: Cloudflare R2 (zeilshipper-media) — creds from .env.pull
  * Dest:   local MinIO (localhost:9000, minioadmin) — same bucket name
  *
- * Skips the db-backups/ prefix (those are private DB snapshots, not media).
+ * Skips the db-backups/ and data/ prefixes (private DB snapshots and the ship
+ * position files — neither is media).
  * Idempotent: checks dest size before copying; skips exact matches.
  */
 
@@ -66,7 +67,10 @@ do {
 
   for (const obj of list.Contents ?? []) {
     const key = obj.Key
-    if (key.startsWith('db-backups/')) continue
+    // db-backups/ holds private DB snapshots; data/ holds the live position
+    // and roster JSON, which local runs generate themselves — pulling either
+    // would overwrite local test state with production data.
+    if (key.startsWith('db-backups/') || key.startsWith('data/')) continue
 
     const existing = await destSize(key)
     if (existing === obj.Size) {

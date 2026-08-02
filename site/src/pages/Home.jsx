@@ -5,6 +5,7 @@ import { asset } from '../utils/asset.js'
 import ShipGlobe from '../components/globe/ShipGlobe.jsx'
 import ShipCard from '../components/ShipCard.jsx'
 import { useIsTouch } from '../hooks/useMediaQuery.js'
+import { useShips } from '../hooks/useShips.js'
 
 // Altitudes are Earth radii above the surface: visible height is roughly 53 * altitude
 // degrees. The located fleet spans 1.97 degrees around 52.48N 4.96E, so 0.065 frames
@@ -98,6 +99,8 @@ export default function HomePage({ navigate }) {
   const [chapter, setChapter] = useState(null)
   const { t, tc } = useLanguage()
   const isTouch = useIsTouch()
+  // Baked CMS fields merged with the positions fetched from the media bucket.
+  const ships = useShips()
 
   const activeChapter = chapter === null ? null : GLOBE_CHAPTERS[Math.min(chapter, GLOBE_CHAPTERS.length - 1)]
   const pov = activeChapter
@@ -105,6 +108,7 @@ export default function HomePage({ navigate }) {
     : INITIAL_POV
 
   const handleShipClick = useCallback(ship => setSelectedShip(ship), [])
+  const handleDeselect = useCallback(() => setSelectedShip(null), [])
 
   const chapters = HOME_PAGE.chapters.map((ch, i) => ({
     ...CHAPTERS_STRUCT[i],
@@ -164,9 +168,10 @@ export default function HomePage({ navigate }) {
               </>
             )}
             <ShipGlobe
-              ships={SHIPS}
+              ships={ships}
               selectedShip={selectedShip}
               onSelectShip={handleShipClick}
+              onDeselect={handleDeselect}
               pov={pov}
               /* The hero opens on the full globe turning; once the chapters take over
                  only "the world" one spins, since the closer framings would drift off. */
@@ -183,7 +188,7 @@ export default function HomePage({ navigate }) {
 
             {/* Same card the fleet map uses — the sticky globe column is positioned,
                 so it anchors over the globe here just as it does there. */}
-            <ShipCard ship={selectedShip} onClose={() => setSelectedShip(null)} />
+            <ShipCard ship={selectedShip} onClose={handleDeselect} />
           </div>
 
           {/* Scrolling text + chapters */}

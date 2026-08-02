@@ -18,6 +18,11 @@ import { fileURLToPath } from 'node:url'
 
 const API     = (process.env.PAYLOAD_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
 const PUBLIC  = (process.env.PAYLOAD_PUBLIC_URL || API).replace(/\/+$/, '')
+const MEDIA   = (process.env.MEDIA_BASE_URL || 'http://localhost:9000/zeilshipper-media').replace(/\/+$/, '')
+
+// Ship positions live on the media bucket, not in Payload. We bake a snapshot
+// at build time as a fallback; the browser fetches the live file on mount.
+const POSITIONS_URL = process.env.POSITIONS_URL || `${MEDIA}/data/positions.json`
 const SITE    = resolve(fileURLToPath(import.meta.url), '..', '..')
 const OUT_DIR = resolve(SITE, 'src/data/generated')
 
@@ -113,22 +118,53 @@ function image(rel) {
 
 // ── Per-collection transforms ───────────────────────────────────────────────
 
+/**
+ * Snapshot of data/positions.json, baked into ships.json as the fallback the
+ * globe renders before (or instead of) the runtime fetch. Positions no longer
+ * come from Payload at all — the nightly job owns that file on R2.
+ *
+ * A missing or unreachable positions file must not break the build: we warn and
+ * emit ships without coordinates, which the globe already handles by skipping
+ * them.
+ */
+async function fetchPositionSnapshot() {
+  try {
+    const res = await fetch(POSITIONS_URL)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const json = await res.json()
+    const ships = json?.ships ?? {}
+    console.log(`  · positions: ${Object.keys(ships).length} ship(s) from ${POSITIONS_URL}`)
+    return ships
+  } catch (err) {
+    console.warn(
+      `  ! positions: could not read ${POSITIONS_URL} (${err.message}).\n` +
+      `    Ships will be baked without coordinates and rely on the runtime fetch.\n` +
+      `    Locally, run: cd cms && npm run publish-roster && npm run update-positions -- --fixture=synthetic`
+    )
+    return {}
+  }
+}
+
 async function loadShips() {
-  const docs = await fetchCollection('ships')
-  return docs.map(d => ({
-    id: d.id,
-    name: text(d.name),
-    type: text(d.type),
-    lat: num(d.lat),
-    lng: num(d.lng),
-    port: text(d.port),
-    speed: num(d.speed),
-    year: num(d.year),
-    region: text(d.region) || 'thuiswateren',
-    passengers: num(d.passengers),
-    positionUpdatedAt: text(d.positionUpdatedAt) || null,
-    image: image(d.image)?.src || '',
-  }))
+  const [docs, positions] = await Promise.all([fetchCollection('ships'), fetchPositionSnapshot()])
+  return docs.map(d => {
+    const pos = positions[String(d.id)] ?? {}
+    return {
+      id: d.id,
+      name: text(d.name),
+      type: text(d.type),
+      lat: num(pos.lat),
+      lng: num(pos.lng),
+      port: text(d.port),
+      speed: num(d.speed),
+      year: num(d.year),
+      region: text(d.region) || 'thuiswateren',
+      passengers: num(d.passengers),
+      positionUpdatedAt: text(pos.positionUpdatedAt) || null,
+      history: Array.isArray(pos.history) ? pos.history : [],
+      image: image(d.image)?.src || '',
+    }
+  })
 }
 
 async function loadBlogPosts() {

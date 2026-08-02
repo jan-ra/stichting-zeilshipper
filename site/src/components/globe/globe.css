@@ -164,6 +164,93 @@
   opacity: 0.18;
 }
 
+/* While one ship is selected the rest of the fleet recedes so its track reads clearly.
+   Weaker than the filter dim above — these ships are still context worth seeing, and
+   still clickable, so a visitor can hop straight from one ship to the next.
+   Excludes markers the filter already dimmed, which should stay the faintest thing on
+   the globe rather than being lifted back up to this level. */
+.sz-globe__overlay.has-selection .sz-marker:not(.is-selected):not(.is-dimmed) {
+  opacity: 0.3;
+}
+
+.sz-marker {
+  transition: opacity 0.35s ease;
+}
+
+/* ── Selected ship's track ──────────────────────────────────────────────────── */
+
+/* Projected in screen space by ShipMarkers every frame; the element itself never
+   moves, only its path data and circle centres. */
+.sz-route {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  /* Above the plain dots (1) and cluster discs (2), which would otherwise sit on top of
+     the date tags, but below tooltips (8), pickers (9) and the selected marker (10).
+     Nothing is blocked by this: the layer takes no pointer events. */
+  z-index: 3;
+  animation: sz-route-in 0.45s ease both;
+}
+
+@keyframes sz-route-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.sz-route__line {
+  fill: none;
+  stroke: #ffd68c;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 5 4;
+  opacity: 0.75;
+  /* Keeps the line legible over both the dark sea and the lighter landmasses. */
+  filter: drop-shadow(0 0 3px rgba(8, 18, 34, 0.9));
+}
+
+.sz-route__dot {
+  fill: #ffd68c;
+  stroke: rgba(15, 34, 56, 0.85);
+  stroke-width: 1.25;
+  visibility: hidden;
+}
+
+/* Where the ship is now. Its own marker sits on top of this, so the halo reads as a
+   ring around the marker rather than a competing dot. */
+.sz-route__dot.is-newest {
+  fill: #fff3d6;
+  stroke-width: 1.5;
+}
+
+/* Date of each fix. `paint-order: stroke` draws the navy outline underneath the glyphs
+   instead of over them, which is what keeps these readable against both the dark sea
+   and the lighter landmasses — a drop-shadow alone smears at this size. */
+.sz-route__tag {
+  fill: #f4ede1;
+  stroke: rgba(8, 18, 34, 0.85);
+  stroke-width: 3;
+  paint-order: stroke;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  visibility: hidden;
+  user-select: none;
+}
+
+.sz-route__tag.is-newest {
+  fill: #ffd68c;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sz-route { animation-duration: 0.01ms; }
+  .sz-marker { transition: none; }
+}
+
 .sz-marker.is-dimmed .sz-marker__hit {
   pointer-events: none;
   cursor: default;

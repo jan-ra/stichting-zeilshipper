@@ -1,11 +1,16 @@
 #!/usr/bin/env node
 /**
- * One-shot position updater via the MyShipTracking REST API.
+ * Nightly position updater via the MyShipTracking REST API.
  *
- * Fetches all ships with an MMSI + autoTrack from Payload, asks MyShipTracking
- * for their current positions in as few requests as possible, and PATCHes each
- * ship that came back. Ships MyShipTracking has no recent position for keep
- * their old coordinates.
+ * Reads the tracking roster from the media bucket, asks MyShipTracking for the
+ * current positions in as few requests as possible, merges them into the
+ * existing positions file (keeping a rolling 7-day history per ship) and writes
+ * the result back as a single object.
+ *
+ * This script deliberately does NOT talk to Payload. Both its input and its
+ * output live on R2, so the nightly run costs nothing on the CMS side — the Fly
+ * machine stays asleep and the site is never rebuilt. The roster is kept current
+ * by the Ships afterChange hook (src/hooks/publishShipRoster.ts).
  *
  * Credit usage is the floor for "position every ship once": the bulk endpoint
  * with response=simple costs 1 credit per vessel, and we batch up to 100 MMSIs
@@ -13,37 +18,39 @@
  *
  * Required env vars:
  *   MYSHIPTRACKING_API_KEY – from your myshiptracking.com account
- *   POSITION_BOT_API_KEY   – Payload API key for the position-bot editor user
- *   PAYLOAD_API_URL        – default: http://localhost:3001
+ *   S3_*                   – media bucket credentials, see .env.example
+ *
+ * Usage:
+ *   npm run update-positions
+ *   node --env-file=.env scripts/update-positions.mjs --dry-run
+ *   node --env-file=.env scripts/update-positions.mjs --fixture=synthetic
+ *   node --env-file=.env scripts/update-positions.mjs --fixture=synthetic --at=2026-08-01T02:00:00Z
+ *   node --env-file=.env scripts/update-positions.mjs --fixture=scripts/fixtures/myshiptracking-sample.json
+ *
+ * Flags:
+ *   --dry-run              print the merged result, write nothing
+ *   --fixture=<path>       read canned API rows from a JSON file
+ *   --fixture=synthetic    generate a plausible fix for every roster ship
+ *   --at=<iso>             override the fix timestamp (fixture modes only)
  */
 
-const API = (process.env.PAYLOAD_API_URL || 'http://localhost:3001').replace(/\/+$/, '')
-const MST_API_KEY          = process.env.MYSHIPTRACKING_API_KEY
-const POSITION_BOT_API_KEY = process.env.POSITION_BOT_API_KEY
-const MST_BULK_URL         = 'https://api.myshiptracking.com/api/v2/vessel/bulk'
+import { readFile } from 'node:fs/promises'
 
-const CHUNK_SIZE = 100 // MyShipTracking bulk limit is 100 identifiers per request.
+import { POSITIONS_KEY, ROSTER_KEY, getJson, putJson, requireS3Env } from './lib/r2.mjs'
 
-if (!MST_API_KEY)          { console.error('Missing MYSHIPTRACKING_API_KEY'); process.exit(1) }
-if (!POSITION_BOT_API_KEY) { console.error('Missing POSITION_BOT_API_KEY');   process.exit(1) }
+const MST_API_KEY  = process.env.MYSHIPTRACKING_API_KEY
+const MST_BULK_URL = 'https://api.myshiptracking.com/api/v2/vessel/bulk'
 
-// ── Fetch ships that should be tracked ─────────────────────────────────────
+const CHUNK_SIZE   = 100 // MyShipTracking bulk limit is 100 identifiers per request.
+const HISTORY_MAX  = 7   // One entry per nightly run — a rolling week of track.
 
-async function fetchTrackedShips() {
-  const url = `${API}/api/ships?limit=1000&depth=0`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`GET /api/ships returned ${res.status}`)
-  const { docs } = await res.json()
+const DRY_RUN   = process.argv.includes('--dry-run')
+const FIXTURE   = process.argv.find(a => a.startsWith('--fixture='))?.slice('--fixture='.length)
+const SYNTHETIC = FIXTURE === 'synthetic'
+const AT        = process.argv.find(a => a.startsWith('--at='))?.slice('--at='.length)
 
-  const tracked = new Map() // mmsi string → { id, name }
-  for (const d of docs) {
-    const mmsi = (d.mmsi ?? '').toString().trim()
-    if (!mmsi) continue
-    if (d.autoTrack === false) continue
-    tracked.set(mmsi, { id: d.id, name: d.name })
-  }
-  return tracked
-}
+if (!FIXTURE && !MST_API_KEY) { console.error('Missing MYSHIPTRACKING_API_KEY'); process.exit(1) }
+requireS3Env()
 
 // ── Ask MyShipTracking for a batch of positions ────────────────────────────
 
@@ -64,24 +71,73 @@ async function fetchPositions(mmsis) {
   return { rows: Array.isArray(json.data) ? json.data : [], charged }
 }
 
-// ── PATCH a single ship's position ─────────────────────────────────────────
+/**
+ * Fixture mode: canned rows instead of a live API call, so local testing burns
+ * zero credits. Rows outside the current batch are filtered out, so batching
+ * behaves as it does against the real endpoint.
+ */
+function fetchPositionsFromFixture(mmsis, rows) {
+  const wanted = new Set(mmsis.map(String))
+  return { rows: rows.filter(r => wanted.has(String(r.mmsi ?? '').trim())), charged: null }
+}
 
-async function patchShip(id, lat, lng, receivedAt) {
-  const res = await fetch(`${API}/api/ships/${id}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type':  'application/json',
-      'Authorization': `users API-Key ${POSITION_BOT_API_KEY}`,
-    },
-    body: JSON.stringify({
-      lat,
-      lng,
-      positionUpdatedAt: receivedAt || new Date().toISOString(),
-    }),
+/**
+ * Synthetic rows for every ship in the roster (`--fixture=synthetic`), each a
+ * small deterministic step away from its previous stored position. Run it
+ * repeatedly and every ship grows a believable track, so the history logic can
+ * be exercised locally without spending credits.
+ *
+ * These positions are FABRICATED. Seed real coordinates first with
+ * `npm run backfill-positions`, and restore them afterwards with
+ * `npm run backfill-positions -- --force` — otherwise the map shows fiction.
+ *
+ * `--at=<iso>` overrides the fix timestamp so you can exercise the dedupe rule
+ * (same timestamp twice must not append) without waiting a day.
+ */
+function syntheticRows(tracked, prevShips, at) {
+  return [...tracked.entries()].map(([mmsi, ships], i) => {
+    const prev = prevShips[String(ships[0].id)]
+    const base = { lat: prev?.lat ?? 53.1 + (i % 20) * 0.05, lng: prev?.lng ?? 5.2 + (i % 20) * 0.07 }
+    // Deterministic per-ship drift — no Math.random, so runs are reproducible.
+    return {
+      mmsi,
+      lat: Number((base.lat + ((i % 7) - 3) * 0.01).toFixed(5)),
+      lng: Number((base.lng + ((i % 5) - 2) * 0.012).toFixed(5)),
+      received: at,
+    }
   })
-  if (!res.ok) {
-    const body = await res.text().catch(() => '')
-    throw new Error(`PATCH /api/ships/${id} returned ${res.status}: ${body.slice(0, 200)}`)
+}
+
+// ── Merge a fix into a ship's stored history ───────────────────────────────
+
+/**
+ * Appends `fix` to `prev.history` when it is genuinely new, trims to the last
+ * HISTORY_MAX entries and returns the ship's new record.
+ *
+ * The dedupe is on the AIS fix time, not the run time: a ship that sat still
+ * and re-reported the same fix must not push six days of real track out of the
+ * buffer. Same reason the record keeps its previous history when we merge.
+ */
+export function mergeShipPosition(prev, fix) {
+  const history = Array.isArray(prev?.history) ? [...prev.history] : []
+  const newest = history[history.length - 1]
+
+  if (!newest || newest.at !== fix.at) {
+    history.push({ lat: fix.lat, lng: fix.lng, at: fix.at })
+  } else {
+    // Same timestamp, refreshed coordinates — correct in place rather than append.
+    history[history.length - 1] = { lat: fix.lat, lng: fix.lng, at: fix.at }
+  }
+
+  const trimmed = history.slice(-HISTORY_MAX)
+  const latest = trimmed[trimmed.length - 1]
+
+  return {
+    mmsi: fix.mmsi,
+    lat: latest.lat,
+    lng: latest.lng,
+    positionUpdatedAt: latest.at,
+    history: trimmed,
   }
 }
 
@@ -94,26 +150,62 @@ function chunk(arr, size) {
 }
 
 async function main() {
-  console.log(`Payload: ${API}`)
-
-  const tracked = await fetchTrackedShips()
-  if (tracked.size === 0) {
-    console.log('No ships with MMSI + autoTrack — nothing to do.')
-    return
+  const roster = await getJson(ROSTER_KEY)
+  if (!roster?.ships?.length) {
+    console.error(
+      `No tracked ships in ${ROSTER_KEY}. Run \`npm run publish-roster\` first ` +
+      `(or save any ship in the admin to fire the hook).`,
+    )
+    process.exit(1)
   }
 
-  const all     = [...tracked.keys()]
-  const batches = chunk(all, CHUNK_SIZE)
-  console.log(`Tracking ${all.length} ship(s) → ${batches.length} bulk request(s) of ≤${CHUNK_SIZE}.`)
+  // mmsi → [{ id, name }]. Duplicate MMSIs happen (the same vessel entered
+  // twice, or a copy-paste error), so every ship sharing an MMSI gets the fix
+  // rather than the last one silently winning. Flagged so it can be cleaned up.
+  const tracked = new Map()
+  for (const s of roster.ships) {
+    const mmsi = String(s.mmsi ?? '').trim()
+    if (!mmsi) continue
+    const ships = tracked.get(mmsi) ?? []
+    ships.push({ id: s.id, name: s.name })
+    tracked.set(mmsi, ships)
+  }
+  for (const [mmsi, ships] of tracked) {
+    if (ships.length > 1) {
+      console.warn(`  ! MMSI ${mmsi} is shared by ${ships.map(s => `${s.id}:${s.name}`).join(', ')} — all will get the same position.`)
+    }
+  }
+
+  const previous = (await getJson(POSITIONS_KEY)) ?? { ships: {} }
+  const prevShips = previous.ships ?? {}
+  // Start from the previous state: ships MyShipTracking has nothing for keep
+  // the position and history they already had.
+  const nextShips = { ...prevShips }
+
+  let fixtureRows = null
+  if (SYNTHETIC) {
+    fixtureRows = syntheticRows(tracked, prevShips, AT || new Date().toISOString())
+    console.log(`Fixture mode: synthetic (${fixtureRows.length} row(s)) at ${AT || 'now'}, no API calls.`)
+  } else if (FIXTURE) {
+    fixtureRows = JSON.parse(await readFile(FIXTURE, 'utf8')).data ?? []
+    console.log(`Fixture mode: ${FIXTURE} (${fixtureRows.length} row(s)), no API calls.`)
+  }
+
+  const all        = [...tracked.keys()]
+  const totalShips = roster.ships.length
+  const batches    = chunk(all, CHUNK_SIZE)
+  console.log(`Tracking ${totalShips} ship(s) over ${all.length} MMSI(s) → ${batches.length} bulk request(s) of ≤${CHUNK_SIZE}.`)
 
   let heard      = 0
-  let updated    = 0
+  let appended   = 0
   let creditsSum = 0
 
   for (const [i, mmsis] of batches.entries()) {
     let rows, charged
     try {
-      ({ rows, charged } = await fetchPositions(mmsis))
+      ({ rows, charged } = FIXTURE
+        ? fetchPositionsFromFixture(mmsis, fixtureRows)
+        : await fetchPositions(mmsis))
     } catch (err) {
       console.error(`  ✗ batch ${i + 1}/${batches.length} failed: ${err.message}`)
       continue
@@ -122,29 +214,53 @@ async function main() {
     console.log(`  Batch ${i + 1}/${batches.length}: ${rows.length} position(s)${charged != null ? `, ${charged} credit(s)` : ''}.`)
 
     for (const row of rows) {
-      const mmsi = String(row.mmsi ?? '').trim()
-      const lat  = row.lat
-      const lng  = row.lng
-      const ship = tracked.get(mmsi)
-      if (!ship || lat == null || lng == null) continue
+      const mmsi  = String(row.mmsi ?? '').trim()
+      const lat   = row.lat
+      const lng   = row.lng
+      const ships = tracked.get(mmsi)
+      if (!ships || lat == null || lng == null) continue
 
-      heard++
-      try {
-        await patchShip(ship.id, lat, lng, row.received)
-        updated++
-        console.log(`  ✓ ${ship.name} (${mmsi}): ${Number(lat).toFixed(5)}, ${Number(lng).toFixed(5)}`)
-      } catch (err) {
-        console.error(`  ✗ ${ship.name} (${mmsi}): ${err.message}`)
+      const fix = {
+        mmsi,
+        lat: Number(lat),
+        lng: Number(lng),
+        at: row.received || new Date().toISOString(),
+      }
+
+      for (const ship of ships) {
+        heard++
+        const key  = String(ship.id)
+        const prev = prevShips[key]
+        if (prev?.positionUpdatedAt !== fix.at) appended++
+        nextShips[key] = mergeShipPosition(prev, fix)
+        console.log(`  ✓ ${ship.name} (${mmsi}): ${fix.lat.toFixed(5)}, ${fix.lng.toFixed(5)} — ${nextShips[key].history.length} point(s)`)
       }
     }
   }
 
-  const missing = all.length - heard
+  // Ships removed from the roster (untracked or deleted in the CMS) drop out.
+  const trackedIds = new Set([...tracked.values()].flat().map(s => String(s.id)))
+  for (const key of Object.keys(nextShips)) {
+    if (!trackedIds.has(key)) delete nextShips[key]
+  }
+
+  const out = { generatedAt: new Date().toISOString(), ships: nextShips }
+
+  const missing = totalShips - heard
   console.log(
-    `\nDone. Positioned ${heard}/${all.length} ship(s), updated ${updated}` +
+    `\nPositioned ${heard}/${totalShips} ship(s), ${appended} new fix/fixes` +
     `${missing ? `, ${missing} had no recent position` : ''}` +
     `${creditsSum ? `. Credits charged: ${creditsSum}` : ''}.`,
   )
+
+  if (DRY_RUN) {
+    console.log(JSON.stringify(out, null, 2))
+    console.log('\n--dry-run: nothing written.')
+    return
+  }
+
+  await putJson(POSITIONS_KEY, out)
+  console.log(`Wrote ${POSITIONS_KEY} (${Object.keys(nextShips).length} ship(s)).`)
 }
 
 main().catch(err => {
