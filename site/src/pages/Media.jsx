@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext.jsx'
 import { asset } from '../utils/asset.js'
 
 const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉', project: '◈' }
-const FORMAT_COLORS = { MP4: '#4a6e9e', ZIP: '#6b4a2b', PDF: '#9e4a4a', MP3: '#4a9e6a' }
+const FORMAT_COLORS = { MP4: '#4a6e9e', ZIP: '#6b4a2b', PDF: '#9e4a4a', MP3: '#4a9e6a', Spotify: '#1db954' }
 const CATEGORIES = ['all', 'video', 'foto', 'tekst', 'project', 'podcast']
 
 export default function MediaPage({ navigate }) {
@@ -120,12 +120,17 @@ export default function MediaPage({ navigate }) {
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 24 }}>{t('media.podcastBadge')}</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'center' }} className="grid-2">
-            <div style={{ aspectRatio: '16/9', background: '#0f2238', border: '1px solid rgba(193,154,82,0.2)', borderRadius: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-              <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(193,154,82,0.12)', border: '1px solid rgba(193,154,82,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: 30, color: '#c19a52', lineHeight: 1 }}>◉</span>
-              </div>
-              <div style={{ fontSize: 11, color: 'rgba(193,154,82,0.35)', fontFamily: 'monospace' }}>[ podcast ]</div>
-            </div>
+            <iframe
+              title={tc(MEDIA_PAGE, 'podcastTitle')}
+              src="https://open.spotify.com/embed/show/53OFpNfrF8cWpgZPOH1zgS?utm_source=generator"
+              width="100%"
+              height="352"
+              frameBorder="0"
+              allowFullScreen
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+              style={{ borderRadius: 12, border: 'none', display: 'block' }}
+            />
             <div>
               <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>{t('media.podcastBadge')}</div>
               <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, color: '#f4ede1', fontWeight: 400, marginBottom: 16 }}>{tc(MEDIA_PAGE, 'podcastTitle')}</h2>
