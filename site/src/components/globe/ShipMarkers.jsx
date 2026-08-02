@@ -15,6 +15,14 @@ const DOT_SCALE_MIN = 0.85
 const DOT_SCALE_MAX = 1.3
 const TIP_MAX_NAMES = 6
 
+// ── Spotlight timings (home hero only) ───────────────────────────────────────
+const SPOT_FIRST_MS = 1600    // let the opening camera flight settle first
+const SPOT_HOLD_MS = 5000     // how long one card stays up
+const SPOT_OUT_MS = 600       // must match the CSS transition in globe.css
+const SPOT_GAP_MS = 1000      // dark pause between two cards
+const SPOT_COOLDOWN_MS = 30000 // silence after the user last pointed at a marker
+const SPOT_EDGE_PX = 90       // keep the anchor clear of the canvas edges
+
 // Visible angular height is roughly 53 * altitude degrees; aiming for the cluster to
 // fill ~60% of that gives span / 32. Round it off to 30.
 const SPLIT_DIVISOR = 30
@@ -32,6 +40,11 @@ const isFrontFacing = (lat, lng, cam) => {
 
 function placeMarkers(globe, clusters, nodes) {
   const cam = globe.camera().position
+  // The overlay cannot clip with `overflow: hidden` — that would cut off tooltips and
+  // pickers, which are allowed to hang over the edge. So markers projecting outside the
+  // canvas box are hidden instead of drawn on top of the rest of the page.
+  const w = globe.width()
+  const h = globe.height()
   for (const c of clusters) {
     const node = nodes.get(c.id)
     if (!node) continue
@@ -40,9 +53,33 @@ function placeMarkers(globe, clusters, nodes) {
       continue
     }
     const { x, y } = globe.getScreenCoords(c.lat, c.lng, 0)
+    if (x < 0 || y < 0 || x > w || y > h) {
+      node.style.visibility = 'hidden'
+      continue
+    }
     node.style.visibility = 'visible'
     node.style.transform = `translate3d(${x}px, ${y}px, 0)`
   }
+}
+
+// The spotlight card rides the marker its ship currently belongs to — which is the
+// group marker while that ship is clustered with others, and its own dot once the
+// cluster splits. Looked up per frame rather than pinned at pick time, so the card
+// keeps pointing at the right thing while the globe turns.
+function placeSpot(globe, shipId, node, clusters) {
+  if (!node || shipId == null) return
+  const cluster = clusters.find(c => c.ships.some(s => s.id === shipId))
+  if (!cluster || !isFrontFacing(cluster.lat, cluster.lng, globe.camera().position)) {
+    node.style.visibility = 'hidden'
+    return
+  }
+  const { x, y } = globe.getScreenCoords(cluster.lat, cluster.lng, 0)
+  if (x < 0 || y < 0 || x > globe.width() || y > globe.height()) {
+    node.style.visibility = 'hidden'
+    return
+  }
+  node.style.visibility = 'visible'
+  node.style.transform = `translate3d(${x}px, ${y}px, 0)`
 }
 
 export default function ShipMarkers({
@@ -56,6 +93,7 @@ export default function ShipMarkers({
   canZoom,
   minAltitude,
   labels,
+  spotlight = false,  // cycle a floating card through random ships (home hero only)
   onSelectShip,
 }) {
   const overlayRef = useRef(null)
@@ -63,10 +101,14 @@ export default function ShipMarkers({
   const clustersRef = useRef([])
   const sigRef = useRef('')
   const assignRef = useRef(null)
+  const spotNodeRef = useRef(null)
+  const spotShipRef = useRef(null)
 
   const [clusters, setClusters] = useState([])
   const [hover, setHover] = useState(null)    // { id, flip }
   const [picker, setPicker] = useState(null)  // { id, flip }
+  const [spot, setSpot] = useState(null)      // { ship, flip, phase: 'in' | 'out' }
+  const [spotPaused, setSpotPaused] = useState(false)
 
   // ── Projection + clustering loop ───────────────────────────────────────────
   useEffect(() => {
@@ -121,6 +163,7 @@ export default function ShipMarkers({
         recluster(globe)
       }
       placeMarkers(globe, clustersRef.current, nodes)
+      placeSpot(globe, spotShipRef.current, spotNodeRef.current, clustersRef.current)
     }
 
     // Seed synchronously so markers appear on the first paint rather than one frame in.
@@ -139,6 +182,74 @@ export default function ShipMarkers({
     const globe = globeRef.current
     if (globe) placeMarkers(globe, clusters, nodesRef.current)
   }, [clusters, globeRef])
+
+  // ── Spotlight ──────────────────────────────────────────────────────────────
+  // Anything the user is actually looking at outranks the showcase: a hovered
+  // marker, an open picker, a selected ship.
+  const spotBlocked = hover != null || picker != null || selectedId != null
+
+  // Pointing at a marker stops the cycle at once; it only resumes once the pointer
+  // has stayed off the markers for the full cooldown.
+  useEffect(() => {
+    if (!spotlight) return
+    if (spotBlocked) { setSpotPaused(true); return }
+    if (!spotPaused) return
+    const timer = setTimeout(() => setSpotPaused(false), SPOT_COOLDOWN_MS)
+    return () => clearTimeout(timer)
+  }, [spotlight, spotBlocked, spotPaused])
+
+  useEffect(() => {
+    if (!spotlight || spotPaused) {
+      // Animate out rather than vanish, then drop the node once the transition ends.
+      setSpot(s => (s && s.phase !== 'out' ? { ...s, phase: 'out' } : s))
+      const timer = setTimeout(() => setSpot(null), SPOT_OUT_MS)
+      return () => clearTimeout(timer)
+    }
+
+    let timer = 0
+    let lastId = null
+
+    const pick = () => {
+      const overlay = overlayRef.current
+      const w = overlay?.clientWidth ?? 0
+      const h = overlay?.clientHeight ?? 0
+      // Only clusters currently drawn are candidates — they are front-facing by
+      // construction — and only those with room around them for a card.
+      const inView = clustersRef.current.filter(
+        c => c.x > SPOT_EDGE_PX && c.x < w - SPOT_EDGE_PX && c.y > SPOT_EDGE_PX && c.y < h - SPOT_EDGE_PX
+      )
+      const candidates = inView.flatMap(c => c.ships.map(s => ({ ship: s, x: c.x })))
+      if (candidates.length === 0) {
+        timer = setTimeout(pick, SPOT_GAP_MS)
+        return
+      }
+      const fresh = candidates.length > 1 ? candidates.filter(c => c.ship.id !== lastId) : candidates
+      const chosen = fresh[Math.floor(Math.random() * fresh.length)]
+      lastId = chosen.ship.id
+      setSpot({ ship: chosen.ship, flip: chosen.x > w * 0.55, phase: 'in' })
+      timer = setTimeout(hide, SPOT_HOLD_MS)
+    }
+
+    const hide = () => {
+      setSpot(s => (s ? { ...s, phase: 'out' } : s))
+      timer = setTimeout(() => {
+        setSpot(null)
+        timer = setTimeout(pick, SPOT_GAP_MS)
+      }, SPOT_OUT_MS)
+    }
+
+    timer = setTimeout(pick, SPOT_FIRST_MS)
+    return () => clearTimeout(timer)
+  }, [spotlight, spotPaused, ships])
+
+  spotShipRef.current = spot?.ship.id ?? null
+
+  // Same reason as the markers above: place the card before its first paint, since
+  // the rAF loop only writes when the camera moves.
+  useLayoutEffect(() => {
+    const globe = globeRef.current
+    if (globe) placeSpot(globe, spotShipRef.current, spotNodeRef.current, clustersRef.current)
+  }, [spot, globeRef])
 
   // Close any open popover when the selection changes from elsewhere (a list click).
   useEffect(() => { setPicker(null) }, [selectedId])
@@ -293,6 +404,25 @@ export default function ShipMarkers({
             </div>
           )
         })}
+
+        {spot && (
+          <div
+            ref={spotNodeRef}
+            className={'sz-spot' + (spot.flip ? ' is-flipped' : '') + (spot.phase === 'out' ? ' is-out' : '')}
+          >
+            <span className="sz-spot__line" />
+            <div className="sz-spot__card">
+              {spot.ship.image && <img className="sz-spot__img" src={asset(spot.ship.image)} alt="" />}
+              <div className="sz-spot__body">
+                <div className="sz-spot__kicker">
+                  {[spot.ship.type, spot.ship.year].filter(Boolean).join(' · ')}
+                </div>
+                <div className="sz-spot__name">{spot.ship.name}</div>
+                {spot.ship.port && <div className="sz-spot__meta">{spot.ship.port}</div>}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* On touch the popover becomes a bottom sheet — it needs to escape the
