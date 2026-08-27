@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
 import { SHIPS, BLOG_POSTS, HOME_PAGE, UNESCO_STEPS } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import { asset } from '../utils/asset.js'
+import { youtubeEmbedUrl } from '../utils/youtube.js'
 import ShipGlobe from '../components/globe/ShipGlobe.jsx'
 import ShipCard from '../components/ShipCard.jsx'
 import { useIsTouch } from '../hooks/useMediaQuery.js'
@@ -12,15 +13,22 @@ import { useShips } from '../hooks/useShips.js'
 // frames the Netherlands and every ship in it.
 const GLOBE_CHAPTERS = [
   { lat: 52.48, lng: 4.96, zoom: 6.6, autoRotate: false, regionKey: 'thuiswateren' },
-  { lat: 52.0, lng: 12.0, zoom: 1.55, autoRotate: false, regionKey: 'europa' },
-  { lat: 20.0, lng: -5.0, zoom: 1.1, autoRotate: true, regionKey: 'wereld' },
+  // Lower zoom than the hero yet larger on screen: MapLibre sizes the globe by
+  // 1/cos(latitude), so this chapter's lat 52 renders ~1.5x the hero's lat 20 at equal
+  // zoom. 1.7 lands Europe just filling the column, limb still visible at the edges.
+  { lat: 52.0, lng: 12.0, zoom: 1.7, autoRotate: false, regionKey: 'europa' },
+  // The world chapter sits just wider than the opening shot — it is the widest the
+  // journey ever goes, so it must not read as smaller than the hero it grew out of.
+  { lat: 20.0, lng: -5.0, zoom: 1.85, autoRotate: true, regionKey: 'wereld' },
   // Chapter IV closes on Harlingen, the busiest basin (16 ships within a few hundred m),
   // at the same country-wide zoom as chapter I — pushing in further reads as a slam.
   { lat: 53.173, lng: 5.415, zoom: 6.6, autoRotate: false, regionKey: 'thuiswateren' },
 ]
 
 // Opens on the whole globe, slowly turning; the chapters push in from here.
-const INITIAL_VIEW = { lat: 20.0, lng: 4.96, zoom: 1.3, ms: 0 }
+// Zoom 2.0 fills about 80% of the hero column's width. The chapters above are pitched
+// around this, so moving it means moving them.
+const INITIAL_VIEW = { lat: 20.0, lng: 4.96, zoom: 2.0, ms: 0 }
 
 const CHAPTERS_STRUCT = [
   { index: 0, roman: 'I' },
@@ -101,6 +109,8 @@ export default function HomePage({ navigate }) {
   const isTouch = useIsTouch()
   // Baked CMS fields merged with the positions fetched from the media bucket.
   const ships = useShips()
+
+  const spotlightEmbed = youtubeEmbedUrl(HOME_PAGE.mediaSpotlightYoutubeUrl)
 
   const activeChapter = chapter === null ? null : GLOBE_CHAPTERS[Math.min(chapter, GLOBE_CHAPTERS.length - 1)]
   const view = activeChapter
@@ -365,13 +375,26 @@ export default function HomePage({ navigate }) {
       {/* ── MEDIA SPOTLIGHT ── */}
       <div style={{ background: '#f4ede1', padding: '100px 2rem' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }} className="grid-2">
-          <div style={{ aspectRatio: '16/9', borderRadius: 2, cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
-            <img src={HOME_PAGE.mediaSpotlightThumbnail ? asset(HOME_PAGE.mediaSpotlightThumbnail.src) : `${import.meta.env.BASE_URL}waterschatten-thumbnail.jpg`} alt={tc(HOME_PAGE, 'mediaSpotlightTitle')} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,26,46,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(193,154,82,0.18)', border: '1px solid rgba(193,154,82,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ width: 0, height: 0, borderLeft: '18px solid #c19a52', borderTop: '11px solid transparent', borderBottom: '11px solid transparent', marginLeft: 4 }} />
-              </div>
-            </div>
+          <div style={{ aspectRatio: '16/9', borderRadius: 2, position: 'relative', overflow: 'hidden', background: '#0a1a2e' }}>
+            {spotlightEmbed ? (
+              <iframe
+                title={tc(HOME_PAGE, 'mediaSpotlightTitle')}
+                src={spotlightEmbed}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                loading="lazy"
+                style={{ width: '100%', height: '100%', display: 'block', border: 'none' }}
+              />
+            ) : (
+              <>
+                <img src={HOME_PAGE.mediaSpotlightThumbnail ? asset(HOME_PAGE.mediaSpotlightThumbnail.src) : `${import.meta.env.BASE_URL}waterschatten-thumbnail.jpg`} alt={tc(HOME_PAGE, 'mediaSpotlightTitle')} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,26,46,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(193,154,82,0.18)', border: '1px solid rgba(193,154,82,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 0, height: 0, borderLeft: '18px solid #c19a52', borderTop: '11px solid transparent', borderBottom: '11px solid transparent', marginLeft: 4 }} />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
           <div>
             <div style={{ fontSize: 10, color: '#a07d33', letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: 16 }}>{tc(HOME_PAGE, 'mediaSpotlightBadge')}</div>

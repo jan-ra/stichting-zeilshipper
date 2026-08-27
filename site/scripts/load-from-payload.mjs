@@ -251,7 +251,8 @@ async function loadMediaItems() {
       tag: locStr(d.tag, 'nl'),
       tag_en: locStr(d.tag, 'en') || locStr(d.tag, 'nl'),
       format: text(d.format),
-      url: text(d.externalUrl) || file?.src || '',
+      youtubeUrl: text(d.youtubeUrl),
+      url: text(d.youtubeUrl) || text(d.externalUrl) || file?.src || '',
     }
   })
 }
@@ -360,6 +361,7 @@ async function loadHomePage() {
     ...emit('mediaSpotlightBadge', d.mediaSpotlightBadge),
     ...emit('mediaSpotlightTitle', d.mediaSpotlightTitle),
     ...emit('mediaSpotlightBody',  d.mediaSpotlightBody),
+    mediaSpotlightYoutubeUrl: text(d.mediaSpotlightYoutubeUrl),
     mediaSpotlightThumbnail: image(d.mediaSpotlightThumbnail),
 
     ...emit('helpBadge', d.helpBadge),
@@ -493,6 +495,7 @@ async function loadMediaPage() {
     ...emit('promotionLabel', d.promotionLabel),
     ...emit('featuredTitle',  d.featuredTitle),
     ...emit('featuredBody',   d.featuredBody),
+    featuredYoutubeUrl: text(d.featuredYoutubeUrl),
     featuredThumbnail: image(d.featuredThumbnail),
     ...emit('podcastTitle', d.podcastTitle),
     ...emit('podcastBody',  d.podcastBody),
