@@ -59,11 +59,14 @@ npm run minio:up                    # local S3 for media uploads
 npm run dev                         # http://localhost:3001/admin
 ```
 
-Seed the CMS once with the bundled photos + videos:
+Seed the CMS once with the bundled photos:
 
 ```sh
-npm run seed                        # reads from ../site/public/ and ./seed-assets/videos/
+npm run seed                        # reads from ../site/public/
 ```
+
+Videos are not uploaded to the media bucket — media items of type `video` carry a
+YouTube watch URL and the site embeds the player.
 
 ### 2. Site (Vite)
 

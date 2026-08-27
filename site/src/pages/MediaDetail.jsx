@@ -1,5 +1,6 @@
 import { MEDIA_ITEMS } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
+import { youtubeEmbedUrl } from '../utils/youtube.js'
 
 const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉', project: '◈' }
 
@@ -26,7 +27,8 @@ export default function MediaDetailPage({ navigate, mediaItemId }) {
     )
   }
 
-  const isVideo   = item.type === 'video'
+  const youtubeEmbed = youtubeEmbedUrl(item.youtubeUrl || item.url)
+  const isVideo   = item.type === 'video' && Boolean(youtubeEmbed)
   const isPodcast = item.type === 'podcast'
   const typeLabel = t('mediaDetail.typeLabels')[item.type] || item.type
   const spotifyEmbed = spotifyEmbedUrl(item.url)
@@ -87,14 +89,15 @@ export default function MediaDetailPage({ navigate, mediaItemId }) {
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
           {isVideo && (
-            <div style={{ borderRadius: 2, overflow: 'hidden', background: '#000', boxShadow: '0 8px 40px rgba(0,0,0,0.5)' }}>
-              <video
-                controls
-                style={{ width: '100%', display: 'block', maxHeight: 540 }}
-                src={item.url}
-              >
-                Je browser ondersteunt geen video afspelen.
-              </video>
+            <div style={{ borderRadius: 2, overflow: 'hidden', background: '#000', boxShadow: '0 8px 40px rgba(0,0,0,0.5)', aspectRatio: '16/9' }}>
+              <iframe
+                title={tc(item, 'title')}
+                src={youtubeEmbed}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                loading="lazy"
+                style={{ width: '100%', height: '100%', display: 'block', border: 'none' }}
+              />
             </div>
           )}
 

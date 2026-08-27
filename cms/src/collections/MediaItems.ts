@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { isAdminOrEditor } from '../access'
 import { collectionRebuildHooks } from '../hooks/triggerRebuild'
+import { youtubeId } from '../lib/youtube'
 
 // "Media items" are editorial download/spotlight entries (videos, podcasts,
 // PDFs) — not to be confused with the upload-backing `media` collection.
@@ -27,8 +28,30 @@ export const MediaItems: CollectionConfig = {
     { name: 'description', type: 'textarea', localized: true },
     { name: 'category', type: 'text' },
     { name: 'tag', type: 'text', localized: true },
-    { name: 'format', type: 'text', admin: { description: 'e.g. MP4, ZIP, PDF, Spotify.' } },
-    { name: 'file', type: 'upload', relationTo: 'media', admin: { description: 'Upload to the Media library.' } },
-    { name: 'externalUrl', type: 'text', label: 'External URL', admin: { description: 'Use this when the asset lives off-platform (Vimeo, Spotify, R2…).' } },
+    { name: 'format', type: 'text', admin: { description: 'e.g. YouTube, ZIP, PDF, Spotify.' } },
+    {
+      name: 'youtubeUrl',
+      type: 'text',
+      label: 'YouTube URL',
+      admin: {
+        condition: (_, siblingData) => siblingData?.type === 'video',
+        description: 'Videos are hosted on YouTube. Paste the watch link, e.g. https://www.youtube.com/watch?v=_nyd12t2_j4',
+      },
+      validate: (value: string | null | undefined, { siblingData }: { siblingData: { type?: string } }) => {
+        if (siblingData?.type !== 'video') return true
+        if (!value) return 'A YouTube URL is required for videos.'
+        return youtubeId(value) ? true : 'Not a recognisable YouTube URL.'
+      },
+    },
+    {
+      name: 'file',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        condition: (_, siblingData) => siblingData?.type !== 'video',
+        description: 'Upload to the Media library. Not used for videos — those live on YouTube.',
+      },
+    },
+    { name: 'externalUrl', type: 'text', label: 'External URL', admin: { condition: (_, siblingData) => siblingData?.type !== 'video', description: 'Use this when the asset lives off-platform (Spotify, R2…).' } },
   ],
 }

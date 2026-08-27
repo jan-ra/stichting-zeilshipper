@@ -22,7 +22,9 @@ const payload = await getPayload({ config })
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 const PUBLIC    = path.join(REPO_ROOT, 'site', 'public')
-const VIDEOS    = path.join(REPO_ROOT, 'cms', 'seed-assets', 'videos')
+
+// Videos live on YouTube, not in the media bucket.
+const WATERSCHATTEN_YOUTUBE_URL = 'https://www.youtube.com/watch?v=_nyd12t2_j4'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -67,7 +69,6 @@ async function reseedLocalized(collection: string, records: Array<Record<string,
 function mimeType(filename: string) {
   if (filename.endsWith('.webp')) return 'image/webp'
   if (filename.endsWith('.png'))  return 'image/png'
-  if (filename.endsWith('.mp4'))  return 'video/mp4'
   if (filename.endsWith('.jxl'))  return 'image/jxl'
   return 'image/jpeg'
 }
@@ -81,23 +82,6 @@ async function uploadImage(relPath: string, alt: string) {
     collection: 'media',
     data: { alt },
     file: { data, name, size, mimetype: mimeType(name) },
-  })
-}
-
-async function uploadVideo(filename: string) {
-  const abs  = path.join(VIDEOS, filename)
-  const name = path.basename(abs)
-  if (!fs.existsSync(abs)) {
-    console.warn(`    ⚠ ${filename} not found — skipping (media item will have no attached video)`)
-    return null
-  }
-  const data = fs.readFileSync(abs)
-  const size = data.byteLength
-  console.log(`    ↑ ${filename} (${(size / 1_000_000).toFixed(0)} MB)`)
-  return payload.create({
-    collection: 'media',
-    data: { alt: '' },
-    file: { data, name, size, mimetype: 'video/mp4' },
   })
 }
 
@@ -164,6 +148,18 @@ async function seedGlobal(slug: string, data: Record<string, any>) {
 
 console.log('Seeding Payload…\n')
 console.log('  Uploading photos…')
+
+// Clear everything that points at media before the media wipe: array rows such as
+// `blog_posts_images.image_id` and `home_page_scroll_photos.photo_id` are NOT NULL,
+// so deleting a media doc they still reference fails the constraint. All of it is
+// re-created further down.
+for (const collection of ['media-items', 'blog-posts', 'info-boards', 'team-members', 'ships', 'partners', 'unesco-steps'] as const) {
+  const { docs } = await payload.find({ collection, limit: 1000, pagination: false })
+  for (const doc of docs) await payload.delete({ collection, id: doc.id })
+}
+for (const locale of ['nl', 'en'] as const) {
+  await payload.updateGlobal({ slug: 'home-page', locale, data: { scrollPhotos: [], chapters: [] } })
+}
 
 // Clear existing media
 const { docs: existingMedia } = await payload.find({ collection: 'media', limit: 1000, pagination: false })
@@ -425,28 +421,7 @@ const blogPosts = [
   },
 ]
 
-// ── Media items (videos + podcast) ───────────────────────────────────────────
-
-console.log('  Uploading videos…')
-
-// Clear existing media items first
-const { docs: existingItems } = await payload.find({ collection: 'media-items', limit: 1000, pagination: false })
-for (const doc of existingItems) await payload.delete({ collection: 'media-items', id: doc.id })
-
-const videos: Record<string, number> = {}
-const videoFiles = [
-  'Waterschatten-een-impressie-van-de-chartervaart.mp4',
-  'Marijke-de-Jong-tuigage-stabiliteitsberekeningen-docent.mp4',
-  'Renee-schipper-van-de-Bontekoe.mp4',
-  'De-vloot-en-de-haven_-niet-uit-de-drukken-in-geld.mp4',
-  'De-Bruine-Vloot-en-de-havens.mp4',
-  'Patrick-zeilmaker.mp4',
-  'Tess-op-zee.mp4',
-]
-for (const filename of videoFiles) {
-  const doc = await uploadVideo(filename)
-  if (doc) videos[filename] = doc.id as number
-}
+// ── Media items (video + podcast) ────────────────────────────────────────────
 
 const mediaItems = [
   {
@@ -458,80 +433,8 @@ const mediaItems = [
     category: 'video',
     tag: 'Erfgoed',
     tag_en: 'Heritage',
-    format: 'MP4',
-    file: videos['Waterschatten-een-impressie-van-de-chartervaart.mp4'],
-  },
-  {
-    type: 'video',
-    title: 'Marijke de Jong',
-    title_en: 'Marijke de Jong',
-    description: 'Scheepsbouwkundige Marijke de Jong als ontwerper en adviseur voor de zeilende chartervaart. Ze vertelt over veilig en mooi schepen bouwen, haar werk voor rederijen en de Enkhuizer Zeevaartschool en waarom goed ontwerp essentieel is om de historische vloot toekomst te geven.',
-    description_en: 'Naval architect Marijke de Jong as a designer and adviser for the sailing charter industry. She talks about building safe and beautiful ships, her work for shipping companies and the Enkhuizer Nautical College, and why good design is essential to give the historic fleet a future.',
-    category: 'video',
-    tag: 'Vakmanschap',
-    tag_en: 'Craftsmanship',
-    format: 'MP4',
-    file: videos['Marijke-de-Jong-tuigage-stabiliteitsberekeningen-docent.mp4'],
-  },
-  {
-    type: 'video',
-    title: 'Renée, schipper van de Bontekoe',
-    title_en: 'Renée, skipper of the Bontekoe',
-    description: 'Renée vertelt over haar leven en werk als schipper op een traditioneel zeilschip. De video benadrukt haar passie, vakmanschap en de vrijheid op het water.',
-    description_en: 'Renée talks about her life and work as a skipper on a traditional sailing vessel. The video highlights her passion, craftsmanship and the freedom on the water.',
-    category: 'video',
-    tag: 'Portret',
-    tag_en: 'Portrait',
-    format: 'MP4',
-    file: videos['Renee-schipper-van-de-Bontekoe.mp4'],
-  },
-  {
-    type: 'video',
-    title: 'De vloot en de haven. Niet uit te drukken in geld!',
-    title_en: 'The fleet and the harbour. Beyond price!',
-    description: 'De Bruine Vloot en historische havens versterken elkaar. De schepen zorgen voor sfeer, levendig toerisme, lokale werkgelegenheid, onderwijs en cultureel erfgoed. Zonder vloot geen échte haven — en dat is in geld niet te vangen.',
-    description_en: 'The Bruine Vloot and historic harbours reinforce each other. The ships provide atmosphere, vibrant tourism, local employment, education and cultural heritage. Without the fleet there is no real harbour — and that cannot be expressed in money.',
-    category: 'video',
-    tag: 'Erfgoed',
-    tag_en: 'Heritage',
-    format: 'MP4',
-    file: videos['De-vloot-en-de-haven_-niet-uit-de-drukken-in-geld.mp4'],
-  },
-  {
-    type: 'video',
-    title: 'De Bruine Vloot en de havens',
-    title_en: 'The Bruine Vloot and the harbours',
-    description: 'Hoe belangrijk de traditionele zeilschepen zijn voor de Nederlandse havens. Schippers en andere betrokkenen vertellen over de sfeer, het erfgoed en de economische waarde die deze schepen meebrengen aan levendige, aantrekkelijke havensteden.',
-    description_en: 'How important the traditional sailing ships are to Dutch harbours. Skippers and others involved talk about the atmosphere, heritage and economic value these vessels bring to vibrant, attractive harbour towns.',
-    category: 'video',
-    tag: 'Erfgoed',
-    tag_en: 'Heritage',
-    format: 'MP4',
-    file: videos['De-Bruine-Vloot-en-de-havens.mp4'],
-  },
-  {
-    type: 'video',
-    title: 'Patrick, zeilmaker',
-    title_en: 'Patrick, sailmaker',
-    description: 'Patrick, zeilmaker voor de historische chartervloot, toont zijn ambacht van zeilen ontwerpen, repareren en onderhouden. Zijn passie en vakmanschap zijn cruciaal voor het behoud van varend erfgoed.',
-    description_en: 'Patrick, a sailmaker for the historic charter fleet, demonstrates his craft of designing, repairing and maintaining sails. His passion and craftsmanship are crucial to preserving floating heritage.',
-    category: 'video',
-    tag: 'Vakmanschap',
-    tag_en: 'Craftsmanship',
-    format: 'MP4',
-    file: videos['Patrick-zeilmaker.mp4'],
-  },
-  {
-    type: 'video',
-    title: 'Tess op zee',
-    title_en: 'Tess at sea',
-    description: 'Tess vertelt over haar ervaringen als bemanningslid op een traditioneel zeilschip. Een persoonlijk portret van het leven op het water en de liefde voor de Bruine Vloot.',
-    description_en: 'Tess talks about her experiences as a crew member on a traditional sailing vessel. A personal portrait of life on the water and the love for the Bruine Vloot.',
-    category: 'video',
-    tag: 'Portret',
-    tag_en: 'Portrait',
-    format: 'MP4',
-    file: videos['Tess-op-zee.mp4'],
+    format: 'YouTube',
+    youtubeUrl: WATERSCHATTEN_YOUTUBE_URL,
   },
   {
     type: 'podcast',
@@ -588,6 +491,7 @@ const mediaPageData = {
   featuredTitle_en: 'Waterschatten',
   featuredBody:    'Een door de BBZ gemaakte promotiefilm die heel goed gebruikt kan worden om de Bruine Vloot, haar bemanning en de bijbehorende beroepsvelden voor te stellen.',
   featuredBody_en: 'A promotional film made by the BBZ that can be used very effectively to introduce the Bruine Vloot, its crew and the associated professional fields.',
+  featuredYoutubeUrl: WATERSCHATTEN_YOUTUBE_URL,
   featuredThumbnail: photos['waterschatten-thumbnail.jpg'],
   podcastTitle:    'Roefgesprekken',
   podcastTitle_en: 'Roefgesprekken',
@@ -840,6 +744,7 @@ const homePageData = {
   mediaSpotlightBody_en:   'A promotional film made by the BBZ that can be used very effectively to introduce the Bruine Vloot, its crew and the associated professional fields.',
   mediaSpotlightCta:       'Alle media →',
   mediaSpotlightCta_en:    'All media →',
+  mediaSpotlightYoutubeUrl: WATERSCHATTEN_YOUTUBE_URL,
   mediaSpotlightThumbnail: photos['waterschatten-thumbnail.jpg'],
   newsBadge:    'Nieuws',
   newsBadge_en: 'News',

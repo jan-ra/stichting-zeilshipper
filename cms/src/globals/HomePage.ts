@@ -156,7 +156,8 @@ export const HomePage: GlobalConfig = {
         { name: 'mediaSpotlightTitle',     type: 'text',     localized: true, label: 'Title' },
         { name: 'mediaSpotlightBody',      type: 'textarea', localized: true, label: 'Body' },
         { name: 'mediaSpotlightCta',       type: 'text',     localized: true, label: 'CTA button label' },
-        { name: 'mediaSpotlightThumbnail', type: 'upload',   relationTo: 'media', label: 'Thumbnail image' },
+        { name: 'mediaSpotlightYoutubeUrl', type: 'text',    label: 'YouTube URL', admin: { description: 'Watch link of the video embedded on the homepage, e.g. https://www.youtube.com/watch?v=_nyd12t2_j4' } },
+        { name: 'mediaSpotlightThumbnail', type: 'upload',   relationTo: 'media', label: 'Thumbnail image', admin: { description: 'Fallback shown when no YouTube URL is set.' } },
       ],
     },
 
