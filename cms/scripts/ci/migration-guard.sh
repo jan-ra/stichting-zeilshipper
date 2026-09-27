@@ -45,7 +45,8 @@ done
 
 echo "-- destructive: migrations new vs $BASE_REF"
 if git rev-parse --verify -q "$BASE_REF" >/dev/null; then
-  added="$(git diff --name-only --diff-filter=AM "$BASE_REF" -- src/migrations | grep -E '\.ts$' | grep -v index.ts || true)"
+  # Committed and uncommitted changes, plus files git does not track yet.
+  added="$( { git diff --name-only --diff-filter=AM "$BASE_REF" -- src/migrations; git ls-files --others --exclude-standard --full-name src/migrations; } | grep -E '\.ts$' | grep -v index.ts | sort -u || true)"
   hits=""
   for f in $added; do
     [ -f "../$f" ] || [ -f "$f" ] || continue
