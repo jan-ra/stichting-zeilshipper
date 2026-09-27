@@ -34,8 +34,11 @@ run() { stage "$@" || FAILED=1; }
 
 # ── Static ─────────────────────────────────────────────────────────────────
 run "CMS typecheck"     bash -c "cd '$REPO_ROOT/cms' && PAYLOAD_SECRET=verify DATABASE_URI=file:$OUT_DIR/types.db node node_modules/payload/bin.js generate:types >/dev/null 2>&1 && npx tsc --noEmit -p . && echo '    ok'"
-run "Unit tests (cms)"  bash -c "cd '$REPO_ROOT/cms' && node --test 'tests/**/*.test.mjs' 2>&1 | grep -E '^ℹ (pass|fail)|✖' "
-run "Unit tests (site)" bash -c "cd '$REPO_ROOT/site' && node --test 'tests/**/*.test.js' 2>&1 | grep -E '^ℹ (pass|fail)|✖' "
+# The stage result is node's exit code; the grep only trims the output.
+unit() { (cd "$REPO_ROOT/$1" && node --test --test-reporter=spec "$2") >"$OUT_DIR/unit-$1.log" 2>&1; local rc=$?; grep -E '^ℹ (pass|fail)|✖' "$OUT_DIR/unit-$1.log" | sed 's/^/    /'; return $rc; }
+run "Unit tests (cms)"  unit cms 'tests/**/*.test.mjs'
+run "Unit tests (site)" unit site 'tests/**/*.test.js'
+
 run "Migration guard"   bash "$REPO_ROOT/cms/scripts/ci/migration-guard.sh"
 
 if [ "$MODE" = quick ]; then write_report "verify --quick" $FAILED; exit $FAILED; fi
