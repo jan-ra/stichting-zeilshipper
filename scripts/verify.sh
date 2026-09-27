@@ -26,7 +26,8 @@ for a in "$@"; do
 done
 
 source "$REPO_ROOT/scripts/lib/stack.sh"
-rm -rf "$OUT_DIR"; mkdir -p "$OUT_DIR"
+# Keep the rehearsal output: it is a separate, slower run that the PR also quotes.
+mkdir -p "$OUT_DIR"; find "$OUT_DIR" -mindepth 1 -maxdepth 1 ! -name "rehearsal*" -exec rm -rf {} +
 trap 'cleanup_pids $CMS_PORT $SITE_PORT' EXIT
 FAILED=0
 run() { stage "$@" || FAILED=1; }
