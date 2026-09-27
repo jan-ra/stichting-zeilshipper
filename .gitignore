@@ -27,3 +27,7 @@ pnpm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Root tooling
+node_modules/
+.verify/

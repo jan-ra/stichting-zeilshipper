@@ -36,13 +36,13 @@
 
 import { readFile } from 'node:fs/promises'
 
+import { mergeShipPosition } from './lib/positions.mjs'
 import { POSITIONS_KEY, ROSTER_KEY, getJson, putJson, requireS3Env } from './lib/r2.mjs'
 
 const MST_API_KEY  = process.env.MYSHIPTRACKING_API_KEY
 const MST_BULK_URL = 'https://api.myshiptracking.com/api/v2/vessel/bulk'
 
 const CHUNK_SIZE   = 100 // MyShipTracking bulk limit is 100 identifiers per request.
-const HISTORY_MAX  = 7   // One entry per nightly run — a rolling week of track.
 
 const DRY_RUN   = process.argv.includes('--dry-run')
 const FIXTURE   = process.argv.find(a => a.startsWith('--fixture='))?.slice('--fixture='.length)
@@ -106,39 +106,6 @@ function syntheticRows(tracked, prevShips, at) {
       received: at,
     }
   })
-}
-
-// ── Merge a fix into a ship's stored history ───────────────────────────────
-
-/**
- * Appends `fix` to `prev.history` when it is genuinely new, trims to the last
- * HISTORY_MAX entries and returns the ship's new record.
- *
- * The dedupe is on the AIS fix time, not the run time: a ship that sat still
- * and re-reported the same fix must not push six days of real track out of the
- * buffer. Same reason the record keeps its previous history when we merge.
- */
-export function mergeShipPosition(prev, fix) {
-  const history = Array.isArray(prev?.history) ? [...prev.history] : []
-  const newest = history[history.length - 1]
-
-  if (!newest || newest.at !== fix.at) {
-    history.push({ lat: fix.lat, lng: fix.lng, at: fix.at })
-  } else {
-    // Same timestamp, refreshed coordinates — correct in place rather than append.
-    history[history.length - 1] = { lat: fix.lat, lng: fix.lng, at: fix.at }
-  }
-
-  const trimmed = history.slice(-HISTORY_MAX)
-  const latest = trimmed[trimmed.length - 1]
-
-  return {
-    mmsi: fix.mmsi,
-    lat: latest.lat,
-    lng: latest.lng,
-    positionUpdatedAt: latest.at,
-    history: trimmed,
-  }
 }
 
 // ── Main ───────────────────────────────────────────────────────────────────

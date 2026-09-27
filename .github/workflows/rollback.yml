@@ -1,0 +1,134 @@
+name: Rollback
+
+# Put a previous release back. Two independent levers:
+#
+#   code (always)  — redeploys the CMS image recorded in the chosen release tag and
+#                    points the site's `release` branch at that tag's commit.
+#                    Data is untouched. Safe whenever the releases in between only
+#                    ADDED columns (the migration guard enforces that by default).
+#
+#   data (opt-in)  — restores the pre-release DB backup of a release. This DISCARDS
+#                    every content edit made since that backup. Needs confirm=restore.
+#                    The current DB is backed up first, so even this is undoable.
+on:
+  workflow_dispatch:
+    inputs:
+      to_release:
+        description: 'Release tag to return to, e.g. release/20261001-0930-abc1234 (see Tags)'
+        required: true
+      restore_db_from:
+        description: 'Optional: release tag whose PRE-release backup to restore (usually the release you are undoing). Leave empty to keep current data.'
+        required: false
+      confirm:
+        description: 'Type "restore" to allow the DB restore'
+        required: false
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  APP: stichting-zeilshipper-cms
+  CMS_URL: https://admin.stichtingzeilschipper.nl
+  SITE_URL: https://stichtingzeilschipper.nl
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: auto
+  R2: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: sqlite3 CLI
+        run: command -v sqlite3 || (sudo apt-get update -q && sudo apt-get install -yq sqlite3)
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Resolve the target
+        id: t
+        env:
+          TO: ${{ inputs.to_release }}
+          DB_FROM: ${{ inputs.restore_db_from }}
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          set -euo pipefail
+          git rev-parse -q --verify "refs/tags/$TO" >/dev/null || { echo "::error::no tag $TO"; exit 1; }
+          IMG=$(git tag -l --format='%(contents)' "$TO" | sed -n 's/^image=//p' | head -1)
+          [ -n "$IMG" ] || { echo "::error::$TO records no image"; exit 1; }
+          echo "image=$IMG" >> "$GITHUB_OUTPUT"
+          echo "commit=$(git rev-list -n1 "$TO")" >> "$GITHUB_OUTPUT"
+          if [ -n "$DB_FROM" ]; then
+            [ "$CONFIRM" = restore ] || { echo "::error::restore_db_from set but confirm != restore"; exit 1; }
+            KEY=$(git tag -l --format='%(contents)' "$DB_FROM" | sed -n 's/^backup=//p' | head -1)
+            [ -n "$KEY" ] || { echo "::error::$DB_FROM records no backup"; exit 1; }
+            echo "backup=$KEY" >> "$GITHUB_OUTPUT"
+          fi
+          echo "### Rollback to \`$TO\`
+          - image: \`$IMG\`
+          - DB restore: \`${KEY:-no — data kept as is}\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Wake CMS
+        run: for i in $(seq 1 40); do curl -sf "$CMS_URL/api/access" -o /dev/null && exit 0; sleep 3; done; exit 1
+
+      - name: Back up the current DB first
+        id: safety
+        run: |
+          set -euo pipefail
+          F="_pre-rollback-${GITHUB_RUN_ID}.db"
+          flyctl ssh console -a "$APP" -C "sqlite3 /data/payload.db \".backup /data/$F\""
+          flyctl ssh sftp get -a "$APP" "/data/$F" ./current.db
+          flyctl ssh console -a "$APP" -C "rm -f /data/$F"
+          KEY="releases/rollback-$(date -u +%Y%m%d-%H%M%S)/payload.db"
+          aws s3 cp ./current.db "s3://zeilshipper-media/$KEY" --endpoint-url "$R2"
+          echo "- current DB saved to \`$KEY\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Redeploy the CMS image
+        working-directory: cms
+        run: flyctl deploy -a "$APP" --image "${{ steps.t.outputs.image }}" --wait-timeout 10m
+
+      - name: Restore the DB backup
+        if: steps.t.outputs.backup != ''
+        run: |
+          set -euo pipefail
+          aws s3 cp "s3://zeilshipper-media/${{ steps.t.outputs.backup }}" ./restore.db --endpoint-url "$R2"
+          test "$(sqlite3 ./restore.db 'pragma integrity_check')" = ok
+          flyctl ssh sftp put -a "$APP" ./restore.db "/data/_restore-${GITHUB_RUN_ID}.db"
+          # sqlite's backup API writes the pages under the proper locks — no torn file.
+          flyctl ssh console -a "$APP" -C "sqlite3 /data/payload.db \".restore /data/_restore-${GITHUB_RUN_ID}.db\""
+          flyctl ssh console -a "$APP" -C "rm -f /data/_restore-${GITHUB_RUN_ID}.db"
+          MID=$(flyctl machine list -a "$APP" --json | jq -r '.[0].id')
+          flyctl machine restart "$MID" -a "$APP"
+          echo "- DB restored from \`${{ steps.t.outputs.backup }}\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify CMS
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 40); do curl -sf "$CMS_URL/api/access" -o /dev/null && break; sleep 3; done
+          for p in "api/ships?limit=1" "api/globals/home-page"; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$CMS_URL/$p"); echo "$p -> $code"; test "$code" = 200
+          done
+
+      - name: Point the site at the release commit
+        run: git push --force origin "${{ steps.t.outputs.commit }}:refs/heads/release"
+
+      - name: Wait for the site
+        env:
+          WANT: ${{ steps.t.outputs.commit }}
+        run: |
+          for i in $(seq 1 60); do
+            LIVE=$(curl -s "$SITE_URL/?r=$RANDOM" | grep -o '<meta name="release" content="[^"]*"' | sed 's/.*content="//; s/"$//' || true)
+            [ "$LIVE" = "$WANT" ] && { echo "site live at $LIVE"; exit 0; }
+            # Commits from before the release meta existed never report one.
+            [ "$i" -ge 40 ] && [ -z "$LIVE" ] && { echo "::warning::site reports no release meta (pre-pipeline commit) — check Cloudflare"; exit 0; }
+            sleep 15
+          done
+          exit 1

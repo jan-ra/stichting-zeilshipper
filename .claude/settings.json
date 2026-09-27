@@ -1,0 +1,45 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run verify:*)",
+      "Bash(npm run rehearse:*)",
+      "Bash(npm run pull:*)",
+      "Bash(npm run test:*)",
+      "Bash(npm run e2e:*)",
+      "Bash(./scripts/verify.sh:*)",
+      "Bash(./scripts/rehearse-release.sh:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue comment:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh project item-list:*)",
+      "Bash(gh project item-add:*)",
+      "Bash(gh project item-edit:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh run watch:*)",
+      "Bash(flyctl status:*)",
+      "Bash(flyctl releases:*)",
+      "Bash(flyctl machine list:*)",
+      "Bash(flyctl logs:*)"
+    ],
+    "deny": [
+      "Bash(flyctl deploy:*)",
+      "Bash(fly deploy:*)",
+      "Bash(flyctl secrets set:*)",
+      "Bash(flyctl secrets unset:*)",
+      "Bash(flyctl volumes:*)",
+      "Bash(flyctl apps destroy:*)",
+      "Bash(flyctl machine destroy:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(gh workflow run rollback.yml:*)",
+      "Bash(git push origin main:*)",
+      "Bash(git push origin HEAD:main:*)",
+      "Bash(git push origin HEAD:refs/heads/release:*)",
+      "Bash(git push --force:*)",
+      "Bash(npm run seed:*)"
+    ]
+  }
+}

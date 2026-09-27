@@ -32,6 +32,40 @@ import { SupportLetterPage } from './src/globals/SupportLetterPage'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
+const sqliteArgs: Parameters<typeof sqliteAdapter>[0] = {
+  client: {
+    url: process.env.DATABASE_URI || 'file:./data/payload.db',
+  },
+  // Schema is managed exclusively through committed migrations (src/migrations),
+  // applied identically on local and prod. `push` (dev auto-sync) is OFF so that
+  // local schema can never silently drift from what prod will run.
+  push: false,
+  migrationDir: path.resolve(dirname, 'src/migrations'),
+  // WAL lets readers (the site build, admin list views) proceed during a write, and
+  // busyTimeout makes a second writer wait instead of failing with SQLITE_BUSY.
+  wal: true,
+  busyTimeout: 5000,
+}
+
+// Transactions: ON for `payload migrate`, OFF for the running server.
+//
+// The SQLite adapter treats every transaction as a no-op unless transactionOptions
+// is set, so without this a migration that fails halfway leaves the DB half-written.
+// With it, each migration (schema or data) commits or rolls back as a whole — and at
+// boot nothing else is writing, so there is no contention.
+//
+// It stays off for the server because libsql opens a fresh connection per
+// transaction without the busy timeout: concurrent saves then fail instantly with
+// SQLITE_BUSY (reproduced by scripts/ci/concurrency-probe.ts). Revisit when that is
+// fixed upstream.
+//
+// A getter because `payload migrate` sets PAYLOAD_MIGRATING after this file is
+// evaluated but before the adapter reads its options in payload.init().
+Object.defineProperty(sqliteArgs, 'transactionOptions', {
+  enumerable: true,
+  get: () => (process.env.PAYLOAD_MIGRATING === 'true' ? { behavior: 'immediate' } : undefined),
+})
+
 export default buildConfig({
   plugins: [
     s3Storage({
@@ -107,16 +141,7 @@ export default buildConfig({
   ],
   cors: '*',
   csrf: [],
-  db: sqliteAdapter({
-    client: {
-      url: process.env.DATABASE_URI || 'file:./data/payload.db',
-    },
-    // Schema is managed exclusively through committed migrations (src/migrations),
-    // applied identically on local and prod. `push` (dev auto-sync) is OFF so that
-    // local schema can never silently drift from what prod will run.
-    push: false,
-    migrationDir: path.resolve(dirname, 'src/migrations'),
-  }),
+  db: sqliteAdapter(sqliteArgs),
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   serverURL: process.env.PAYLOAD_PUBLIC_URL || '',

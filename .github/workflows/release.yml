@@ -1,0 +1,160 @@
+name: Release
+
+# Merging to main ships it, in order:  DB backup → CMS (migrations at boot) → site.
+#
+# The site is NOT built on push. Cloudflare Workers Builds watches the `release`
+# branch, and only this workflow moves it — after the CMS is healthy — so the site
+# is never built against a CMS that lacks its fields yet.
+#
+# Every run ends in an annotated tag `release/<utc>-<sha>` recording the image that
+# went live, the image it replaced, and the pre-release DB backup. rollback.yml reads
+# those tags.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      force_cms:
+        description: Deploy the CMS even if cms/ has not changed since the last release
+        type: boolean
+        default: false
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  APP: stichting-zeilshipper-cms
+  CMS_URL: https://admin.stichtingzeilschipper.nl
+  SITE_URL: https://stichtingzeilschipper.nl
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: sqlite3 CLI
+        run: command -v sqlite3 || (sudo apt-get update -q && sudo apt-get install -yq sqlite3)
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Plan
+        id: plan
+        run: |
+          set -euo pipefail
+          LAST=$(git tag -l 'release/*' --sort=-creatordate | head -1)
+          CMS=true
+          if [ -n "$LAST" ] && [ "${{ inputs.force_cms }}" != "true" ] && git diff --quiet "$LAST" HEAD -- cms/; then CMS=false; fi
+          TAG="release/$(date -u +%Y%m%d-%H%M)-${GITHUB_SHA::7}"
+          echo "last=$LAST" >> "$GITHUB_OUTPUT"
+          echo "cms=$CMS"   >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG"   >> "$GITHUB_OUTPUT"
+          {
+            echo "### Release \`$TAG\`"
+            echo "- previous release: \`${LAST:-none}\`"
+            echo "- CMS changed: **$CMS**"
+            echo '```'; git log --oneline "${LAST:-HEAD~1}..HEAD" | head -30; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Wake CMS
+        run: |
+          for i in $(seq 1 40); do curl -sf "$CMS_URL/api/access" -o /dev/null && exit 0; sleep 3; done
+          echo "CMS did not wake" >&2; exit 1
+
+      - name: Record the live image (rollback target)
+        id: prev
+        run: |
+          IMG=$(flyctl machine list -a "$APP" --json | jq -r '[.[] | select(.config.image)][0].config.image')
+          echo "image=$IMG" >> "$GITHUB_OUTPUT"
+          echo "- image before: \`$IMG\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Pre-release DB backup → R2 releases/
+        id: backup
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          TAG: ${{ steps.plan.outputs.tag }}
+        run: |
+          set -euo pipefail
+          F="_release-${GITHUB_RUN_ID}.db"
+          flyctl ssh console -a "$APP" -C "sqlite3 /data/payload.db \".backup /data/$F\""
+          flyctl ssh sftp get -a "$APP" "/data/$F" "./payload.db"
+          flyctl ssh console -a "$APP" -C "rm -f /data/$F"
+          test "$(sqlite3 ./payload.db 'pragma integrity_check')" = ok
+          KEY="releases/${TAG#release/}/payload.db"
+          # releases/ is outside the db-backups/ lifecycle rule: kept until deleted by hand.
+          aws s3 cp ./payload.db "s3://zeilshipper-media/$KEY" --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          echo "key=$KEY" >> "$GITHUB_OUTPUT"
+          echo "- DB backup: \`$KEY\` ($(stat -c %s payload.db) bytes, $(sqlite3 payload.db 'select count(*) from ships') ships)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Deploy CMS (migrations run at boot, each in a transaction)
+        id: deploy
+        if: steps.plan.outputs.cms == 'true'
+        working-directory: cms
+        run: flyctl deploy -a "$APP" --remote-only --wait-timeout 10m
+
+      - name: Verify CMS
+        id: verify_cms
+        if: steps.plan.outputs.cms == 'true'
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 40); do curl -sf "$CMS_URL/api/access" -o /dev/null && break; sleep 3; done
+          EXPECTED=$(cd cms/src/migrations && ls *.ts | grep -v index.ts | sed 's/\.ts$//' | sort)
+          APPLIED=$(flyctl ssh console -a "$APP" -C "sqlite3 /data/payload.db 'select name from payload_migrations'" | tr -d '\r' | sort)
+          MISSING=$(comm -23 <(echo "$EXPECTED") <(echo "$APPLIED"))
+          if [ -n "$MISSING" ]; then echo "Migrations not applied: $MISSING" >&2; exit 1; fi
+          for p in "api/ships?limit=1" "api/blog-posts?limit=1" "api/media-items?limit=1" "api/globals/home-page"; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$CMS_URL/$p"); echo "$p -> $code"; test "$code" = 200
+          done
+          echo "- migrations applied: $(echo $APPLIED)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Roll the CMS back to the previous image
+        if: failure() && steps.deploy.outcome != 'skipped' && steps.prev.outputs.image != ''
+        working-directory: cms
+        run: |
+          echo "::error::CMS release failed — restoring ${{ steps.prev.outputs.image }}. The DB is untouched: a failed migration rolls back its own transaction."
+          flyctl deploy -a "$APP" --image "${{ steps.prev.outputs.image }}" --wait-timeout 10m
+
+      - name: Publish site (move the release branch → Cloudflare builds it)
+        run: git push --force origin "HEAD:refs/heads/release"
+
+      - name: Wait for the site to go live
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 60); do
+            LIVE=$(curl -s "$SITE_URL/?r=$RANDOM" | grep -o '<meta name="release" content="[^"]*"' | sed 's/.*content="//; s/"$//' || true)
+            [ "$LIVE" = "$GITHUB_SHA" ] && { echo "site live at $LIVE"; exit 0; }
+            echo "live=${LIVE:-?} want=$GITHUB_SHA ($i/60)"; sleep 15
+          done
+          echo "::error::Site did not go live within 15 min — check the Cloudflare build log." ; exit 1
+
+      - name: Smoke-test the live site
+        run: |
+          set -euo pipefail
+          for p in / /vloot /media /blog /team /unesco /informatieborden /support; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$SITE_URL$p"); echo "$p -> $code"; test "$code" = 200
+          done
+
+      - name: Tag the release
+        if: always() && steps.backup.outcome == 'success'
+        env:
+          TAG: ${{ steps.plan.outputs.tag }}
+        run: |
+          set -euo pipefail
+          NOW=$(flyctl machine list -a "$APP" --json | jq -r '[.[] | select(.config.image)][0].config.image')
+          git config user.name "release-bot"; git config user.email "release-bot@users.noreply.github.com"
+          STATUS=${{ job.status }}
+          git tag -a "$TAG" -m "status=$STATUS" -m "image=$NOW" -m "previous_image=${{ steps.prev.outputs.image }}" \
+            -m "backup=${{ steps.backup.outputs.key }}" -m "cms_deployed=${{ steps.plan.outputs.cms }}" -m "run=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          git push origin "$TAG"
+          echo "- tagged \`$TAG\` (status $STATUS, image \`$NOW\`)" >> "$GITHUB_STEP_SUMMARY"
