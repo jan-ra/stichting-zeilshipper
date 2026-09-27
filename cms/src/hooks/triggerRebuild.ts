@@ -22,7 +22,11 @@ const fireNow = (url: string) => {
     .catch(err => console.error('[rebuild] deploy hook failed:', err))
 }
 
-export const triggerRebuild = () => {
+export const triggerRebuild = (args?: { context?: Record<string, unknown> }) => {
+  // Data migrations pass `context: { skipRebuild: true }`: they run inside the
+  // short-lived `payload migrate` process at boot, where a 30 s timer would hold
+  // the server start hostage. The release pipeline rebuilds the site itself.
+  if (args?.context?.skipRebuild) return
   const url = process.env.CF_PAGES_DEPLOY_HOOK
   if (!url) {
     console.warn('[rebuild] CF_PAGES_DEPLOY_HOOK not set — skipping')

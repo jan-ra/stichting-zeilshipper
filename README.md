@@ -100,7 +100,16 @@ npm run update-positions -- --fixture=synthetic --at=2026-08-02T02:00:00Z   # sa
 npm run backfill-positions -- --force                                       # back to real data
 ```
 
-## Production builds
+## Shipping a change
 
-- **Site:** Cloudflare Workers Builds auto-builds on every push to `main` (build command `npm ci && npm run build:full`, root `site`). For local production builds: `cd site && npm run build:full` → `site/dist/`.
-- **CMS:** `cd cms && flyctl deploy`. Uses `cms/Dockerfile` and `cms/fly.toml`. Full setup runbook in [infra/README.md](infra/README.md).
+```sh
+npm run verify            # before every PR — see infra/DEVOPS-PLAN.md § Verify and rehearse
+npm run rehearse          # additionally, for DB/config/image changes
+```
+
+Merge the PR → [release.yml](.github/workflows/release.yml) backs up the DB, deploys the
+CMS (migrations at boot), then publishes the site via the `release` branch and tags
+`release/*`. Undo with Actions → Rollback. Never `flyctl deploy` by hand.
+
+Working from tickets: issues on the [project board](https://github.com/users/jan-ra/projects/5)
+are picked up with the `/ticket <n>` Claude Code skill (see [CLAUDE.md](CLAUDE.md)).

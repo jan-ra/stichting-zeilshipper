@@ -1,0 +1,48 @@
+name: CI
+
+# Cheap backstop on every PR. The real gate is `npm run verify` on the maintainer's
+# machine (prod snapshot + browser tests), whose report goes in the PR body — CI has
+# no production data by design.
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # migration guard diffs against origin/main
+
+      - name: sqlite3 CLI
+        run: command -v sqlite3 || (sudo apt-get update -q && sudo apt-get install -yq sqlite3)
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            cms/package-lock.json
+            site/package-lock.json
+
+      - run: npm ci
+        working-directory: cms
+      - run: npm ci
+        working-directory: site
+
+      - name: verify --ci (typecheck, unit tests, migration guard, migrations from zero, CMS build)
+        env:
+          BASE_REF: origin/${{ github.base_ref || 'main' }}
+          # A PR that removes content or columns on purpose carries this label.
+          ALLOW_DESTRUCTIVE_MIGRATION: ${{ contains(github.event.pull_request.labels.*.name, 'destructive-migration') && '1' || '' }}
+        run: ./scripts/verify.sh --ci
+
+      - name: Report
+        if: always()
+        run: cat .verify/report.md >> "$GITHUB_STEP_SUMMARY" || true

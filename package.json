@@ -3,6 +3,13 @@
   "private": true,
   "scripts": {
     "pull": "./scripts/pull.sh",
-    "dev": "./scripts/dev.sh"
+    "dev": "./scripts/dev.sh",
+    "verify": "./scripts/verify.sh",
+    "rehearse": "./scripts/rehearse-release.sh",
+    "test": "cd cms && node --test \"tests/**/*.test.mjs\" && cd ../site && node --test \"tests/**/*.test.js\"",
+    "e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
   }
 }

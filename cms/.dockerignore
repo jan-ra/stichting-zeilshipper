@@ -1,6 +1,6 @@
 # flyctl launch added from .gitignore
 **/node_modules
-**/.next
+**/.next*
 **/out
 
 # Local SQLite + uploads (mounted as a volume on fly.io)
