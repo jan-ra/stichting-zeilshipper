@@ -6,7 +6,9 @@
  *   1. Scans the JSON for any string URL that starts with MEDIA_BASE_URL.
  *   2. Probes each URL (HEAD) for content-type and size.
  *   3. Downloads image/* responses up to BAKE_MAX_BYTES into public/baked/.
- *   4. Rewrites the JSON in-place so baked URLs point to /baked/<filename>.
+ *   4. Writes downscaled WebP copies of each raster image (see lib/srcset.mjs).
+ *   5. Rewrites the JSON in-place so baked URLs point to /baked/<filename>, and
+ *      gives every `{ src }` image object a `srcSet` listing those copies.
  *
  * Larger files and non-image types (video, audio, pdf, zip) are left alone
  * and load directly from R2 at runtime.
@@ -15,10 +17,13 @@
  *   MEDIA_BASE_URL   - required, e.g. https://media.zeilshipper.nl
  *   BAKE_MAX_BYTES   - default 2_097_152 (2 MiB)
  */
-import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises'
+import { readdir, readFile, writeFile, mkdir, access } from 'node:fs/promises'
 import { resolve, dirname, extname, basename } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createHash } from 'node:crypto'
+import sharp from 'sharp'
+
+import { addSrcSets, srcSetOf, variantPath, variantWidthsFor } from './lib/srcset.mjs'
 
 const SITE      = resolve(fileURLToPath(import.meta.url), '..', '..')
 const GEN_DIR   = resolve(SITE, 'src/data/generated')
@@ -90,6 +95,35 @@ async function download(url, destPath) {
   await writeFile(destPath, buf)
 }
 
+// ── Downscaled copies ───────────────────────────────────────────────────────
+//
+// The CMS serves uploads as they were uploaded — camera originals of up to 7700px and
+// 1.5 MB for photos that render a few hundred pixels wide. Each raster image gets WebP
+// copies at the widths in lib/srcset.mjs so pages can offer them through srcset.
+// Variant names derive from the content-hashed baked name, so a copy that already
+// exists locally is reused rather than re-encoded.
+
+const RESIZABLE = /^image\/(jpeg|png|webp)$/
+const VARIANT_QUALITY = 78
+
+const exists = path => access(path).then(() => true, () => false)
+
+// Returns the srcset string for `publicPath`, or null when there is nothing smaller.
+async function writeVariants(filePath, publicPath) {
+  const { width } = await sharp(filePath).metadata()
+  const widths = variantWidthsFor(width ?? 0)
+  if (widths.length === 0) return null
+  for (const w of widths) {
+    const dest = resolve(BAKED_DIR, basename(variantPath(publicPath, w)))
+    if (await exists(dest)) continue
+    await sharp(filePath).resize({ width: w }).webp({ quality: VARIANT_QUALITY }).toFile(dest)
+  }
+  return srcSetOf([
+    { path: publicPath, width },
+    ...widths.map(w => ({ path: variantPath(publicPath, w), width: w })),
+  ])
+}
+
 // ── Driver ──────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -113,7 +147,8 @@ async function main() {
 
   // 2. classify + download eligible ones
   const map = new Map() // original URL -> /baked/<filename>
-  let baked = 0, skipped = 0, errors = 0
+  const srcSets = new Map() // /baked/<filename> -> srcset
+  let baked = 0, skipped = 0, errors = 0, variants = 0
 
   for (const url of urls) {
     const p = await probe(url)
@@ -135,18 +170,28 @@ async function main() {
     } catch (err) {
       console.warn(`  ! ${url} — download failed: ${err.message}`)
       errors++
+      continue
+    }
+
+    if (!RESIZABLE.test(p.type)) continue
+    try {
+      const set = await writeVariants(dest, `${PUBLIC}/${name}`)
+      if (set) { srcSets.set(`${PUBLIC}/${name}`, set); variants++ }
+    } catch (err) {
+      // A copy that fails to encode only costs that image its srcset; it still renders.
+      console.warn(`  ! ${url} — variants failed: ${err.message}`)
     }
   }
 
   // 3. rewrite JSON
   if (map.size > 0) {
     for (const { path, doc } of docs) {
-      const next = rewrite(doc, map)
+      const next = addSrcSets(rewrite(doc, map), srcSets)
       await writeFile(path, JSON.stringify(next, null, 2) + '\n', 'utf8')
     }
   }
 
-  console.log(`bake-media: baked=${baked} skipped=${skipped} errors=${errors}`)
+  console.log(`bake-media: baked=${baked} with-variants=${variants} skipped=${skipped} errors=${errors}`)
   if (errors > 0) process.exit(1)
 }
 

@@ -8,3 +8,12 @@ export function asset(path) {
   if (/^https?:\/\//i.test(path)) return path
   return BASE + String(path).replace(/^\//, '')
 }
+
+// Same for every candidate of a srcset ("url 640w, url 1280w").
+export function assetSrcSet(srcSet) {
+  if (!srcSet) return undefined
+  return srcSet.split(',').map(c => {
+    const [url, descriptor] = c.trim().split(/\s+/)
+    return descriptor ? `${asset(url)} ${descriptor}` : asset(url)
+  }).join(', ')
+}
