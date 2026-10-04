@@ -59,11 +59,9 @@ npm run minio:up                    # local S3 for media uploads
 npm run dev                         # http://localhost:3001/admin
 ```
 
-Seed the CMS once with the bundled photos:
-
-```sh
-npm run seed                        # reads from ../site/public/
-```
+There is no seed: content lives only in production. Start from a copy of it with
+`npm run pull` (above). Without prod access, `npm run migrate` gives a working but empty
+CMS, or restore any backup from R2 (`releases/` or `db-backups/`) to `data/payload.db`.
 
 Videos are not uploaded to the media bucket — media items of type `video` carry a
 YouTube watch URL and the site embeds the player.

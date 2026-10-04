@@ -9,9 +9,9 @@ Architecture and ops: [README.md](README.md), [infra/DEVOPS-PLAN.md](infra/DEVOP
   backs up the DB, deploys the CMS (migrations at boot), then moves the `release` branch,
   which is what Cloudflare builds. Never run `flyctl deploy`, `flyctl secrets`, push to
   `main`/`release`, or merge PRs — the maintainer merges.
-- **Prod content is the source of truth.** Never overwrite the prod DB, never run
-  `npm run seed` or `scripts/import-ships.mjs` against it. Content changes that must ship
-  with code go in a **data migration** (below), never in a manual edit.
+- **Prod content is the source of truth.** Never overwrite the prod DB or write to it
+  outside a migration. Content changes that must ship with code go in a **data
+  migration** (below), never in a manual edit.
 - Reading prod is fine: `npm run pull` (snapshot + media, read-only).
 - No emojis in code, UI strings or commits.
 
