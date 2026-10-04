@@ -38,8 +38,7 @@
       "Bash(git push origin main:*)",
       "Bash(git push origin HEAD:main:*)",
       "Bash(git push origin HEAD:refs/heads/release:*)",
-      "Bash(git push --force:*)",
-      "Bash(npm run seed:*)"
+      "Bash(git push --force:*)"
     ]
   }
 }

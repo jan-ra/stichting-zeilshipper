@@ -17,15 +17,17 @@ handled in opposite ways:
 |---|---|---|
 | Examples | add a field to Ships, add a collection | a blog post, a ship's position, a partner logo |
 | Source of truth | **code** (`src/collections/*`, `src/globals/*`) | **the production database** |
-| How it reaches prod | committed **migration files** → applied on deploy | edited in the admin UI; **never** seeded over |
+| How it reaches prod | committed **migration files** → applied on deploy | edited in the admin UI, or a guarded **data migration** |
 | Local tool | `npm run migrate:create` then `npm run migrate` | `npm run pull` (copy prod down) |
-| Danger | forgetting to generate a migration | running a **seed/import** script against prod |
+| Danger | forgetting to generate a migration | overwriting prod with a local DB |
 
 Golden rules:
 1. **Schema travels only as committed migrations.** `push` (dev auto-sync) is OFF
    ([payload.config.ts](../cms/payload.config.ts)) so local can never silently drift from prod.
-2. **Never seed/import into prod.** `seed.ts` and `import-ships.mjs` wipe-and-reinsert;
-   they are local-bootstrap tools. Prod content lives in the admin UI + nightly backups.
+2. **Never overwrite prod content.** It lives in the admin UI + backups. Content that must
+   change with a release goes in a guarded data migration (see [CLAUDE.md](../CLAUDE.md)).
+   There is deliberately no seed or bulk-import script: a fresh environment starts from
+   a prod snapshot or a backup.
 
 ---
 
@@ -257,8 +259,6 @@ of Cloudflare/GitHub config — see [README.md](README.md) § 3.
 
 | Task | Tool | Where it's safe to run |
 |---|---|---|
-| Seed full demo dataset | `npm run seed` | **local only** (wipes collections) |
-| Import curated ships | `node scripts/import-ships.mjs` | 🔜 non-destructive upsert via a manual pipeline |
 | Nightly AIS positions | [update-positions.yml](../.github/workflows/update-positions.yml) | GitHub Actions cron (prod) ✅ |
 | Republish the tracking roster | `npm run publish-roster` | anywhere (read-only against Payload) |
 
@@ -270,13 +270,13 @@ of Cloudflare/GitHub config — see [README.md](README.md) § 3.
 - 🔜 **Runtime transactions.** Blocked on libsql applying the busy timeout to its
   per-transaction connections; `scripts/ci/concurrency-probe.ts contention` is the test
   that must pass with transactions on for the server.
-- 🔜 **Prod guards** on `seed.ts` / `import-ships.mjs` (`ALLOW_DESTRUCTIVE=1`), and
-  `import-ships` rewritten as a non-destructive upsert exposed as `workflow_dispatch`.
+- ✅ **Removed the seed and one-off import/image scripts** (2026-10). Recover any of them
+  from git history if a bulk operation is ever needed again — as a data migration.
 - 🔜 **Hardening**: populate `csrf` allowlist + scope `cors` in the Payload config.
 - 🔜 **Retire the Payload position columns.** `ships.lat` / `lng` / `position_updated_at`
   are no longer read or written by anything — R2 owns positions now. Once the R2 path has
   a week of green nights in prod: drop the three fields from `Ships.ts`, `npm run
-  migrate:create`, `npm run generate:types`, then delete the `position-bot` user, the
-  `POSITION_BOT_API_KEY` Fly secret, and `cms/scripts/provision-position-bot.mjs`. Take a
+  migrate:create` (a DROP — needs the `destructive-migration` label), then delete the
+  `bot@ramdohr.dev` editor user in the admin. Take a
   manual backup first (`gh workflow run backup-db.yml`) — this is the one irreversible
   step in the migration.

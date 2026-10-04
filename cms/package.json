@@ -15,7 +15,6 @@
     "migrate:create": "node --env-file=.env node_modules/payload/bin.js migrate:create",
     "migrate:status": "node --env-file=.env node_modules/payload/bin.js migrate:status",
     "migrate:fresh": "node --env-file=.env node_modules/payload/bin.js migrate:fresh",
-    "seed": "tsx --env-file=.env src/seed.ts",
     "minio:up": "docker compose -f docker-compose.minio.yml up -d",
     "minio:down": "docker compose -f docker-compose.minio.yml down",
     "update-positions": "node --env-file=.env scripts/update-positions.mjs",
