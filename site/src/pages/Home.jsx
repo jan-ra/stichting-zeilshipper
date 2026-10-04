@@ -29,6 +29,8 @@ const GLOBE_CHAPTERS = [
 // Opens on the whole globe, slowly turning; the chapters push in from here.
 // The chapters above are pitched around this, so moving it means moving them.
 const INITIAL_VIEW = { lat: 20.0, lng: 4.96, zoom: 2.0, ms: 0 }
+// Scrolling back up to the intro flies home at the chapters' pace rather than snapping.
+const RETURN_MS = 2200
 
 // INITIAL_VIEW's zoom is the floor. Where the column has room — any desktop — the
 // opening shot and the two whole-globe chapters (`fillsPane`) zoom in by the same amount
@@ -113,6 +115,11 @@ function ChapterPanel({ ch, index, onVisible, chapterLabel }) {
 export default function HomePage({ navigate }) {
   const [selectedShip, setSelectedShip] = useState(null)
   const [chapter, setChapter] = useState(null)
+  // Whether the chapters have taken the camera yet: the first view lands instantly, but
+  // the way back to it from a chapter should be a flight.
+  const leftIntro = useRef(false)
+  if (chapter !== null) leftIntro.current = true
+  const introRef = useRef(null)
   const [zoomBoost, setZoomBoost] = useState(0)
   const globeColRef = useRef(null)
   const { t, tc } = useLanguage()
@@ -142,7 +149,21 @@ export default function HomePage({ navigate }) {
   const activeChapter = chapter === null ? null : GLOBE_CHAPTERS[Math.min(chapter, GLOBE_CHAPTERS.length - 1)]
   const view = activeChapter
     ? { lat: activeChapter.lat, lng: activeChapter.lng, zoom: activeChapter.zoom + (activeChapter.fillsPane ? zoomBoost : 0), ms: 2200 }
-    : { ...INITIAL_VIEW, zoom: INITIAL_VIEW.zoom + zoomBoost }
+    : { ...INITIAL_VIEW, zoom: INITIAL_VIEW.zoom + zoomBoost, ms: leftIntro.current ? RETURN_MS : INITIAL_VIEW.ms }
+
+  // The chapters only ever claim the camera, so without this the globe stayed on the
+  // last chapter it saw after scrolling back to the top. Reaching the top of the intro
+  // hands it back to the opening shot — whole globe, turning. Like the chapters this
+  // acts on entry only, so scrolling down past it never fights them for the camera.
+  useEffect(() => {
+    const el = introRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) setChapter(null)
+    })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
 
   const handleShipClick = useCallback(ship => setSelectedShip(ship), [])
   const handleDeselect = useCallback(() => setSelectedShip(null), [])
@@ -231,6 +252,8 @@ export default function HomePage({ navigate }) {
           {/* Scrolling text + chapters */}
           <div className="hero-text-col" style={{ gridColumn: 1, gridRow: 1, display: 'flex', flexDirection: 'column' }}>
             <div className="hero-intro" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', padding: '312px 64px 80px 4rem', position: 'relative' }}>
+              {/* "Back at the top" sentinel for the globe — the top 40vh of the intro. */}
+              <div ref={introRef} aria-hidden="true" style={{ position: 'absolute', top: 0, left: 0, width: 1, height: '40vh', pointerEvents: 'none' }} />
 
               <div style={{ fontSize: 10, color: '#a07d33', letterSpacing: '0.28em', textTransform: 'uppercase', marginBottom: 24 }}>
                 {tc(HOME_PAGE, 'heroBadge')}

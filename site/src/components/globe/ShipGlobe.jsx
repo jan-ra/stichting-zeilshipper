@@ -40,6 +40,8 @@ export default function ShipGlobe({
   // Autorotate drives the camera itself, so it has to stand down while a flight of ours
   // is running — setCenter would cancel the flyTo mid-animation.
   const flyingRef = useRef(false)
+  // Which of our flights is the current one — see the moveend handler below.
+  const flightRef = useRef(0)
   // True while the visitor is working the camera, plus a short tail for drag inertia.
   const gestureRef = useRef(false)
   const gestureTimer = useRef(0)
@@ -132,6 +134,7 @@ export default function ShipGlobe({
     // `zoomInOnly` flights may pan and move closer, never further away — pulling the
     // camera back out from under someone who has already zoomed in is disorienting.
     const zoom = view.zoomInOnly ? Math.max(view.zoom, map.getZoom()) : view.zoom
+    const flight = ++flightRef.current
     flyingRef.current = true
     map.flyTo({
       center: [view.lng, view.lat],
@@ -140,14 +143,22 @@ export default function ShipGlobe({
       // flight has to state it — otherwise the last selection's offset lingers.
       padding: view.padding ?? NO_PADDING,
       duration: view.ms ?? 1500,
-    })
+    }, { szFlight: flight })
     // viewKey rather than view: the pages rebuild the object on unrelated renders.
   }, [ready, viewKey])
 
   useEffect(() => {
     const map = mapRef.current
     if (!map) return
-    const done = () => { flyingRef.current = false }
+    // A new flight stops the one in progress, and MapLibre fires that one's moveend
+    // synchronously from inside flyTo — after we have already marked the new flight as
+    // running. Clearing the flag on any moveend handed the camera to autorotate mid-
+    // flight, whose setCenter then cancelled the flight: scrolling quickly back up the
+    // home chapters left the globe stuck part-way out. Only the current flight's end
+    // (or a gesture's, which carries no tag) counts.
+    const done = e => {
+      if (e.szFlight == null || e.szFlight === flightRef.current) flyingRef.current = false
+    }
     map.on('moveend', done)
     return () => { map.off('moveend', done) }
   }, [ready, mapRef])
