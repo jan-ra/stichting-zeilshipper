@@ -70,7 +70,6 @@ const TYPES = [
   ...TYPE_GROUPS.map(g => g.label).filter(l => presentCats.has(l)),
   ...(presentCats.has(OTHER) ? [OTHER] : []),
 ]
-const REGIONS = ['all', 'thuiswateren', 'europa', 'wereld']
 
 const matchesSearch = (s, q) => {
   if (!q) return true
@@ -176,7 +175,7 @@ function paneMetrics(paneEl) {
 
 export default function FleetPage() {
   const [selectedId, setSelectedId] = useState(null)
-  const [filter, setFilter] = useState({ type: 'all', region: 'all', search: '' })
+  const [filter, setFilter] = useState({ type: 'all', search: '' })
   const [userInteracted, setUserInteracted] = useState(false)
   const [view, setView] = useState(DEFAULT_VIEW)
   const { t, tc } = useLanguage()
@@ -208,11 +207,8 @@ export default function FleetPage() {
     if (fit > DEFAULT_VIEW.zoom) setView({ ...DEFAULT_VIEW, zoom: fit, ms: 0 })
   }, [])
 
-  const regionLabels = t('fleet.regionLabels')
-
   const filtered = useMemo(() => allItems.filter(s => {
     if (filter.type !== 'all' && categoryOf(s.type) !== filter.type) return false
-    if (filter.region !== 'all' && s.region !== filter.region) return false
     if (!matchesSearch(s, filter.search)) return false
     return true
   }), [allItems, filter])
@@ -220,7 +216,7 @@ export default function FleetPage() {
   // Non-matching markers stay on the globe for context but are dimmed and inert.
   // `null` means "no filter active", which lets ShipMarkers skip the check entirely.
   const matchedIds = useMemo(() => {
-    const noFilter = filter.type === 'all' && filter.region === 'all' && !filter.search
+    const noFilter = filter.type === 'all' && !filter.search
     return noFilter ? null : new Set(filtered.map(s => s.id))
   }, [filtered, filter])
 
@@ -250,18 +246,6 @@ export default function FleetPage() {
     const ship = allItemsRef.current.find(s => s.id === selectedId)
     if (ship) flyTo(fitRoute(ship, paneMetrics(mapRef.current)))
   }, [selectedId, flyTo])
-
-  // Switching region re-frames the globe around whatever that region contains. This is
-  // a filter action rather than a ship click, so it may zoom out.
-  const firstRegionRun = useRef(true)
-  useEffect(() => {
-    if (firstRegionRun.current) { firstRegionRun.current = false; return }
-    if (selected) return
-    flyTo(fitView(
-      allItems.filter(s => filter.region === 'all' || s.region === filter.region),
-      paneMetrics(mapRef.current)
-    ))
-  }, [filter.region])
 
   return (
     <div className="fleet-shell">
@@ -316,7 +300,7 @@ export default function FleetPage() {
                 >✕</button>
               )}
             </div>
-            <div className="fleet-chips" style={{ marginBottom: 6 }}>
+            <div className="fleet-chips">
               {TYPES.map(o => (
                 <button key={o} onClick={() => setFilter(f => ({ ...f, type: o }))} style={{
                   background: filter.type === o ? '#c19a52' : 'rgba(15,34,56,0.06)',
@@ -326,19 +310,6 @@ export default function FleetPage() {
                   padding: '5px 10px', borderRadius: 2, transition: 'all 0.2s', whiteSpace: 'nowrap',
                 }}>
                   {o === 'all' ? t('fleet.allTypes') : o === OTHER ? t('fleet.otherType') : o}
-                </button>
-              ))}
-            </div>
-            <div className="fleet-chips">
-              {REGIONS.map(o => (
-                <button key={o} onClick={() => setFilter(f => ({ ...f, region: o }))} style={{
-                  background: filter.region === o ? '#c19a52' : 'rgba(15,34,56,0.06)',
-                  border: 'none', cursor: 'pointer',
-                  fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase',
-                  color: filter.region === o ? '#0f2238' : 'rgba(15,34,56,0.55)',
-                  padding: '5px 10px', borderRadius: 2, transition: 'all 0.2s', whiteSpace: 'nowrap',
-                }}>
-                  {regionLabels[o]}
                 </button>
               ))}
             </div>
