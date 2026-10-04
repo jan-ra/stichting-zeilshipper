@@ -2,7 +2,7 @@
 
 Two-package monorepo:
 
-- **`site/`** — Vite + React static frontend. Deploys to Cloudflare Workers Builds on every push to `main`.
+- **`site/`** — Vite + React static frontend. Built and served by Cloudflare Workers Builds from the `release` branch, which only the release workflow moves.
 - **`cms/`** — Payload CMS on Next.js. Deploys to Fly.io. SQLite + S3-compatible media storage (Cloudflare R2 in prod, MinIO locally).
 
 The site is fully static. At build time, `site/scripts/load-from-payload.mjs` fetches every collection from the running Payload instance and writes JSON into `site/src/data/generated/`, which Vite then inlines. There are no runtime CMS calls from the browser.
@@ -11,7 +11,7 @@ The site is fully static. At build time, `site/scripts/load-from-payload.mjs` fe
 
 ## Reproduce production locally (two commands)
 
-Prereqs: Node 20+, Docker, `flyctl` authenticated (`flyctl auth login`).
+Prereqs: Node 22 (`.nvmrc`), Docker, `flyctl` authenticated (`flyctl auth login`).
 
 ### 1. Pull live data
 
@@ -47,7 +47,7 @@ Press Ctrl-C to stop.
 
 ## Manual dev setup
 
-Prereqs: Node 20+, Docker.
+Prereqs: Node 22 (`.nvmrc`), Docker.
 
 ### 1. CMS (Payload)
 
@@ -103,14 +103,69 @@ npm run backfill-positions -- --force                                       # ba
 
 ## Shipping a change
 
+### From ticket to production
+
+```mermaid
+flowchart TD
+  ticket["Issue on the project board"] --> skill["/ticket n<br/>Claude Code on this machine"]
+
+  subgraph local["This machine: reads prod, never writes it"]
+    snapshot[("Prod snapshot<br/>npm run pull")]
+    skill --> branch["Branch issue-n-slug"]
+    branch --> verify["npm run verify<br/>typecheck, unit tests, migration guard<br/>pending migrations on prod snapshot + db-diff<br/>CMS + site build, browser smoke tests"]
+    verify -->|"migrations, config,<br/>Dockerfile changed"| rehearse["npm run rehearse<br/>prod image on a prod copy<br/>+ rollback leg against the live image"]
+    snapshot -.-> verify
+    snapshot -.-> rehearse
+  end
+
+  verify --> pr["Pull request<br/>links the issue, reports pasted"]
+  rehearse --> pr
+  pr --> ci["CI: verify --ci"]
+  ci --> merge{"Maintainer merges to main"}
+
+  subgraph release["release.yml"]
+    backup["1 Back up prod DB<br/>to R2 releases/"] --> deploy["2 flyctl deploy, if cms/ changed<br/>migrations at boot, one transaction each"]
+    deploy --> check["3 Verify CMS<br/>migrations recorded, API answers"]
+    check -->|fails| revert["Redeploy previous image"]
+    check --> publish["4 Move the release branch"]
+    publish --> live["5 Wait until the live site<br/>reports this commit, smoke-test"]
+    live --> tag["6 Tag release/stamp-sha"]
+  end
+
+  merge --> backup
+  deploy --> fly[("Fly.io: Payload CMS<br/>SQLite volume")]
+  publish --> cf["Cloudflare Workers Builds<br/>builds the release branch"]
+  fly -->|"content, at build time"| cf
+  cf --> site["stichtingzeilschipper.nl"]
+  tag -.-> rollback["Actions: Rollback<br/>previous image + site commit<br/>DB restore only on request"]
+```
+
 ```sh
 npm run verify            # before every PR — see infra/DEVOPS-PLAN.md § Verify and rehearse
 npm run rehearse          # additionally, for DB/config/image changes
 ```
 
-Merge the PR → [release.yml](.github/workflows/release.yml) backs up the DB, deploys the
-CMS (migrations at boot), then publishes the site via the `release` branch and tags
-`release/*`. Undo with Actions → Rollback. Never `flyctl deploy` by hand.
+Merging is the release button. Never `flyctl deploy` by hand or push to `release`.
+Undo with Actions → Rollback: code-only by default, restoring the pre-release DB backup
+is an explicit opt-in. Details in [infra/DEVOPS-PLAN.md](infra/DEVOPS-PLAN.md) § Release & rollback.
 
 Working from tickets: issues on the [project board](https://github.com/users/jan-ra/projects/5)
 are picked up with the `/ticket <n>` Claude Code skill (see [CLAUDE.md](CLAUDE.md)).
+
+### Production between releases
+
+```mermaid
+flowchart LR
+  editor["Editor"] -->|"save in admin"| cms["Payload CMS on Fly.io<br/>admin.stichtingzeilschipper.nl"]
+  cms -->|"deploy hook, 30 s debounce"| cf["Cloudflare Workers Builds<br/>release branch"]
+  cf -->|"fetch all content"| cms
+  cf --> site["Static site<br/>stichtingzeilschipper.nl"]
+  cms -->|"uploads, ship roster"| r2[("Cloudflare R2<br/>media, data/positions.json<br/>db-backups/, releases/")]
+  visitor["Visitor"] --> site
+  site -->|"images, live positions"| r2
+  cron["GitHub Actions cron"] -->|"02:00 UTC positions<br/>from MyShipTracking"| r2
+  cron -->|"03:00 UTC DB backup"| r2
+```
+
+A content edit is live after the debounced rebuild (about 2 minutes) without a release.
+Ship positions never rebuild anything: the browser fetches `positions.json` directly.
