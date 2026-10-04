@@ -115,6 +115,8 @@ directory" now lives in [site/wrangler.toml](../site/wrangler.toml) under the
 
 1. Cloudflare dashboard → Workers & Pages → **Create application** → **Connect to Git** → choose this repo, branch `main`.
 2. Build configuration:
+   - **Production branch** (Settings → Build → Branch control): `release` — not `main`.
+     Only the release workflow moves `release`, after the CMS is live.
    - **Root directory**: `/site`
    - **Build command**: `npm ci && npm run build:full`
    - **Deploy command**: `npx wrangler deploy`
@@ -129,7 +131,7 @@ directory" now lives in [site/wrangler.toml](../site/wrangler.toml) under the
    Live ship positions need no variable of their own — `site/vite.config.js` derives the
    URL from `MEDIA_BASE_URL`.
 4. **Custom domain**: Worker → Settings → Domains & Routes → add `<your-domain>` (apex) and/or `www.<your-domain>`.
-5. **Deploy hook**: Worker → Settings → Builds → Deploy hooks → "Add deploy hook" named `cms-trigger`. Copy the URL.
+5. **Deploy hook**: Worker → Settings → Builds → Deploy hooks → "Add deploy hook" named `cms-trigger`, **branch `release`**. Copy the URL.
 6. Wire the deploy hook into Fly so a CMS save triggers a rebuild:
    ```bash
    flyctl secrets set CF_PAGES_DEPLOY_HOOK="<URL from previous step>"
@@ -223,21 +225,14 @@ Verify: `gh workflow run update-positions.yml`, then
 
 ## Restore drill
 
-Once after first successful backup, do a recovery test to confirm the snapshot is intact.
+Restores go through the Rollback workflow (`restore_db_from` + `confirm=restore`), which
+backs up the current DB first and uses sqlite's `.restore` on the live file. To check a
+backup locally:
 
 ```bash
-# 1. Download latest snapshot
-aws s3 cp s3://zeilshipper-media/db-backups/$(date -u +%Y-%m-%d).db ./restore.db \
+aws s3 cp s3://zeilshipper-media/releases/<stamp>-<sha>/payload.db ./restore.db \
   --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
-
-# 2. Sanity-check
-sqlite3 ./restore.db ".tables"
-sqlite3 ./restore.db "SELECT count(*) FROM payload_locked_documents;"
-
-# 3. (Only in an emergency) push it back over the live DB
-flyctl scale count 0 -a stichting-zeilshipper-cms
-flyctl ssh sftp put -a stichting-zeilshipper-cms ./restore.db /data/payload.db
-flyctl scale count 1 -a stichting-zeilshipper-cms
+sqlite3 ./restore.db "pragma integrity_check; select count(*) from ships;"
 ```
 
 ## Troubleshooting

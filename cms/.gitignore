@@ -1,5 +1,5 @@
 node_modules/
-.next/
+.next*/
 out/
 
 # Local SQLite + uploads (mounted as a volume on fly.io)
@@ -16,3 +16,4 @@ src/payload-types.ts
 *.local
 
 .DS_Store
+tsconfig.tsbuildinfo

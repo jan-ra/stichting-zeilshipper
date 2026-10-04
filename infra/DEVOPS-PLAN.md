@@ -34,14 +34,31 @@ Golden rules:
 Your laptop **is** the staging environment — an exact copy of prod.
 
 ```sh
-npm run pull      # (repo root) prod DB + media → local; do this now and then
-npm run dev       # runs migrations, then the full stack (CMS + site)
+npm run pull      # (repo root) prod DB snapshot + media → local, read-only against prod
+npm run dev       # the full stack (CMS + site) on that copy
+npm run verify    # the gate before any PR (see below)
 ```
 
-`npm run pull` brings the production DB down byte-for-byte. Because prod records
-which migrations it has applied (in its `payload_migrations` table), the copy you
-pull already knows its migration state — so `npm run migrate` locally applies only
-what prod is still missing. That is your migration dry-run.
+`npm run pull` takes an online `sqlite3 .backup` on the Fly machine (consistent even while
+someone is saving), keeps it read-only under `cms/data/snapshots/` (newest 10, `LATEST`
+points at the current one) and copies it over `cms/data/payload.db` (the old file is kept
+as `.bak-<stamp>`). `--snapshot-only` leaves your working DB alone.
+
+### Verify and rehearse
+
+| | `npm run verify` | `npm run rehearse` |
+|---|---|---|
+| When | every PR | PRs touching migrations, `payload.config.ts`, Dockerfile, entrypoint |
+| Typecheck, unit tests, migration guard (drift + destructive) | yes | — |
+| Pending migrations on a copy of the prod snapshot; schema == fresh-from-migrations; no row lost (`db-diff`) | yes | yes, inside the real image |
+| CMS | `next build` + `next start` | the production Docker image through its entrypoint |
+| Transactions + concurrent writes probe | — | yes |
+| Site build on that data + browser smoke tests (nl/en, desktop/mobile) | yes | yes |
+| Rollback leg: the image **live on Fly now** booted on the migrated DB | — | yes |
+
+Both write `.verify/report.md` (pasted into the PR) and screenshots under `.verify/`.
+`npm run verify -- --quick` is the fast inner loop; `--ci` is what GitHub runs on PRs
+(no prod data there, by design).
 
 ---
 
@@ -80,8 +97,15 @@ payload migrate   →   next start
 
 - Env comes from Fly secrets (no `.env` in prod).
 - Nothing pending → fast no-op. A deploy carrying a new migration → applies the delta.
-- A failed migration exits non-zero → health check never passes → **Fly keeps the
-  previous release.** Combined with a pre-deploy backup, a bad migration is recoverable.
+- Each migration runs **in a transaction** and commits or rolls back as a whole.
+  The SQLite adapter only does this when `transactionOptions` is set; before 2026-09 it
+  was not, and an aborted migration write persisted (proven by the rehearsal probe).
+  Transactions are enabled for `payload migrate` only — at runtime libsql's
+  per-transaction connections lack the busy timeout and concurrent saves fail with
+  SQLITE_BUSY. The server runs with WAL + a 5 s busy timeout instead. See the comment in
+  [payload.config.ts](../cms/payload.config.ts).
+- A failed migration exits non-zero → health check never passes → the release workflow
+  redeploys the previous image. The DB is unchanged (the transaction rolled back).
 - **Fail-fast guard:** the entrypoint refuses to start if the DB still carries the
   dev-push marker (`dev`/-1), because in that state `payload migrate` would hit a
   no-TTY prompt and *silently skip* migrations. This forces you to run adoption
@@ -187,11 +211,45 @@ npm run backfill-positions -- --force                                       # ba
 
 ---
 
-## Backups & restore ✅
+## Release & rollback ✅
 
-- Nightly `.backup` snapshot → R2 `db-backups/`, 7-day lifecycle ([backup-db.yml](../.github/workflows/backup-db.yml)).
-- 🔜 Pre-deploy backups → `db-backups/predeploy/<sha>.db` on a longer-retention prefix.
-- Restore drill: see [README.md](README.md) § Restore drill.
+Merging a PR to `main` is the release button ([release.yml](../.github/workflows/release.yml)):
+
+1. **Backup** — online `.backup` of the prod DB → R2 `releases/<stamp>-<sha>/payload.db`
+   (outside the `db-backups/` lifecycle rule; kept until deleted by hand).
+2. **CMS** — `flyctl deploy` if `cms/` changed since the last release. Migrations run at
+   boot, each in a transaction. The workflow then checks every committed migration is
+   recorded in prod and the API answers. On failure it redeploys the previous image.
+3. **Site** — force-moves the `release` branch to the merged commit. Cloudflare Workers
+   Builds watches `release`, not `main`, so the site is always built **after** the CMS
+   it reads from is live. The workflow waits until `<meta name="release">` on the live
+   site equals the commit, then smoke-tests the pages.
+4. **Tag** — annotated `release/<utc>-<sha>` recording the new image, the previous image
+   and the backup key.
+
+CMS saves still rebuild the site through the deploy hook (built from `release`).
+
+**Rollback** ([rollback.yml](../.github/workflows/rollback.yml), Actions → Rollback → Run):
+
+- `to_release`: the tag to go back to. Redeploys its CMS image and points `release` at
+  its commit. **Data is kept.** This is safe whenever the releases being undone only
+  added columns — which the migration guard enforces, and `npm run rehearse` proves by
+  booting the live image on the migrated DB.
+- `restore_db_from` + `confirm=restore`: additionally restores that release's
+  pre-release backup. **Discards content edits made since.** The current DB is backed up
+  first, so this too can be undone.
+
+The `release` branch and the GitHub `main` branch protection are the only manual pieces
+of Cloudflare/GitHub config — see [README.md](README.md) § 3.
+
+## Backups ✅
+
+- Nightly `.backup` snapshot → R2 `db-backups/` ([backup-db.yml](../.github/workflows/backup-db.yml)).
+  Meant to expire after 7 days via a bucket lifecycle rule — as of 2026-09 the rule is
+  not active (55 objects), so add it in R2 → bucket → Settings → Object lifecycle rules.
+- Pre-release backups → `releases/`, one per release, no expiry.
+- Restore = the Rollback workflow's `restore_db_from`. Rehearse a restore locally by
+  downloading a backup and `cp`-ing it to `cms/data/payload.db`.
 
 ---
 
@@ -208,10 +266,10 @@ npm run backfill-positions -- --force                                       # ba
 
 ## Roadmap
 
-- 🔜 **Ordered deploy pipeline** (`.github/workflows/deploy.yml`): on push to `main` →
-  CI (typecheck+build) → pre-deploy backup → `flyctl deploy` (migrations on boot) →
-  trigger site build via Cloudflare deploy hook. Switch Cloudflare from build-on-push
-  to deploy-hook-only so the release order is DB → CMS → site.
+- ✅ **Ordered release pipeline**, rollback workflow, local verify/rehearse (2026-09).
+- 🔜 **Runtime transactions.** Blocked on libsql applying the busy timeout to its
+  per-transaction connections; `scripts/ci/concurrency-probe.ts contention` is the test
+  that must pass with transactions on for the server.
 - 🔜 **Prod guards** on `seed.ts` / `import-ships.mjs` (`ALLOW_DESTRUCTIVE=1`), and
   `import-ships` rewritten as a non-destructive upsert exposed as `workflow_dispatch`.
 - 🔜 **Hardening**: populate `csrf` allowlist + scope `cors` in the Payload config.
