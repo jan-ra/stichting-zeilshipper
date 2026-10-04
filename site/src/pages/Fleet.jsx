@@ -37,7 +37,11 @@ const SELECT_ZOOM = 10.7
 const CARD_MARGIN_PX = 20   // breathing room around the card when reserving space
 const CARD_MAX_RESERVE = 0.45
 
-const DEFAULT_VIEW = { lat: 52.5, lng: 5.0, zoom: 1.7, ms: 1500 }
+// Zoom 1.8 puts the planet at roughly 93% of the pane's height, which is the tighter of
+// the two axes on this page. Note the globe grows as a *fraction* of a shrinking pane —
+// the camera distance is derived from the viewport height — so this is deliberately kept
+// short of filling it, leaving room on stubbier windows.
+const DEFAULT_VIEW = { lat: 52.5, lng: 5.0, zoom: 1.8, ms: 1500 }
 
 // The zoom at which `spanDeg` degrees of latitude fill `fill` of a pane `heightPx` tall.
 // MapLibre lays the world out in 512px tiles, so at zoom z one pixel is

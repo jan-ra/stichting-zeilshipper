@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { MEDIA_ITEMS, MEDIA_PAGE } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import { asset } from '../utils/asset.js'
+import { youtubeEmbedUrl } from '../utils/youtube.js'
 
 const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉', project: '◈' }
-const FORMAT_COLORS = { MP4: '#4a6e9e', ZIP: '#6b4a2b', PDF: '#9e4a4a', MP3: '#4a9e6a', Spotify: '#1db954' }
+const FORMAT_COLORS = { YouTube: '#c4302b', ZIP: '#6b4a2b', PDF: '#9e4a4a', MP3: '#4a9e6a', Spotify: '#1db954' }
 const CATEGORIES = ['all', 'video', 'foto', 'tekst', 'project', 'podcast']
 
 export default function MediaPage({ navigate }) {
@@ -12,6 +13,7 @@ export default function MediaPage({ navigate }) {
   const { t, tc } = useLanguage()
 
   const catLabels = t('media.catLabels')
+  const featuredEmbed = youtubeEmbedUrl(MEDIA_PAGE.featuredYoutubeUrl)
   const filtered = filter === 'all' ? MEDIA_ITEMS : MEDIA_ITEMS.filter(i => i.category === filter)
 
   return (
@@ -52,13 +54,26 @@ export default function MediaPage({ navigate }) {
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 24 }}>{t('media.featuredBadge')}</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'center' }} className="grid-2">
-            <div onClick={() => navigate('media-detail', 1)} style={{ aspectRatio: '16/9', borderRadius: 2, cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
-              <img src={MEDIA_PAGE.featuredThumbnail ? asset(MEDIA_PAGE.featuredThumbnail.src) : `${import.meta.env.BASE_URL}waterschatten-thumbnail.jpg`} alt={tc(MEDIA_PAGE, 'featuredTitle')} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-              <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,26,46,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(193,154,82,0.18)', border: '1px solid rgba(193,154,82,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ width: 0, height: 0, borderLeft: '20px solid #c19a52', borderTop: '12px solid transparent', borderBottom: '12px solid transparent', marginLeft: 5 }} />
+            <div style={{ aspectRatio: '16/9', borderRadius: 2, position: 'relative', overflow: 'hidden', background: '#0a1a2e' }}>
+              {featuredEmbed ? (
+                <iframe
+                  title={tc(MEDIA_PAGE, 'featuredTitle')}
+                  src={featuredEmbed}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  loading="lazy"
+                  style={{ width: '100%', height: '100%', display: 'block', border: 'none' }}
+                />
+              ) : (
+                <div onClick={() => navigate('media-detail', 1)} style={{ width: '100%', height: '100%', cursor: 'pointer', position: 'relative' }}>
+                  <img src={MEDIA_PAGE.featuredThumbnail ? asset(MEDIA_PAGE.featuredThumbnail.src) : `${import.meta.env.BASE_URL}waterschatten-thumbnail.jpg`} alt={tc(MEDIA_PAGE, 'featuredTitle')} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,26,46,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(193,154,82,0.18)', border: '1px solid rgba(193,154,82,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: 0, height: 0, borderLeft: '20px solid #c19a52', borderTop: '12px solid transparent', borderBottom: '12px solid transparent', marginLeft: 5 }} />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <div>
               <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>{tc(MEDIA_PAGE, 'promotionLabel')}</div>
@@ -67,7 +82,7 @@ export default function MediaPage({ navigate }) {
                 {tc(MEDIA_PAGE, 'featuredBody')}
               </p>
               <button onClick={() => navigate('media-detail', 1)} style={{ background: '#c19a52', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', color: '#0f2238', padding: '11px 22px', borderRadius: 2 }}>
-                {t('media.downloadVideo')}
+                {t('media.watchVideo')}
               </button>
             </div>
           </div>
