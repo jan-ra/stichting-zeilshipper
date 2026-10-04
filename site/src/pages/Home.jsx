@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
 import { SHIPS, BLOG_POSTS, HOME_PAGE, UNESCO_STEPS } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
-import { asset } from '../utils/asset.js'
+import { asset, assetSrcSet } from '../utils/asset.js'
 import { youtubeEmbedUrl } from '../utils/youtube.js'
 import ShipGlobe from '../components/globe/ShipGlobe.jsx'
 import ShipCard from '../components/ShipCard.jsx'
@@ -144,7 +144,20 @@ export default function HomePage({ navigate }) {
               {HOME_PAGE.scrollPhotos.length > 0
                 ? [...HOME_PAGE.scrollPhotos, ...HOME_PAGE.scrollPhotos].map((photo, i) => (
                     <div key={i} style={{ flexShrink: 0, width: 260, height: '100%', overflow: 'hidden' }}>
-                      <img src={asset(photo.src)} alt={photo.alt || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'saturate(0.96)' }} />
+                      {/* 260px tiles: srcset picks the 320/640px copy instead of the camera
+                          original. Lazy so phones, where the strip is display:none, fetch
+                          nothing; the second copy of the loop reuses the first's files. */}
+                      <img
+                        src={asset(photo.src)}
+                        srcSet={assetSrcSet(photo.srcSet)}
+                        sizes="260px"
+                        width={260}
+                        height={220}
+                        loading="lazy"
+                        decoding="async"
+                        alt={photo.alt || ''}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', filter: 'saturate(0.96)' }}
+                      />
                     </div>
                   ))
                 : null}
@@ -239,7 +252,9 @@ export default function HomePage({ navigate }) {
                 <ChapterPanel ch={ch} index={i} onVisible={setChapter} chapterLabel={t('home.chapterLabel')} />
                 {ch.photo && (
                   <div style={{ height: 220, overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
-                    <img src={asset(ch.photo.src)} alt={ch.photo.alt || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: ch.photoPosition || 'center center', display: 'block', filter: 'saturate(0.96)' }} />
+                    {/* Below the fold, the text column's width: half the window on desktop,
+                        all of it on phones. */}
+                    <img src={asset(ch.photo.src)} srcSet={assetSrcSet(ch.photo.srcSet)} sizes="(max-width: 900px) 100vw, 50vw" loading="lazy" decoding="async" alt={ch.photo.alt || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: ch.photoPosition || 'center center', display: 'block', filter: 'saturate(0.96)' }} />
                     <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, #efe7d8 0%, transparent 22%, transparent 78%, #efe7d8 100%)' }} />
                     <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(193,154,82,0.08) 0%, transparent 100%)' }} />
                   </div>
