@@ -105,12 +105,6 @@ export const strings = {
       noPosition: 'Geen positie bekend',
       globeUnavailable: 'Kaart niet beschikbaar',
       close: 'Sluiten',
-      regionLabels: {
-        all: "Alle regio's",
-        thuiswateren: 'Nederland',
-        europa: 'Europa',
-        wereld: 'Wereld',
-      },
     },
 
     infoBorden: {
@@ -357,12 +351,6 @@ export const strings = {
       noPosition: 'No position known',
       globeUnavailable: 'Map unavailable',
       close: 'Close',
-      regionLabels: {
-        all: 'All regions',
-        thuiswateren: 'Netherlands',
-        europa: 'Europe',
-        wereld: 'World',
-      },
     },
 
     infoBorden: {
