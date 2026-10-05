@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } from 'react'
 import { SHIPS, FLEET_PAGE } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import { asset } from '../utils/asset.js'
 import ShipGlobe from '../components/globe/ShipGlobe.jsx'
+import { zoomForGlobeDiameter } from '../components/globe/globeSize.js'
 import ShipCard from '../components/ShipCard.jsx'
 import { useShips } from '../hooks/useShips.js'
 
@@ -43,6 +44,13 @@ const CARD_MAX_RESERVE = 0.45
 // short of filling it, leaving room on stubbier windows.
 const DEFAULT_VIEW = { lat: 52.5, lng: 5.0, zoom: 1.8, ms: 1500 }
 
+// On a desktop the pane is much wider than it is tall, so the opening shot zooms in from
+// DEFAULT_VIEW until the globe spans 95% of the pane's width. The top and bottom of the
+// planet run off the pane — fine on a map you can drag — but no more than 30% of the
+// pane's height in all. Phones already fill their pane at DEFAULT_VIEW and keep it.
+const FLEET_FILL_WIDTH = 0.95
+const FLEET_MAX_HEIGHT = 1.3
+
 // The zoom at which `spanDeg` degrees of latitude fill `fill` of a pane `heightPx` tall.
 // MapLibre lays the world out in 512px tiles, so at zoom z one pixel is
 // 360 * cos(lat) / (512 * 2^z) degrees.
@@ -62,7 +70,6 @@ const TYPES = [
   ...TYPE_GROUPS.map(g => g.label).filter(l => presentCats.has(l)),
   ...(presentCats.has(OTHER) ? [OTHER] : []),
 ]
-const REGIONS = ['all', 'thuiswateren', 'europa', 'wereld']
 
 const matchesSearch = (s, q) => {
   if (!q) return true
@@ -168,7 +175,7 @@ function paneMetrics(paneEl) {
 
 export default function FleetPage() {
   const [selectedId, setSelectedId] = useState(null)
-  const [filter, setFilter] = useState({ type: 'all', region: 'all', search: '' })
+  const [filter, setFilter] = useState({ type: 'all', search: '' })
   const [userInteracted, setUserInteracted] = useState(false)
   const [view, setView] = useState(DEFAULT_VIEW)
   const { t, tc } = useLanguage()
@@ -191,11 +198,17 @@ export default function FleetPage() {
   // Measured when framing a track, to know how much of the pane the card will cover.
   const mapRef = useRef(null)
 
-  const regionLabels = t('fleet.regionLabels')
+  // Opening shot sized to the pane (see FLEET_GLOBE_FIT). Measured once, before paint;
+  // after that the camera belongs to the visitor, so a resize does not re-frame it.
+  useLayoutEffect(() => {
+    const { clientWidth: w, clientHeight: h } = mapRef.current ?? {}
+    if (!w || !h) return
+    const fit = zoomForGlobeDiameter(Math.min(w * FLEET_FILL_WIDTH, h * FLEET_MAX_HEIGHT), DEFAULT_VIEW.lat, h)
+    if (fit > DEFAULT_VIEW.zoom) setView({ ...DEFAULT_VIEW, zoom: fit, ms: 0 })
+  }, [])
 
   const filtered = useMemo(() => allItems.filter(s => {
     if (filter.type !== 'all' && categoryOf(s.type) !== filter.type) return false
-    if (filter.region !== 'all' && s.region !== filter.region) return false
     if (!matchesSearch(s, filter.search)) return false
     return true
   }), [allItems, filter])
@@ -203,7 +216,7 @@ export default function FleetPage() {
   // Non-matching markers stay on the globe for context but are dimmed and inert.
   // `null` means "no filter active", which lets ShipMarkers skip the check entirely.
   const matchedIds = useMemo(() => {
-    const noFilter = filter.type === 'all' && filter.region === 'all' && !filter.search
+    const noFilter = filter.type === 'all' && !filter.search
     return noFilter ? null : new Set(filtered.map(s => s.id))
   }, [filtered, filter])
 
@@ -233,18 +246,6 @@ export default function FleetPage() {
     const ship = allItemsRef.current.find(s => s.id === selectedId)
     if (ship) flyTo(fitRoute(ship, paneMetrics(mapRef.current)))
   }, [selectedId, flyTo])
-
-  // Switching region re-frames the globe around whatever that region contains. This is
-  // a filter action rather than a ship click, so it may zoom out.
-  const firstRegionRun = useRef(true)
-  useEffect(() => {
-    if (firstRegionRun.current) { firstRegionRun.current = false; return }
-    if (selected) return
-    flyTo(fitView(
-      allItems.filter(s => filter.region === 'all' || s.region === filter.region),
-      paneMetrics(mapRef.current)
-    ))
-  }, [filter.region])
 
   return (
     <div className="fleet-shell">
@@ -299,7 +300,7 @@ export default function FleetPage() {
                 >✕</button>
               )}
             </div>
-            <div className="fleet-chips" style={{ marginBottom: 6 }}>
+            <div className="fleet-chips">
               {TYPES.map(o => (
                 <button key={o} onClick={() => setFilter(f => ({ ...f, type: o }))} style={{
                   background: filter.type === o ? '#c19a52' : 'rgba(15,34,56,0.06)',
@@ -309,19 +310,6 @@ export default function FleetPage() {
                   padding: '5px 10px', borderRadius: 2, transition: 'all 0.2s', whiteSpace: 'nowrap',
                 }}>
                   {o === 'all' ? t('fleet.allTypes') : o === OTHER ? t('fleet.otherType') : o}
-                </button>
-              ))}
-            </div>
-            <div className="fleet-chips">
-              {REGIONS.map(o => (
-                <button key={o} onClick={() => setFilter(f => ({ ...f, region: o }))} style={{
-                  background: filter.region === o ? '#c19a52' : 'rgba(15,34,56,0.06)',
-                  border: 'none', cursor: 'pointer',
-                  fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase',
-                  color: filter.region === o ? '#0f2238' : 'rgba(15,34,56,0.55)',
-                  padding: '5px 10px', borderRadius: 2, transition: 'all 0.2s', whiteSpace: 'nowrap',
-                }}>
-                  {regionLabels[o]}
                 </button>
               ))}
             </div>

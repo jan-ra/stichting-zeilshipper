@@ -5,21 +5,13 @@ import { useState, useEffect, useRef } from 'react'
 // no coastlines. Handing MapLibre a worker Vite has built itself is the fix; `?worker&url`
 // bundles it with its shared chunk and returns a URL that works in both modes.
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
+import { CAMERA_K, globeRadiusPx as globeRadiusAt } from './globeSize.js'
 
 // OpenFreeMap: OpenStreetMap data on the OpenMapTiles schema, no key, no domain
 // allowlist, commercial use explicitly allowed. Attribution is required, and the style
 // carries its own — hence the plain AttributionControl below rather than a custom
 // string, which would render it twice.
 export const STYLE_URL = 'https://tiles.openfreemap.org/styles/dark'
-
-// MapLibre's default vertical field of view, and the constant that turns a viewport
-// height into the camera's distance from the map centre in pixels:
-//   cameraToCenterDistance = 0.5 / tan(fov / 2) * height
-const FOV_RAD = 0.6435011087932844
-const CAMERA_K = 0.5 / Math.tan(FOV_RAD / 2)
-
-// MapLibre works in 512px tiles, so the whole world is 512 * 2^zoom pixels wide.
-const TILE_SIZE = 512
 
 const rad = deg => (deg * Math.PI) / 180
 
@@ -65,7 +57,7 @@ export function createView(map) {
     if (z === mZoom && c.lat === mLat && c.lng === mLng && h === mH) return
     mZoom = z; mLat = c.lat; mLng = c.lng; mH = h
 
-    const globeRadiusPx = (TILE_SIZE * 2 ** z) / (2 * Math.PI) / Math.cos(rad(c.lat))
+    const globeRadiusPx = globeRadiusAt(z, c.lat)
     const d = (CAMERA_K * h) / globeRadiusPx
     cosLimit = 1 / (1 + d)
     centre = unitVec(c.lat, c.lng)

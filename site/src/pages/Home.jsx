@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useCallback, Fragment } from 'react'
 import { SHIPS, BLOG_POSTS, HOME_PAGE, UNESCO_STEPS } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import { asset, assetSrcSet } from '../utils/asset.js'
 import { youtubeEmbedUrl } from '../utils/youtube.js'
 import ShipGlobe from '../components/globe/ShipGlobe.jsx'
+import { zoomForGlobeDiameter } from '../components/globe/globeSize.js'
 import ShipCard from '../components/ShipCard.jsx'
 import { useIsTouch } from '../hooks/useMediaQuery.js'
 import { useShips } from '../hooks/useShips.js'
@@ -16,19 +17,28 @@ const GLOBE_CHAPTERS = [
   // Lower zoom than the hero yet larger on screen: MapLibre sizes the globe by
   // 1/cos(latitude), so this chapter's lat 52 renders ~1.5x the hero's lat 20 at equal
   // zoom. 1.7 lands Europe just filling the column, limb still visible at the edges.
-  { lat: 52.0, lng: 12.0, zoom: 1.7, autoRotate: false, regionKey: 'europa' },
+  { lat: 52.0, lng: 12.0, zoom: 1.7, autoRotate: false, regionKey: 'europa', fillsPane: true },
   // The world chapter sits just wider than the opening shot — it is the widest the
   // journey ever goes, so it must not read as smaller than the hero it grew out of.
-  { lat: 20.0, lng: -5.0, zoom: 1.85, autoRotate: true, regionKey: 'wereld' },
+  { lat: 20.0, lng: -5.0, zoom: 1.85, autoRotate: true, regionKey: 'wereld', fillsPane: true },
   // Chapter IV closes on Harlingen, the busiest basin (16 ships within a few hundred m),
   // at the same country-wide zoom as chapter I — pushing in further reads as a slam.
   { lat: 53.173, lng: 5.415, zoom: 6.6, autoRotate: false, regionKey: 'thuiswateren' },
 ]
 
 // Opens on the whole globe, slowly turning; the chapters push in from here.
-// Zoom 2.0 fills about 80% of the hero column's width. The chapters above are pitched
-// around this, so moving it means moving them.
+// The chapters above are pitched around this, so moving it means moving them.
 const INITIAL_VIEW = { lat: 20.0, lng: 4.96, zoom: 2.0, ms: 0 }
+// Scrolling back up to the intro flies home at the chapters' pace rather than snapping.
+const RETURN_MS = 2200
+
+// INITIAL_VIEW's zoom is the floor. Where the column has room — any desktop — the
+// opening shot and the two whole-globe chapters (`fillsPane`) zoom in by the same amount
+// until the globe spans 88% of the column's width, or 82% of its height if that is
+// tighter, so the top stays clear of the nav. The country-wide chapters frame a fixed
+// area and keep their zoom. Phones already fill their pane at INITIAL_VIEW.
+const HERO_FILL_WIDTH = 0.88
+const HERO_FILL_HEIGHT = 0.82
 
 const CHAPTERS_STRUCT = [
   { index: 0, roman: 'I' },
@@ -105,6 +115,13 @@ function ChapterPanel({ ch, index, onVisible, chapterLabel }) {
 export default function HomePage({ navigate }) {
   const [selectedShip, setSelectedShip] = useState(null)
   const [chapter, setChapter] = useState(null)
+  // Whether the chapters have taken the camera yet: the first view lands instantly, but
+  // the way back to it from a chapter should be a flight.
+  const leftIntro = useRef(false)
+  if (chapter !== null) leftIntro.current = true
+  const introRef = useRef(null)
+  const [zoomBoost, setZoomBoost] = useState(0)
+  const globeColRef = useRef(null)
   const { t, tc } = useLanguage()
   const isTouch = useIsTouch()
   // Baked CMS fields merged with the positions fetched from the media bucket.
@@ -112,10 +129,41 @@ export default function HomePage({ navigate }) {
 
   const spotlightEmbed = youtubeEmbedUrl(HOME_PAGE.mediaSpotlightYoutubeUrl)
 
+  // Measured before paint so the globe is created at the boosted zoom rather than
+  // visibly jumping to it; re-measured when the window is resized.
+  useLayoutEffect(() => {
+    const el = globeColRef.current
+    if (!el) return
+    const measure = () => {
+      const { clientWidth: w, clientHeight: h } = el
+      if (!w || !h) return
+      const fit = zoomForGlobeDiameter(Math.min(w * HERO_FILL_WIDTH, h * HERO_FILL_HEIGHT), INITIAL_VIEW.lat, h)
+      setZoomBoost(Math.max(0, fit - INITIAL_VIEW.zoom))
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
   const activeChapter = chapter === null ? null : GLOBE_CHAPTERS[Math.min(chapter, GLOBE_CHAPTERS.length - 1)]
   const view = activeChapter
-    ? { lat: activeChapter.lat, lng: activeChapter.lng, zoom: activeChapter.zoom, ms: 2200 }
-    : INITIAL_VIEW
+    ? { lat: activeChapter.lat, lng: activeChapter.lng, zoom: activeChapter.zoom + (activeChapter.fillsPane ? zoomBoost : 0), ms: 2200 }
+    : { ...INITIAL_VIEW, zoom: INITIAL_VIEW.zoom + zoomBoost, ms: leftIntro.current ? RETURN_MS : INITIAL_VIEW.ms }
+
+  // The chapters only ever claim the camera, so without this the globe stayed on the
+  // last chapter it saw after scrolling back to the top. Reaching the top of the intro
+  // hands it back to the opening shot — whole globe, turning. Like the chapters this
+  // acts on entry only, so scrolling down past it never fights them for the camera.
+  useEffect(() => {
+    const el = introRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) setChapter(null)
+    })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
 
   const handleShipClick = useCallback(ship => setSelectedShip(ship), [])
   const handleDeselect = useCallback(() => setSelectedShip(null), [])
@@ -165,13 +213,13 @@ export default function HomePage({ navigate }) {
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 64, background: 'linear-gradient(to bottom, transparent, #f4ede1)', pointerEvents: 'none' }} />
           </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '100vh' }} className="hero-grid">
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 3fr', minHeight: '100vh' }} className="hero-grid">
 
           {/* Globe first in DOM order: at <=900px .hero-grid becomes `display: block`,
               which puts the globe above the chapters and — unlike a single-column grid,
               where a sticky item unsticks at the end of its own row — lets it stay
               pinned while the chapters scroll past and fly the camera. */}
-          <div className="hero-globe" style={{ gridColumn: 2, gridRow: 1, position: 'sticky', top: 0, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
+          <div ref={globeColRef} className="hero-globe" style={{ gridColumn: 2, gridRow: 1, position: 'sticky', top: 0, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
             <div style={{ position: 'absolute', bottom: 40, left: '50%', transform: 'translateX(-50%)', textAlign: 'center', zIndex: 10, pointerEvents: 'none' }}>
               <div style={{ fontSize: 10, color: '#c19a52', letterSpacing: '0.25em', textTransform: 'uppercase', opacity: 0.9 }}>
                 {chapter !== null && t(`regions.${GLOBE_CHAPTERS[chapter]?.regionKey}`)}
@@ -217,6 +265,8 @@ export default function HomePage({ navigate }) {
           {/* Scrolling text + chapters */}
           <div className="hero-text-col" style={{ gridColumn: 1, gridRow: 1, display: 'flex', flexDirection: 'column' }}>
             <div className="hero-intro" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', padding: '312px 64px 80px 4rem', position: 'relative' }}>
+              {/* "Back at the top" sentinel for the globe — the top 40vh of the intro. */}
+              <div ref={introRef} aria-hidden="true" style={{ position: 'absolute', top: 0, left: 0, width: 1, height: '40vh', pointerEvents: 'none' }} />
 
               <div style={{ fontSize: 10, color: '#a07d33', letterSpacing: '0.28em', textTransform: 'uppercase', marginBottom: 24 }}>
                 {tc(HOME_PAGE, 'heroBadge')}
