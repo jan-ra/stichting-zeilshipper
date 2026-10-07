@@ -4,9 +4,12 @@ import { useLanguage } from '../context/LanguageContext.jsx'
 import { asset } from '../utils/asset.js'
 import { youtubeEmbedUrl } from '../utils/youtube.js'
 
-const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉', project: '◈' }
+const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉' }
 const FORMAT_COLORS = { YouTube: '#c4302b', ZIP: '#6b4a2b', PDF: '#9e4a4a', MP3: '#4a9e6a', Spotify: '#1db954' }
-const CATEGORIES = ['all', 'video', 'foto', 'tekst', 'project', 'podcast']
+// Filter on the item's type (a fixed select in the CMS), and only offer the types that
+// currently have at least one item, in this order.
+const TYPE_ORDER = ['video', 'photo', 'text', 'podcast']
+const CATEGORIES = ['all', ...TYPE_ORDER.filter(type => MEDIA_ITEMS.some(i => i.type === type))]
 
 export default function MediaPage({ navigate }) {
   const [filter, setFilter] = useState('all')
@@ -14,7 +17,7 @@ export default function MediaPage({ navigate }) {
 
   const catLabels = t('media.catLabels')
   const featuredEmbed = youtubeEmbedUrl(MEDIA_PAGE.featuredYoutubeUrl)
-  const filtered = filter === 'all' ? MEDIA_ITEMS : MEDIA_ITEMS.filter(i => i.category === filter)
+  const filtered = filter === 'all' ? MEDIA_ITEMS : MEDIA_ITEMS.filter(i => i.type === filter)
 
   return (
     <div style={{ paddingTop: 68 }}>

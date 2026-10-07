@@ -2,7 +2,7 @@ import { MEDIA_ITEMS } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import { youtubeEmbedUrl } from '../utils/youtube.js'
 
-const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉', project: '◈' }
+const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉' }
 
 // Turn a public Spotify show/episode link into its embeddable player URL.
 function spotifyEmbedUrl(url) {
