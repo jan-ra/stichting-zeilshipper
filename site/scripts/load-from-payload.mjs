@@ -159,6 +159,7 @@ async function loadShips() {
       speed: num(d.speed),
       year: num(d.year),
       region: text(d.region) || 'thuiswateren',
+      area: text(d.area) || null,
       crew: num(d.crew),
       website: text(d.website) || null,
       positionUpdatedAt: text(pos.positionUpdatedAt) || null,

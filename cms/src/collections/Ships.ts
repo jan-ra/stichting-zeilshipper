@@ -6,7 +6,7 @@ import { publishShipRosterAfterChange, publishShipRosterAfterDelete } from '../h
 
 export const Ships: CollectionConfig = {
   slug: 'ships',
-  admin: { useAsTitle: 'name', defaultColumns: ['name', 'image', 'type', 'port', 'crew'] },
+  admin: { useAsTitle: 'name', defaultColumns: ['name', 'image', 'type', 'port', 'area'] },
   access: { read: () => true, create: isAdminOrEditor, update: isAdminOrEditor, delete: isAdminOrEditor },
   // Rebuild the site on edit, and re-publish the tracking roster to R2 so the
   // nightly position job picks up MMSI / autoTrack changes.
@@ -76,6 +76,17 @@ export const Ships: CollectionConfig = {
     },
     { name: 'speed', type: 'number', label: 'Speed (kn)' },
     { name: 'year', type: 'number', label: 'Year built' },
+    {
+      name: 'area',
+      type: 'select',
+      label: 'Sailing area',
+      defaultValue: 'inland',
+      options: [
+        { label: 'Inland (Binnen)', value: 'inland' },
+        { label: 'Sea (Zee)', value: 'sea' },
+      ],
+      admin: { description: 'Used by the area filter on the fleet page.' },
+    },
     { name: 'crew', type: 'number', label: 'Crew', defaultValue: 2, min: 0 },
     {
       name: 'website',
