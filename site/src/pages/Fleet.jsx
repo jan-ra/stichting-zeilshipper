@@ -346,8 +346,7 @@ export default function FleetPage() {
                       )}
                     </div>
                     <div style={{ marginTop: 6, fontSize: 11, color: 'rgba(15,34,56,0.5)', display: 'flex', gap: 14 }}>
-                      <span>{item.port}</span>
-                      <span>{item.passengers} pax</span>
+                      {item.port && <span>{item.port}</span>}
                     </div>
                     <div style={{ marginTop: 4, fontSize: 10, color: 'rgba(15,34,56,0.55)' }}>
                       {item.lat == null
