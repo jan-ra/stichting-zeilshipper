@@ -36,14 +36,20 @@ export default function ShipCard({ ship, onClose }) {
           <div className="sz-shipcard__facts">
             {[
               [t('fleet.port'), ship.port],
-              [t('fleet.passengers'), ship.passengers],
-            ].map(([label, value]) => (
+              [t('fleet.crew'), ship.crew],
+            ].filter(([, value]) => value != null && value !== '').map(([label, value]) => (
               <div key={label}>
                 <div className="sz-shipcard__factLabel">{label}</div>
                 <div className="sz-shipcard__factValue">{value}</div>
               </div>
             ))}
           </div>
+
+          {ship.website && (
+            <a className="sz-shipcard__website" href={ship.website} target="_blank" rel="noopener noreferrer">
+              {t('fleet.website')} &rarr;
+            </a>
+          )}
 
           <div className="sz-shipcard__meta">
             {ship.lat == null

@@ -6,7 +6,7 @@ import { publishShipRosterAfterChange, publishShipRosterAfterDelete } from '../h
 
 export const Ships: CollectionConfig = {
   slug: 'ships',
-  admin: { useAsTitle: 'name', defaultColumns: ['name', 'image', 'type', 'port', 'region'] },
+  admin: { useAsTitle: 'name', defaultColumns: ['name', 'image', 'type', 'port', 'crew'] },
   access: { read: () => true, create: isAdminOrEditor, update: isAdminOrEditor, delete: isAdminOrEditor },
   // Rebuild the site on edit, and re-publish the tracking roster to R2 so the
   // nightly position job picks up MMSI / autoTrack changes.
@@ -17,7 +17,8 @@ export const Ships: CollectionConfig = {
   fields: [
     { name: 'name', type: 'text', required: true },
     { name: 'type', type: 'text' },
-    { name: 'port', type: 'text' },
+    // Still stored as `port`: renaming the column would not be additive. Only the label changed.
+    { name: 'port', type: 'text', label: 'Homeport' },
     {
       name: 'region',
       type: 'select',
@@ -75,6 +76,16 @@ export const Ships: CollectionConfig = {
     },
     { name: 'speed', type: 'number', label: 'Speed (kn)' },
     { name: 'year', type: 'number', label: 'Year built' },
-    { name: 'passengers', type: 'number' },
+    { name: 'crew', type: 'number', label: 'Crew', defaultValue: 2, min: 0 },
+    {
+      name: 'website',
+      type: 'text',
+      admin: { description: "The ship's own website, e.g. https://www.example.nl. Shown as a link on the ship card." },
+      validate: (value: string | null | undefined) =>
+        !value || /^https?:\/\/\S+\.\S+$/.test(value) ? true : 'Enter a full URL starting with http:// or https://',
+    },
+    // No longer shown anywhere. Hidden rather than removed so the column survives and a
+    // rollback to the previous image still finds it; drop it in a later contract step.
+    { name: 'passengers', type: 'number', admin: { hidden: true } },
   ],
 }
