@@ -175,6 +175,8 @@ export const strings = {
       download: '↓ Download',
       podcastBadge: 'Podcasts',
       listenNow: 'Luister nu',
+      podcastLatest: 'Nieuwste aflevering',
+      podcastAllEpisodes: 'Alle afleveringen op Spotify',
       pressBadge: 'Pers & media',
     },
 
@@ -424,6 +426,8 @@ export const strings = {
       download: '↓ Download',
       podcastBadge: 'Podcasts',
       listenNow: 'Listen now',
+      podcastLatest: 'Latest episode',
+      podcastAllEpisodes: 'All episodes on Spotify',
       pressBadge: 'Press & media',
     },
 

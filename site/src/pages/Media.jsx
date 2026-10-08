@@ -4,6 +4,12 @@ import { useLanguage } from '../context/LanguageContext.jsx'
 import { asset, assetSrcSet } from '../utils/asset.js'
 import { youtubeEmbedUrl } from '../utils/youtube.js'
 
+// Spotify's show embed only ever plays the newest episode — there is no embed that lists
+// them all — so the section labels it as such and links out to the full show.
+const PODCAST_SHOW_ID = '53OFpNfrF8cWpgZPOH1zgS'
+const PODCAST_SHOW_URL = `https://open.spotify.com/show/${PODCAST_SHOW_ID}`
+const PODCAST_ITEM = MEDIA_ITEMS.find(i => i.type === 'podcast')
+
 const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉' }
 const FORMAT_COLORS = { YouTube: '#c4302b', ZIP: '#6b4a2b', PDF: '#9e4a4a', MP3: '#4a9e6a', Spotify: '#1db954' }
 // Filter on the item's type (a fixed select in the CMS), and only offer the types that
@@ -150,26 +156,39 @@ export default function MediaPage({ navigate }) {
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 24 }}>{t('media.podcastBadge')}</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'center' }} className="grid-2">
-            <iframe
-              title={tc(MEDIA_PAGE, 'podcastTitle')}
-              src="https://open.spotify.com/embed/show/53OFpNfrF8cWpgZPOH1zgS?utm_source=generator"
-              width="100%"
-              height="352"
-              frameBorder="0"
-              allowFullScreen
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              loading="lazy"
-              style={{ borderRadius: 12, border: 'none', display: 'block' }}
-            />
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: 'rgba(244,237,225,0.6)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#1db954' }} />
+                {t('media.podcastLatest')}
+              </div>
+              <iframe
+                title={`${tc(MEDIA_PAGE, 'podcastTitle')} — ${t('media.podcastLatest')}`}
+                src={`https://open.spotify.com/embed/show/${PODCAST_SHOW_ID}?utm_source=generator`}
+                width="100%"
+                height="352"
+                frameBorder="0"
+                allowFullScreen
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+                style={{ borderRadius: 12, border: 'none', display: 'block' }}
+              />
+            </div>
             <div>
               <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>{t('media.podcastBadge')}</div>
               <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, color: '#f4ede1', fontWeight: 400, marginBottom: 16 }}>{tc(MEDIA_PAGE, 'podcastTitle')}</h2>
               <p style={{ fontSize: 14, color: 'rgba(244,237,225,0.55)', lineHeight: 1.8, marginBottom: 24 }}>
                 {tc(MEDIA_PAGE, 'podcastBody')}
               </p>
-              <button onClick={() => navigate('media-detail', 8)} style={{ background: '#c19a52', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', color: '#0f2238', padding: '11px 22px', borderRadius: 2 }}>
-                {t('media.listenNow')}
-              </button>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+                <a href={PODCAST_SHOW_URL} target="_blank" rel="noopener noreferrer" style={{ background: '#1db954', color: '#0a1a2e', fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', padding: '11px 22px', borderRadius: 2, textDecoration: 'none', display: 'inline-block' }}>
+                  {t('media.podcastAllEpisodes')} &rarr;
+                </a>
+                {PODCAST_ITEM && (
+                  <button onClick={() => navigate('media-detail', PODCAST_ITEM.id)} style={{ background: 'none', border: '1px solid rgba(193,154,82,0.45)', cursor: 'pointer', fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', color: '#c19a52', padding: '10px 22px', borderRadius: 2 }}>
+                    {t('media.listenNow')}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
