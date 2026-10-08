@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { globeScreenDiameter, zoomForGlobeDiameter } from '../src/components/globe/globeSize.js'
+import { globeScreenDiameter, scaleGlobeZoom, zoomForGlobeDiameter } from '../src/components/globe/globeSize.js'
 
 const near = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, `${msg}: ${a} vs ${b}`)
 
@@ -21,4 +21,13 @@ test('zoomForGlobeDiameter inverts globeScreenDiameter', () => {
 test('a shorter pane brings the camera closer, so the same zoom draws a smaller globe', () => {
   assert.ok(globeScreenDiameter(2, 20, 600) < globeScreenDiameter(2, 20, 900))
   assert.ok(zoomForGlobeDiameter(700, 20, 600) > zoomForGlobeDiameter(700, 20, 900))
+})
+
+test('scaleGlobeZoom draws the globe at the given fraction of its size', () => {
+  for (const [z, lat, h] of [[2.0, 20, 900], [1.8, 52.5, 744], [2.6, 20, 420]]) {
+    const before = globeScreenDiameter(z, lat, h)
+    const scaled = scaleGlobeZoom(z, lat, h, 0.9)
+    assert.ok(scaled < z, 'shrinking zooms out')
+    near(globeScreenDiameter(scaled, lat, h), before * 0.9, 1e-6, `${z} at ${lat} in ${h}px`)
+  }
 })

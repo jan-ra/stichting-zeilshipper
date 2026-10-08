@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext.jsx'
 import { asset, assetSrcSet } from '../utils/asset.js'
 import { youtubeEmbedUrl } from '../utils/youtube.js'
 import ShipGlobe from '../components/globe/ShipGlobe.jsx'
-import { zoomForGlobeDiameter } from '../components/globe/globeSize.js'
+import { OPENING_GLOBE_SCALE, scaleGlobeZoom, zoomForGlobeDiameter } from '../components/globe/globeSize.js'
 import ShipCard from '../components/ShipCard.jsx'
 import { useIsTouch } from '../hooks/useMediaQuery.js'
 import { useShips } from '../hooks/useShips.js'
@@ -37,6 +37,8 @@ const RETURN_MS = 2200
 // until the globe spans 88% of the column's width, or 82% of its height if that is
 // tighter, so the top stays clear of the nav. The country-wide chapters frame a fixed
 // area and keep their zoom. Phones already fill their pane at INITIAL_VIEW.
+// The result is then drawn at OPENING_GLOBE_SCALE of that size, which is why the boost
+// can be negative on a phone.
 const HERO_FILL_WIDTH = 0.88
 const HERO_FILL_HEIGHT = 0.82
 
@@ -138,7 +140,8 @@ export default function HomePage({ navigate }) {
       const { clientWidth: w, clientHeight: h } = el
       if (!w || !h) return
       const fit = zoomForGlobeDiameter(Math.min(w * HERO_FILL_WIDTH, h * HERO_FILL_HEIGHT), INITIAL_VIEW.lat, h)
-      setZoomBoost(Math.max(0, fit - INITIAL_VIEW.zoom))
+      const opening = scaleGlobeZoom(Math.max(INITIAL_VIEW.zoom, fit), INITIAL_VIEW.lat, h, OPENING_GLOBE_SCALE)
+      setZoomBoost(opening - INITIAL_VIEW.zoom)
     }
     measure()
     const ro = new ResizeObserver(measure)

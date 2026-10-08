@@ -3,7 +3,7 @@ import { SHIPS, FLEET_PAGE } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import { asset } from '../utils/asset.js'
 import ShipGlobe from '../components/globe/ShipGlobe.jsx'
-import { zoomForGlobeDiameter } from '../components/globe/globeSize.js'
+import { OPENING_GLOBE_SCALE, scaleGlobeZoom, zoomForGlobeDiameter } from '../components/globe/globeSize.js'
 import ShipCard from '../components/ShipCard.jsx'
 import { useShips } from '../hooks/useShips.js'
 
@@ -47,7 +47,8 @@ const DEFAULT_VIEW = { lat: 52.5, lng: 5.0, zoom: 1.8, ms: 1500 }
 // On a desktop the pane is much wider than it is tall, so the opening shot zooms in from
 // DEFAULT_VIEW until the globe spans 95% of the pane's width. The top and bottom of the
 // planet run off the pane — fine on a map you can drag — but no more than 30% of the
-// pane's height in all. Phones already fill their pane at DEFAULT_VIEW and keep it.
+// pane's height in all. Phones already fill their pane at DEFAULT_VIEW. Either way the
+// opening shot is then drawn at OPENING_GLOBE_SCALE of that size.
 const FLEET_FILL_WIDTH = 0.95
 const FLEET_MAX_HEIGHT = 1.3
 
@@ -204,7 +205,8 @@ export default function FleetPage() {
     const { clientWidth: w, clientHeight: h } = mapRef.current ?? {}
     if (!w || !h) return
     const fit = zoomForGlobeDiameter(Math.min(w * FLEET_FILL_WIDTH, h * FLEET_MAX_HEIGHT), DEFAULT_VIEW.lat, h)
-    if (fit > DEFAULT_VIEW.zoom) setView({ ...DEFAULT_VIEW, zoom: fit, ms: 0 })
+    const zoom = scaleGlobeZoom(Math.max(DEFAULT_VIEW.zoom, fit), DEFAULT_VIEW.lat, h, OPENING_GLOBE_SCALE)
+    setView({ ...DEFAULT_VIEW, zoom, ms: 0 })
   }, [])
 
   const filtered = useMemo(() => allItems.filter(s => {
