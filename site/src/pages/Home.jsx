@@ -32,13 +32,12 @@ const INITIAL_VIEW = { lat: 20.0, lng: 4.96, zoom: 2.0, ms: 0 }
 // Scrolling back up to the intro flies home at the chapters' pace rather than snapping.
 const RETURN_MS = 2200
 
-// INITIAL_VIEW's zoom is the floor. Where the column has room — any desktop — the
-// opening shot and the two whole-globe chapters (`fillsPane`) zoom in by the same amount
-// until the globe spans 88% of the column's width, or 82% of its height if that is
-// tighter, so the top stays clear of the nav. The country-wide chapters frame a fixed
-// area and keep their zoom. Phones already fill their pane at INITIAL_VIEW.
-// The result is then drawn at OPENING_GLOBE_SCALE of that size, which is why the boost
-// can be negative on a phone.
+// The opening shot and the two whole-globe chapters (`fillsPane`) are sized from the
+// column: they shift by the same zoom offset until the globe spans 88% of the column's
+// width, or 82% of its height if that is tighter, so the top stays clear of the nav —
+// then drawn at OPENING_GLOBE_SCALE of that. On a desktop that zooms in from
+// INITIAL_VIEW; on a phone it zooms out, so the whole planet fits the narrow pane. The
+// country-wide chapters frame a fixed area and keep their zoom.
 const HERO_FILL_WIDTH = 0.88
 const HERO_FILL_HEIGHT = 0.82
 
@@ -140,7 +139,7 @@ export default function HomePage({ navigate }) {
       const { clientWidth: w, clientHeight: h } = el
       if (!w || !h) return
       const fit = zoomForGlobeDiameter(Math.min(w * HERO_FILL_WIDTH, h * HERO_FILL_HEIGHT), INITIAL_VIEW.lat, h)
-      const opening = scaleGlobeZoom(Math.max(INITIAL_VIEW.zoom, fit), INITIAL_VIEW.lat, h, OPENING_GLOBE_SCALE)
+      const opening = scaleGlobeZoom(fit, INITIAL_VIEW.lat, h, OPENING_GLOBE_SCALE)
       setZoomBoost(opening - INITIAL_VIEW.zoom)
     }
     measure()
@@ -252,6 +251,8 @@ export default function HomePage({ navigate }) {
               autoRotate={activeChapter ? activeChapter.autoRotate : true}
               autoRotateSpeed={3}
               enableZoom={false}
+              /* Phones zoom out below the default floor to fit the whole planet (see HERO_FILL_*). */
+              minZoom={0.5}
               /* Rotating showcase: one random ship's card floats beside its marker
                  for a few seconds at a time. Home only. */
               spotlight
@@ -550,6 +551,9 @@ export default function HomePage({ navigate }) {
           .hero-chapter { padding: 40px 24px !important; min-height: 52vh !important; }
           .hero-shipcount { top: 12px !important; right: 12px !important; padding: 8px 12px !important; }
           .hero-clickhint { display: none !important; }
+          /* The pinned globe's bottom edge runs over the intro text as it scrolls, so
+             the map credits (i) move to the free top-left corner. */
+          .hero-globe .maplibregl-ctrl-bottom-right { top: 0; bottom: auto; right: auto; left: 0; }
           .hero-scrollhint { left: 24px !important; bottom: 24px !important; }
 
           .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }

@@ -497,7 +497,11 @@
 
 /* Tether: a 46px hairline leaving the marker up and to the right, drawn from the
    marker outwards so the card reads as hanging off that point. Rotated the long
-   way round when the card sits on the other side. */
+   way round when the card sits on the other side. --sz-spot-angle carries the
+   direction into the keyframes, so small panes can hang the card below instead. */
+.sz-spot { --sz-spot-angle: -35deg; }
+.sz-spot.is-flipped { --sz-spot-angle: 215deg; }
+
 .sz-spot__line {
   position: absolute;
   top: 0;
@@ -506,13 +510,8 @@
   height: 1px;
   background: linear-gradient(to right, rgba(193, 154, 82, 0.15), rgba(193, 154, 82, 0.75));
   transform-origin: 0 50%;
-  transform: rotate(-35deg) scaleX(1);
+  transform: rotate(var(--sz-spot-angle)) scaleX(1);
   animation: sz-spot-line-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.sz-spot.is-flipped .sz-spot__line {
-  transform: rotate(215deg) scaleX(1);
-  animation-name: sz-spot-line-in-flipped;
 }
 
 .sz-spot__card {
@@ -544,9 +543,6 @@
   animation: sz-spot-line-out 0.5s cubic-bezier(0.4, 0, 1, 1) both;
 }
 
-.sz-spot.is-out.is-flipped .sz-spot__line {
-  animation-name: sz-spot-line-out-flipped;
-}
 
 @keyframes sz-spot-in {
   from { opacity: 0; transform: translateY(6px) scale(0.94); }
@@ -559,23 +555,13 @@
 }
 
 @keyframes sz-spot-line-in {
-  from { transform: rotate(-35deg) scaleX(0); opacity: 0; }
-  to   { transform: rotate(-35deg) scaleX(1); opacity: 1; }
-}
-
-@keyframes sz-spot-line-in-flipped {
-  from { transform: rotate(215deg) scaleX(0); opacity: 0; }
-  to   { transform: rotate(215deg) scaleX(1); opacity: 1; }
+  from { transform: rotate(var(--sz-spot-angle)) scaleX(0); opacity: 0; }
+  to   { transform: rotate(var(--sz-spot-angle)) scaleX(1); opacity: 1; }
 }
 
 @keyframes sz-spot-line-out {
-  from { transform: rotate(-35deg) scaleX(1); opacity: 1; }
-  to   { transform: rotate(-35deg) scaleX(0); opacity: 0; }
-}
-
-@keyframes sz-spot-line-out-flipped {
-  from { transform: rotate(215deg) scaleX(1); opacity: 1; }
-  to   { transform: rotate(215deg) scaleX(0); opacity: 0; }
+  from { transform: rotate(var(--sz-spot-angle)) scaleX(1); opacity: 1; }
+  to   { transform: rotate(var(--sz-spot-angle)) scaleX(0); opacity: 0; }
 }
 
 .sz-spot__img {
@@ -608,9 +594,14 @@
   color: rgba(244, 237, 225, 0.55);
 }
 
-/* Small panes cannot spare 190px of globe. */
+/* Small panes cannot spare 190px of globe. On a phone the whole planet fits the pane,
+   which puts the fleet near its top edge, so the card hangs below the marker rather
+   than running up into the nav. */
 @media (max-width: 600px) {
-  .sz-spot__card { width: 150px; }
+  .sz-spot { --sz-spot-angle: 35deg; }
+  .sz-spot.is-flipped { --sz-spot-angle: 145deg; }
+  .sz-spot__card { width: 150px; bottom: auto; top: 22px; transform-origin: 0 0; }
+  .sz-spot.is-flipped .sz-spot__card { transform-origin: 100% 0; }
   .sz-spot__img { height: 62px; }
   .sz-spot__name { font-size: 13px; }
 }

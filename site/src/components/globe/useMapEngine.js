@@ -142,6 +142,14 @@ export function useMapEngine(containerRef, { minZoom, maxZoom, initialView, labe
         viewRef.current = createView(map)
 
         map.addControl(new maplibregl.AttributionControl({ compact: true }))
+        // The compact control opens expanded and only folds away on the first drag. On a
+        // phone that full-width strip sits over the page content around the map, so start
+        // it folded to its (i) button there; tapping it still shows the credits.
+        if (window.matchMedia('(max-width: 768px)').matches) {
+          map.once('load', () => {
+            container.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show')
+          })
+        }
 
         map.on('style.load', () => {
           map.setProjection({ type: 'globe' })
