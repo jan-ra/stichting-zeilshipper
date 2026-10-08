@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { allRoutes, canonicalUrl, snippet, KEYWORDS } from '../src/seo.js'
+import { allRoutes, canonicalUrl, snippet, KEYWORDS, SHARE_IMAGE } from '../src/seo.js'
 import { headTags, sitemapXml } from '../scripts/seo-plugin.mjs'
 import { strings } from '../src/i18n/strings.js'
 
@@ -37,7 +37,10 @@ test('only small baked images are used as share images; others fall back to the 
   assert.equal(routes.find(r => r.path === '/blog/bruine-vloot').image, 'https://stichtingzeilschipper.nl/baked/abc-het_vloot.jpg')
   const big = routes.find(r => r.path === '/blog/groot')
   assert.equal(big.image, null)
-  assert.ok(headTags(big, 'https://stichtingzeilschipper.nl/og-image.jpg').includes('og:image" content="https://stichtingzeilschipper.nl/og-image.jpg"'))
+  const head = headTags(big, SHARE_IMAGE)
+  assert.ok(head.includes('og:image" content="https://stichtingzeilschipper.nl/og-image.jpg"'))
+  assert.ok(head.includes('og:image:width" content="1200"') && head.includes('og:image:height" content="630"'))
+  assert.ok(head.includes('twitter:card" content="summary_large_image"'))
   assert.ok(!headTags(big, null).includes('og:image'))
 })
 
@@ -55,4 +58,13 @@ test('snippet trims on a word boundary', () => {
   assert.ok(s.endsWith('…'))
   assert.equal(snippet('kort'), 'kort')
   assert.equal(canonicalUrl('/vloot/'), 'https://stichtingzeilschipper.nl/vloot')
+})
+
+test('the share image is small enough for WhatsApp and the right shape', async () => {
+  const { statSync } = await import('node:fs')
+  const sharp = (await import('sharp')).default
+  const file = new URL('../public/og-image.jpg', import.meta.url)
+  assert.ok(statSync(file).size < 300 * 1024, 'under 300 KB')
+  const { width, height } = await sharp((await import('node:url')).fileURLToPath(file)).metadata()
+  assert.deepEqual([width, height], [SHARE_IMAGE.width, SHARE_IMAGE.height])
 })

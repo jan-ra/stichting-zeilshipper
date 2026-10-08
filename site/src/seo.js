@@ -9,6 +9,15 @@
 export const SITE_URL = 'https://stichtingzeilschipper.nl'
 export const SITE_NAME = 'Stichting Zeilschipper'
 
+// The default link preview: a 1200x630 crop of "Maat Bruine Vloot" from the media
+// library (site/public/og-image.jpg, ~100 KB — WhatsApp drops images over ~300 KB).
+export const SHARE_IMAGE = {
+  url: `${SITE_URL}/og-image.jpg`,
+  width: 1200,
+  height: 630,
+  alt: 'Een matroos hijst het zeil aan boord van een schip van de Bruine Vloot',
+}
+
 export const KEYWORDS = [
   'bruine vloot',
   'unesco erfgoed',
