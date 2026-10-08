@@ -17,6 +17,7 @@ export default function InformatiebPage() {
   const markersRef = useRef([])
   const glRef = useRef(null)   // the lazily imported maplibre-gl namespace
   const [selected, setSelected] = useState(null)
+  const detailRef = useRef(null)
   const [filter, setFilter] = useState('all')
   const { t, tc } = useLanguage()
   const STATUS_LABELS = t('infoBorden.statusLabels')
@@ -68,6 +69,12 @@ export default function InformatiebPage() {
       })
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-left')
       map.addControl(new maplibregl.AttributionControl({ compact: true }))
+      // As on the globes: on a phone, start the credits folded to their (i) button.
+      if (window.matchMedia('(max-width: 768px)').matches) {
+        map.once('load', () => {
+          mapRef.current?.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show')
+        })
+      }
       mapObjRef.current = map
       addMarkers(map, filterRef.current)
     }
@@ -95,6 +102,13 @@ export default function InformatiebPage() {
 
   const displayedList = filter === 'all' ? HARBOURS : HARBOURS.filter(h => h.status === filter)
 
+  // On a phone the detail panel sits below the map rather than beside it, so bring it
+  // into view when a harbour is picked (from the map or from the list further down).
+  useEffect(() => {
+    if (!selected || !window.matchMedia('(max-width: 768px)').matches) return
+    detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [selected])
+
   return (
     <div style={{ paddingTop: 68, background: '#0f2238', minHeight: '100vh' }}>
       {/* Header */}
@@ -109,7 +123,7 @@ export default function InformatiebPage() {
               {tc(INFO_BOARDS_PAGE, 'description')}
             </p>
           </div>
-          <div style={{ display: 'flex', gap: 20 }}>
+          <div className="info-counts" style={{ display: 'flex', gap: 20 }}>
             {['afgerond', 'ingediend', 'kandidaat'].map(s => (
               <div key={s} style={{ textAlign: 'center' }}>
                 <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, color: STATUS_COLORS[s] }}>{counts[s]}</div>
@@ -135,10 +149,12 @@ export default function InformatiebPage() {
       </div>
 
       {/* Map + sidebar */}
-      <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 340px' : '1fr', transition: 'grid-template-columns 0.35s ease', height: '72vh', position: 'relative' }}>
-        <div style={{ position: 'relative' }}>
+      <div className="info-mapgrid" style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 340px' : '1fr', transition: 'grid-template-columns 0.35s ease', height: '72vh', position: 'relative' }}>
+        {/* Own stacking context: the legend and map controls must never rise above the
+            fixed nav as the page scrolls. */}
+        <div className="info-mapcell" style={{ position: 'relative', zIndex: 0 }}>
           <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
-          <div style={{
+          <div className="info-legend" style={{
             position: 'absolute', bottom: 20, left: 20, zIndex: 1000,
             background: 'rgba(10,22,40,0.92)', border: '1px solid rgba(193,154,82,0.2)',
             padding: '14px 18px', borderRadius: 3, backdropFilter: 'blur(8px)',
@@ -154,7 +170,7 @@ export default function InformatiebPage() {
         </div>
 
         {selected && (
-          <div style={{
+          <div ref={detailRef} className="info-detail" style={{
             background: 'rgba(10,22,40,0.98)', borderLeft: '1px solid rgba(193,154,82,0.25)',
             padding: '28px 24px', overflowY: 'auto',
             display: 'flex', flexDirection: 'column', gap: 16,
@@ -223,12 +239,25 @@ export default function InformatiebPage() {
                   <span style={{ fontSize: 15, color: '#f4ede1' }}>{h.name}</span>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: STATUS_COLORS[h.status] }} />
                 </div>
-                <div style={{ fontSize: 12, color: 'rgba(244,237,225,0.35)', marginTop: 4 }}>{h.date} · {h.ships} {t('infoBorden.ships')}</div>
+                <div style={{ fontSize: 12, color: 'rgba(244,237,225,0.35)', marginTop: 4 }}>{[h.date, `${h.ships} ${t('infoBorden.ships')}`].filter(Boolean).join(' · ')}</div>
               </div>
             ))}
           </div>
         </div>
       </div>
+      <style>{`
+        @media (max-width: 768px) {
+          /* One column: the intro reads at full width, the counts sit in a row below. */
+          .info-header { grid-template-columns: 1fr !important; gap: 24px !important; }
+          .info-counts { justify-content: space-between; max-width: 360px; }
+          /* The detail panel goes under the map instead of squeezing it. */
+          .info-mapgrid { grid-template-columns: 1fr !important; height: auto !important; }
+          .info-mapcell { height: 62vh; }
+          .info-detail { border-left: none !important; border-top: 1px solid rgba(193,154,82,0.25); scroll-margin-top: 76px; }
+          .info-legend { bottom: 12px !important; left: 12px !important; padding: 10px 12px !important; }
+          .info-legend > div:first-child { margin-bottom: 6px !important; }
+        }
+      `}</style>
     </div>
   )
 }
