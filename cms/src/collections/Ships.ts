@@ -73,10 +73,8 @@ export const Ships: CollectionConfig = {
     {
       name: 'positionUpdatedAt',
       type: 'date',
-      admin: {
-        readOnly: true,
-        description: 'Unused — the live value lives in data/positions.json on the media bucket.',
-      },
+      // Unused: the live value lives in data/positions.json on the media bucket.
+      admin: { hidden: true },
     },
     { name: 'speed', type: 'number', label: 'Speed (kn)', admin: { hidden: true } },
     { name: 'year', type: 'number', label: 'Year built' },
