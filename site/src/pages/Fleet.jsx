@@ -6,6 +6,7 @@ import ShipGlobe from '../components/globe/ShipGlobe.jsx'
 import { OPENING_GLOBE_SCALE, scaleGlobeZoom, zoomForGlobeDiameter } from '../components/globe/globeSize.js'
 import ShipCard from '../components/ShipCard.jsx'
 import { useShips } from '../hooks/useShips.js'
+import { useMediaQuery } from '../hooks/useMediaQuery.js'
 
 // Fold the many raw type variants (koftjalk, driemastklipper, lemsteraak, …) into
 // a handful of ship families. First match wins, so order matters (aak before
@@ -193,6 +194,10 @@ export default function FleetPage() {
   const [userInteracted, setUserInteracted] = useState(false)
   const [view, setView] = useState(DEFAULT_VIEW)
   const { t, tc } = useLanguage()
+  // Phones show the map and the list one at a time (see the 768px block below); this is
+  // which one. Both stay mounted, so switching never reloads the globe.
+  const isPhone = useMediaQuery('(max-width: 768px)')
+  const [mobileView, setMobileView] = useState('map')
 
   // Baked CMS fields merged with the positions fetched from the media bucket.
   const allItems = useShips()
@@ -241,6 +246,8 @@ export default function FleetPage() {
   const handleSelect = useCallback((item) => {
     setUserInteracted(true)
     setSelectedId(prev => (prev === item.id ? null : item.id))
+    // A ship picked from the list is shown where it is: on the map, with its card.
+    setMobileView('map')
   }, [])
 
   const handleDeselect = useCallback(() => setSelectedId(null), [])
@@ -264,7 +271,7 @@ export default function FleetPage() {
   }, [selectedId, flyTo])
 
   return (
-    <div className="fleet-shell">
+    <div className="fleet-shell" data-view={isPhone ? mobileView : undefined}>
 
       {/* ── Crew notice banner ── */}
       <div className="fleet-banner">
@@ -279,15 +286,31 @@ export default function FleetPage() {
         </div>
       </div>
 
+      {/* ── Phone only: map / list switch ── */}
+      <div className="fleet-toggle" role="tablist">
+        {['map', 'list'].map(v => (
+          <button
+            key={v}
+            type="button"
+            role="tab"
+            aria-selected={mobileView === v}
+            className={'fleet-toggle__btn' + (mobileView === v ? ' is-active' : '')}
+            onClick={() => setMobileView(v)}
+          >
+            {v === 'map' ? t('fleet.viewMap') : `${t('fleet.viewList')} (${shipCount})`}
+          </button>
+        ))}
+      </div>
+
       <div className="fleet-grid">
 
         {/* ── Ship list ── */}
         <div className="fleet-list">
 
           {/* Sticky header + filters */}
-          <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#efe7d8', padding: '28px 24px 16px', borderBottom: '1px solid rgba(193,154,82,0.25)' }}>
-            <div style={{ fontSize: 10, color: '#a07d33', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 6 }}>{t('fleet.badge')}</div>
-            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: '#0f2238', fontWeight: 400, marginBottom: 16 }}>
+          <div className="fleet-list__head" style={{ position: 'sticky', top: 0, zIndex: 10, background: '#efe7d8', padding: '28px 24px 16px', borderBottom: '1px solid rgba(193,154,82,0.25)' }}>
+            <div className="fleet-list__intro" style={{ fontSize: 10, color: '#a07d33', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 6 }}>{t('fleet.badge')}</div>
+            <div className="fleet-list__intro" style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: '#0f2238', fontWeight: 400, marginBottom: 16 }}>
               {shipCount} <span style={{ fontSize: 14, color: 'rgba(15,34,56,0.45)', fontFamily: 'inherit', fontWeight: 400 }}>{t('fleet.of')} {SHIPS.length} {t('fleet.ships')}</span>
             </div>
             <div style={{ position: 'relative', marginBottom: 12 }}>
@@ -411,6 +434,13 @@ export default function FleetPage() {
           {!selected && (
             <div className="fleet-hint">{t('fleet.clickHint')}</div>
           )}
+
+          {/* Phone only: with a filter on, say so on the map and offer the list. */}
+          {matchedIds && (
+            <button type="button" className="fleet-filterpill" onClick={() => setMobileView('list')}>
+              {shipCount} {t('fleet.of')} {SHIPS.length} {t('fleet.ships')}
+            </button>
+          )}
         </div>
       </div>
 
@@ -456,6 +486,7 @@ export default function FleetPage() {
           background: #f4ede1;
         }
         .fleet-chips { display: flex; gap: 2px; flex-wrap: wrap; }
+        .fleet-toggle, .fleet-filterpill { display: none; }
         .fleet-hint {
           position: absolute;
           bottom: 20px;
@@ -473,12 +504,65 @@ export default function FleetPage() {
           /* Reclaim the banner's vertical budget — on a phone it costs a fifth of the
              screen and the same text is on the page above the fold anyway. */
           .fleet-banner { display: none; }
+
+          /* Map and list each get the whole screen, one at a time, switched by the
+             toggle. They share one grid cell and only change visibility, so the globe
+             keeps its camera and tiles, and the list its scroll position. */
+          .fleet-toggle {
+            flex: none;
+            display: flex;
+            gap: 4px;
+            padding: 8px 12px;
+            background: #efe7d8;
+            border-bottom: 1px solid rgba(193,154,82,0.3);
+          }
+          .fleet-toggle__btn {
+            flex: 1;
+            min-height: 40px;
+            border: 1px solid rgba(193,154,82,0.45);
+            border-radius: 2px;
+            background: transparent;
+            color: #6b5428;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+          }
+          .fleet-toggle__btn.is-active { background: #0f2238; border-color: #0f2238; color: #f4ede1; }
           .fleet-grid {
             grid-template-columns: 1fr;
-            grid-template-rows: 42dvh 1fr;
+            grid-template-rows: 1fr;
           }
-          .fleet-map  { grid-row: 1; }
-          .fleet-list { grid-row: 2; }
+          .fleet-map, .fleet-list { grid-area: 1 / 1; }
+          .fleet-shell[data-view="map"] .fleet-list { visibility: hidden; pointer-events: none; }
+          /* Not visibility for the map: markers set their own and would show through.
+             Fade it out and lift the list above it instead. */
+          .fleet-shell[data-view="list"] .fleet-map { opacity: 0; pointer-events: none; }
+          .fleet-shell[data-view="list"] .fleet-list { position: relative; z-index: 5; }
+
+          /* The toggle already carries the count, so the list starts at the search. */
+          .fleet-list__intro { display: none; }
+          .fleet-list__head { padding: 12px 12px 10px !important; }
+
+          .fleet-filterpill {
+            display: block;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 2;
+            min-height: 40px;
+            padding: 0 14px;
+            border: 1px solid #c19a52;
+            border-radius: 20px;
+            background: rgba(15,34,56,0.92);
+            color: #f4ede1;
+            font-family: inherit;
+            font-size: 12px;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+          }
           /* 15 chips wrapping would eat most of the screen; scroll them instead. */
           .fleet-chips {
             flex-wrap: nowrap;

@@ -150,6 +150,14 @@
   }
 }
 
+/* Phones: a compact sheet, so the selected ship and its track stay visible on the map
+   above it (the fleet page frames the camera clear of the sheet). */
+@media (max-width: 768px) {
+  .sz-shipcard { max-height: 55dvh; }
+  .sz-shipcard__img { height: 120px; }
+  .sz-shipcard__body { padding: 12px 16px; }
+}
+
 /* ── Image lightbox ─────────────────────────────────────────────────────────── */
 
 .sz-lightbox {
