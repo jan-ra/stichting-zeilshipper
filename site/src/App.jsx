@@ -14,6 +14,15 @@ import SupportLetterPage from './pages/SupportLetter.jsx'
 import PrivacyPage from './pages/Privacy.jsx'
 import PhotoAttributionsPage from './pages/PhotoAttributions.jsx'
 import { useLanguage } from './context/LanguageContext.jsx'
+import { BLOG_POSTS, MEDIA_ITEMS } from './data/content.js'
+import { STATIC_ROUTES, canonicalUrl, snippet } from './seo.js'
+
+// Point a <meta>/<link> in the head at a new value, creating it if the page has none.
+function setHead(selector, attr, value, create) {
+  let el = document.head.querySelector(selector)
+  if (!el) { el = create(); document.head.appendChild(el) }
+  el.setAttribute(attr, value)
+}
 
 const PAGES = {
   home: HomePage,
@@ -85,7 +94,7 @@ export default function App() {
     initial.page === 'media-detail' ? initial.param : null
   )
 
-  const { t, lang } = useLanguage()
+  const { t, tc, lang } = useLanguage()
 
   const navigate = (p, param = null) => {
     const path = buildPath(p, param)
@@ -119,9 +128,23 @@ export default function App() {
     )
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Title, description and canonical follow the page, the same values the build bakes
+  // into each route's own HTML (see seo.js), so a shared link and the open tab agree.
   useEffect(() => {
-    document.title = t(`pageTitles.${page}`) || t('pageTitles.home')
-  }, [page, lang, t])
+    const path = buildPath(page, page === 'blog-detail' ? blogSlug : page === 'media-detail' ? mediaItemId : null)
+    const post = page === 'blog-detail' ? BLOG_POSTS.find(p => p.slug === blogSlug) : null
+    const item = page === 'media-detail' ? MEDIA_ITEMS.find(m => m.id === mediaItemId) : null
+    const detail = post || item
+    const title = detail ? `${tc(detail, 'title')} — Stichting Zeilschipper` : t(`pageTitles.${page}`) || t('pageTitles.home')
+    const description = post ? snippet(tc(post, 'excerpt'))
+      : item ? snippet(tc(item, 'description'))
+      : STATIC_ROUTES.find(r => r.page === page)?.description
+    document.title = title
+    if (description) {
+      setHead('meta[name="description"]', 'content', description, () => Object.assign(document.createElement('meta'), { name: 'description' }))
+    }
+    setHead('link[rel="canonical"]', 'href', canonicalUrl(path), () => Object.assign(document.createElement('link'), { rel: 'canonical' }))
+  }, [page, blogSlug, mediaItemId, lang, t, tc])
 
   const PageComponent = PAGES[page] || HomePage
 
