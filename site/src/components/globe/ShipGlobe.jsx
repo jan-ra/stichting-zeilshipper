@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo } from 'react'
+import { useRef, useEffect, useMemo, useState, useCallback } from 'react'
 import { useMapEngine } from './useMapEngine.js'
 import ShipMarkers from './ShipMarkers.jsx'
 import { useLanguage } from '../../context/LanguageContext.jsx'
@@ -14,6 +14,9 @@ const NO_PADDING = { top: 0, right: 0, bottom: 0, left: 0 }
 // How long after a gesture ends before autorotate may take the camera back — long
 // enough for MapLibre's drag inertia to play out.
 const GESTURE_COOLDOWN_MS = 900
+
+// One click of the +/- buttons: a whole zoom level, eased.
+const ZOOM_BUTTON_MS = 300
 
 // The one globe used by both the home hero and the fleet page. It owns the camera and
 // the vector basemap on its sphere; ShipMarkers owns everything the user points at.
@@ -32,6 +35,7 @@ export default function ShipGlobe({
   maxZoom = 14,
   spotlight = false,         // rotating showcase card — the home hero only
   showRoute = false,         // draw the selected ship's track — the fleet map only
+  zoomControls = false,      // +/- buttons — the fleet map only
   onUserInteract,
 }) {
   const containerRef = useRef(null)
@@ -163,6 +167,29 @@ export default function ShipGlobe({
     return () => { map.off('moveend', done) }
   }, [ready, mapRef])
 
+  // The +/- buttons. They count as a gesture, so autorotate stands down and does not
+  // cancel the zoom animation with its per-frame setCenter.
+  const [zoom, setZoom] = useState(null)
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !ready || !zoomControls) return
+    const sync = () => setZoom(map.getZoom())
+    sync()
+    map.on('zoomend', sync)
+    return () => { map.off('zoomend', sync) }
+  }, [ready, zoomControls, mapRef])
+
+  const zoomBy = useCallback(delta => {
+    const map = mapRef.current
+    if (!map) return
+    gestureRef.current = true
+    onUserInteract?.()
+    clearTimeout(gestureTimer.current)
+    gestureTimer.current = setTimeout(() => { gestureRef.current = false }, GESTURE_COOLDOWN_MS)
+    const target = Math.min(maxZoom, Math.max(minZoom, map.getZoom() + delta))
+    map.easeTo({ zoom: target, duration: ZOOM_BUTTON_MS })
+  }, [mapRef, onUserInteract, minZoom, maxZoom])
+
   const labels = useMemo(() => ({
     positionUpdated: t('fleet.positionUpdated'),
     shipsHere: t('fleet.shipsHere'),
@@ -179,6 +206,12 @@ export default function ShipGlobe({
     <div className={'sz-globe' + (isStatic ? ' is-static' : '')}>
       <div className="sz-globe__canvas" ref={containerRef} />
       {failed && <div className="sz-globe__status">{t('fleet.globeUnavailable')}</div>}
+      {zoomControls && ready && (
+        <div className="sz-globe__zoom">
+          <button type="button" onClick={() => zoomBy(1)} disabled={zoom != null && zoom >= maxZoom - 1e-3} aria-label={t('fleet.zoomIn')}>+</button>
+          <button type="button" onClick={() => zoomBy(-1)} disabled={zoom != null && zoom <= minZoom + 1e-3} aria-label={t('fleet.zoomOut')}>&minus;</button>
+        </div>
+      )}
       <ShipMarkers
         viewRef={viewRef}
         ready={ready}

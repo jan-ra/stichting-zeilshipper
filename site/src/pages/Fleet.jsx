@@ -385,6 +385,7 @@ export default function FleetPage() {
             /* The track only makes sense here: this is the globe you can zoom, and the
                only one that frames the camera around a selected ship's route. */
             showRoute
+            zoomControls
             onUserInteract={handleUserInteract}
           />
 
