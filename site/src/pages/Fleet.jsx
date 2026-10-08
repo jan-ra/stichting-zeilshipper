@@ -71,6 +71,18 @@ const TYPES = [
   ...(presentCats.has(OTHER) ? [OTHER] : []),
 ]
 
+// Sailing areas, as set per ship in the CMS. Fixed rather than derived from the data so
+// both options stay visible while editors are still filling them in.
+const AREAS = ['all', 'inland', 'sea']
+
+const chipStyle = active => ({
+  background: active ? '#c19a52' : 'rgba(15,34,56,0.06)',
+  border: 'none', cursor: 'pointer',
+  fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase',
+  color: active ? '#0f2238' : 'rgba(15,34,56,0.55)',
+  padding: '5px 10px', borderRadius: 2, transition: 'all 0.2s', whiteSpace: 'nowrap',
+})
+
 const matchesSearch = (s, q) => {
   if (!q) return true
   const needle = q.trim().toLowerCase()
@@ -175,7 +187,7 @@ function paneMetrics(paneEl) {
 
 export default function FleetPage() {
   const [selectedId, setSelectedId] = useState(null)
-  const [filter, setFilter] = useState({ type: 'all', search: '' })
+  const [filter, setFilter] = useState({ type: 'all', area: 'all', search: '' })
   const [userInteracted, setUserInteracted] = useState(false)
   const [view, setView] = useState(DEFAULT_VIEW)
   const { t, tc } = useLanguage()
@@ -209,6 +221,7 @@ export default function FleetPage() {
 
   const filtered = useMemo(() => allItems.filter(s => {
     if (filter.type !== 'all' && categoryOf(s.type) !== filter.type) return false
+    if (filter.area !== 'all' && s.area !== filter.area) return false
     if (!matchesSearch(s, filter.search)) return false
     return true
   }), [allItems, filter])
@@ -216,7 +229,7 @@ export default function FleetPage() {
   // Non-matching markers stay on the globe for context but are dimmed and inert.
   // `null` means "no filter active", which lets ShipMarkers skip the check entirely.
   const matchedIds = useMemo(() => {
-    const noFilter = filter.type === 'all' && !filter.search
+    const noFilter = filter.type === 'all' && filter.area === 'all' && !filter.search
     return noFilter ? null : new Set(filtered.map(s => s.id))
   }, [filtered, filter])
 
@@ -300,15 +313,16 @@ export default function FleetPage() {
                 >✕</button>
               )}
             </div>
+            <div className="fleet-chips" style={{ marginBottom: 8 }}>
+              {AREAS.map(o => (
+                <button key={o} onClick={() => setFilter(f => ({ ...f, area: o }))} style={chipStyle(filter.area === o)}>
+                  {t(`fleet.areas.${o}`)}
+                </button>
+              ))}
+            </div>
             <div className="fleet-chips">
               {TYPES.map(o => (
-                <button key={o} onClick={() => setFilter(f => ({ ...f, type: o }))} style={{
-                  background: filter.type === o ? '#c19a52' : 'rgba(15,34,56,0.06)',
-                  border: 'none', cursor: 'pointer',
-                  fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase',
-                  color: filter.type === o ? '#0f2238' : 'rgba(15,34,56,0.55)',
-                  padding: '5px 10px', borderRadius: 2, transition: 'all 0.2s', whiteSpace: 'nowrap',
-                }}>
+                <button key={o} onClick={() => setFilter(f => ({ ...f, type: o }))} style={chipStyle(filter.type === o)}>
                   {o === 'all' ? t('fleet.allTypes') : o === OTHER ? t('fleet.otherType') : o}
                 </button>
               ))}
@@ -346,8 +360,7 @@ export default function FleetPage() {
                       )}
                     </div>
                     <div style={{ marginTop: 6, fontSize: 11, color: 'rgba(15,34,56,0.5)', display: 'flex', gap: 14 }}>
-                      <span>{item.port}</span>
-                      <span>{item.passengers} pax</span>
+                      {item.port && <span>{item.port}</span>}
                     </div>
                     <div style={{ marginTop: 4, fontSize: 10, color: 'rgba(15,34,56,0.55)' }}>
                       {item.lat == null

@@ -1014,13 +1014,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "cover_image_id": {
-          "name": "cover_image_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "external_url": {
           "name": "external_url",
           "type": "text",
@@ -1053,13 +1046,6 @@
           ],
           "isUnique": false
         },
-        "media_items_cover_image_idx": {
-          "name": "media_items_cover_image_idx",
-          "columns": [
-            "cover_image_id"
-          ],
-          "isUnique": false
-        },
         "media_items_updated_at_idx": {
           "name": "media_items_updated_at_idx",
           "columns": [
@@ -1082,19 +1068,6 @@
           "tableTo": "media",
           "columnsFrom": [
             "file_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        },
-        "media_items_cover_image_id_media_id_fk": {
-          "name": "media_items_cover_image_id_media_id_fk",
-          "tableFrom": "media_items",
-          "tableTo": "media",
-          "columnsFrom": [
-            "cover_image_id"
           ],
           "columnsTo": [
             "id"
@@ -1126,20 +1099,6 @@
         },
         "tag": {
           "name": "tag",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "source": {
-          "name": "source",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "body": {
-          "name": "body",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -5224,6 +5183,6 @@
   "internal": {
     "indexes": {}
   },
-  "id": "94867501-ee9e-44f0-8437-6a021bd15e78",
+  "id": "89cba9fa-cc5f-4101-930c-a0319d147c76",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }
