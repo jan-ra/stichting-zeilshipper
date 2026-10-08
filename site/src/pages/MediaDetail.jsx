@@ -107,6 +107,12 @@ export default function MediaDetailPage({ navigate, mediaItemId }) {
               padding: '56px 48px', display: 'flex', flexDirection: 'column',
               alignItems: 'center', gap: 28, textAlign: 'center',
             }}>
+              {spotifyEmbed && isPodcast && (
+                <div style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: 'rgba(244,237,225,0.6)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: -12 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#1db954' }} />
+                  {t('media.podcastLatest')}
+                </div>
+              )}
               {spotifyEmbed ? (
                 <iframe
                   title={tc(item, 'title')}
@@ -148,7 +154,7 @@ export default function MediaDetailPage({ navigate, mediaItemId }) {
                   display: 'inline-block',
                 }}
               >
-                {isPodcast ? t('mediaDetail.listenNow') : t('mediaDetail.openLink')}
+                {isPodcast ? t('media.podcastAllEpisodes') : t('mediaDetail.openLink')}
               </a>
             </div>
           )}
