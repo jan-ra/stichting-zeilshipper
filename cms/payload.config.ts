@@ -94,7 +94,13 @@ export default buildConfig({
   admin: {
     user: 'users',
     meta: {
-      titleSuffix: '— Stichting Zeilshipper',
+      titleSuffix: '— Stichting Zeilschipper CMS',
+    },
+    components: {
+      graphics: {
+        Logo: '@/components/BrandLogo#default',
+        Icon: '@/components/BrandIcon#default',
+      },
     },
     importMap: {
       baseDir: path.resolve(dirname, 'src'),
