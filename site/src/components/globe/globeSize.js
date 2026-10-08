@@ -38,3 +38,12 @@ export function zoomForGlobeDiameter(diameter, lat, paneHeight) {
   const R = (r * r + r * Math.sqrt(r * r + d * d)) / d
   return Math.log2((R * 2 * Math.PI * Math.cos(rad(lat))) / TILE_SIZE)
 }
+
+// Both pages open with the globe a little smaller than the size they would otherwise
+// pick, so it sits in its pane with some air around it rather than filling it.
+export const OPENING_GLOBE_SCALE = 0.9
+
+// The zoom that draws the globe `scale` times as wide as `zoom` does, in the same pane.
+export function scaleGlobeZoom(zoom, lat, paneHeight, scale) {
+  return zoomForGlobeDiameter(globeScreenDiameter(zoom, lat, paneHeight) * scale, lat, paneHeight)
+}
