@@ -57,6 +57,12 @@ if git rev-parse --verify -q "$BASE_REF" >/dev/null; then
       down_line="$(grep -n 'export async function down' "$p" | cut -d: -f1)"
       h="$(echo "$h" | awk -F: -v d="${down_line:-999999}" '$1 < d')"
     fi
+    # A migration that already exists on $BASE_REF has already run in prod; editing it
+    # cannot re-run what it did. Only the lines this branch adds to it count.
+    if [ -n "$h" ] && git cat-file -e "$BASE_REF:cms/${f#cms/}" 2>/dev/null; then
+      added_lines="$(git diff -U0 "$BASE_REF" -- "$p" | awk '/^@@/ { split($3, a, ","); s = substr(a[1], 2); n = (a[2] == "" ? 1 : a[2]); for (i = 0; i < n; i++) print s + i }' | tr '\n' ' ')"
+      h="$(echo "$h" | awk -F: -v keep="$added_lines" 'BEGIN { split(keep, k, " "); for (i in k) ok[k[i]] = 1 } ok[$1]')"
+    fi
     [ -n "$h" ] && hits+="$p"$'\n'"$(echo "$h" | sed 's/^/     /')"$'\n'
   done
   if [ -n "$hits" ]; then

@@ -89,6 +89,9 @@ const locStr = (f, locale) => {
   return String(f)
 }
 
+// Plain-text bodies with an empty line between paragraphs -> array of paragraphs.
+const paragraphs = (s) => s.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean)
+
 // Localized array fields (e.g. body) come back as { nl: [...], en: [...] }.
 const locArr = (f, locale) => {
   if (!f) return []
@@ -242,6 +245,7 @@ async function loadMediaItems() {
   const docs = await fetchCollection('media-items', '&locale=all')
   return docs.map(d => {
     const file = image(d.file)
+    const cover = image(d.coverImage)
     return {
       id: d.id,
       type: text(d.type),
@@ -255,6 +259,11 @@ async function loadMediaItems() {
       format: text(d.format),
       youtubeUrl: text(d.youtubeUrl),
       url: text(d.youtubeUrl) || text(d.externalUrl) || file?.src || '',
+      coverImage: cover ? { src: cover.src, alt: cover.alt } : null,
+      source: locStr(d.source, 'nl'),
+      source_en: locStr(d.source, 'en') || locStr(d.source, 'nl'),
+      body: paragraphs(locStr(d.body, 'nl')),
+      body_en: paragraphs(locStr(d.body, 'en') || locStr(d.body, 'nl')),
     }
   })
 }

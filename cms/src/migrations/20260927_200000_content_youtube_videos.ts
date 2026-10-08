@@ -1,5 +1,7 @@
 import type { MigrateDownArgs, MigrateUpArgs } from '@payloadcms/db-sqlite'
 
+import { tableIsEmpty } from '../lib/migrationGuards'
+
 /**
  * Data migration: move the site's videos to YouTube.
  *
@@ -24,8 +26,15 @@ const WATERSCHATTEN = 'https://www.youtube.com/watch?v=_nyd12t2_j4'
 const DROPPED_VIDEOS = [2, 3, 4, 5, 6, 7]
 const context = { skipRebuild: true }
 
-export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
+export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   const log = (msg: string) => payload.logger.info(`[content_youtube_videos] ${msg}`)
+
+  // Added 2026-10-07, after this ran on prod: on an empty database there is nothing to
+  // move, and the local API would query media-items columns later migrations add.
+  if (await tableIsEmpty(db, 'media_items')) {
+    log('empty database, nothing to migrate')
+    return
+  }
   const find = (id: number) =>
     payload.findByID({ collection: 'media-items', id, depth: 0, req, disableErrors: true })
 
