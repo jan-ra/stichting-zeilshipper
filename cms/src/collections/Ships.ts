@@ -19,9 +19,13 @@ export const Ships: CollectionConfig = {
     { name: 'type', type: 'text' },
     // Still stored as `port`: renaming the column would not be additive. Only the label changed.
     { name: 'port', type: 'text', label: 'Homeport' },
+    // Region, lat/lng and speed are no longer used anywhere. They are hidden rather than
+    // removed so their columns survive and a rollback to the previous image still finds
+    // them; drop them in a later contract step.
     {
       name: 'region',
       type: 'select',
+      admin: { hidden: true },
       defaultValue: 'thuiswateren',
       options: [
         { label: 'Thuiswateren', value: 'thuiswateren' },
@@ -41,17 +45,17 @@ export const Ships: CollectionConfig = {
     },
     // Positions are no longer stored here — the nightly job owns them on R2
     // (data/positions.json) and the site fetches them at runtime. These two are
-    // kept read-only as a rollback safety net and will be dropped once the R2
-    // path has proven itself in production. Editing them has no effect.
+    // kept, hidden, as a rollback safety net and will be dropped once the R2 path
+    // has proven itself in production.
     {
       name: 'lat',
       type: 'number',
-      admin: { readOnly: true, description: 'Unused — positions come from AIS via R2.' },
+      admin: { hidden: true },
     },
     {
       name: 'lng',
       type: 'number',
-      admin: { readOnly: true, description: 'Unused — positions come from AIS via R2.' },
+      admin: { hidden: true },
     },
     {
       name: 'mmsi',
@@ -74,7 +78,7 @@ export const Ships: CollectionConfig = {
         description: 'Unused — the live value lives in data/positions.json on the media bucket.',
       },
     },
-    { name: 'speed', type: 'number', label: 'Speed (kn)' },
+    { name: 'speed', type: 'number', label: 'Speed (kn)', admin: { hidden: true } },
     { name: 'year', type: 'number', label: 'Year built' },
     {
       name: 'area',

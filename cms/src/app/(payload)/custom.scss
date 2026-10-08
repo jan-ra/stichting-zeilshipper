@@ -166,6 +166,15 @@ select,
   }
 }
 
+// The select's own type-to-search input sits on top of the chosen value. The rule
+// above would give it a white box, which covers the value's first letter.
+.rs__input-container input,
+.rs__input {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
 // ─── Buttons ──────────────────────────────────────────────────────────────────
 .btn,
 button.btn {
