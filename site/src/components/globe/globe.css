@@ -38,6 +38,41 @@
   --sz-dot-scale: 1;
 }
 
+/* +/- zoom buttons, top left of the fleet map: the ship card takes the top right and
+   the attribution the bottom right. */
+.sz-globe__zoom {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(193, 154, 82, 0.5);
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(8, 18, 34, 0.35);
+}
+
+.sz-globe__zoom button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(15, 34, 56, 0.92);
+  color: #c19a52;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.sz-globe__zoom button + button { border-top: 1px solid rgba(193, 154, 82, 0.3); }
+
+.sz-globe__zoom button:hover:not(:disabled) { background: #c19a52; color: #0f2238; }
+
+.sz-globe__zoom button:focus-visible { outline: 2px solid #ffd68c; outline-offset: -2px; }
+
+.sz-globe__zoom button:disabled { color: rgba(193, 154, 82, 0.3); cursor: default; }
+
 .sz-globe__status {
   position: absolute;
   inset: 0;

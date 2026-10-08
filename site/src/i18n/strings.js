@@ -107,6 +107,8 @@ export const strings = {
       noPosition: 'Geen positie bekend',
       globeUnavailable: 'Kaart niet beschikbaar',
       close: 'Sluiten',
+      zoomIn: 'Inzoomen',
+      zoomOut: 'Uitzoomen',
     },
 
     infoBorden: {
@@ -358,6 +360,8 @@ export const strings = {
       noPosition: 'No position known',
       globeUnavailable: 'Map unavailable',
       close: 'Close',
+      zoomIn: 'Zoom in',
+      zoomOut: 'Zoom out',
     },
 
     infoBorden: {
