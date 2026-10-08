@@ -21,7 +21,6 @@ export const MediaItems: CollectionConfig = {
         { label: 'Photo', value: 'photo' },
         { label: 'Text', value: 'text' },
         { label: 'Podcast', value: 'podcast' },
-        { label: 'Project', value: 'project' },
       ],
     },
     { name: 'title', type: 'text', required: true, localized: true },

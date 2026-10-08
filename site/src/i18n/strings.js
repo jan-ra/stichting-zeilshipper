@@ -164,9 +164,8 @@ export const strings = {
       catLabels: {
         all: 'Alles',
         video: "Video's",
-        foto: "Foto's",
-        tekst: 'Teksten',
-        project: 'Projecten',
+        photo: "Foto's",
+        text: 'Teksten',
         podcast: 'Podcast',
       },
       featuredBadge: 'Uitgelicht',
@@ -213,7 +212,7 @@ export const strings = {
       backToMedia: 'Terug naar media',
       listenNow: 'Luister nu',
       openLink: 'Open link',
-      typeLabels: { video: 'Video', photo: "Foto's", text: 'Tekst', podcast: 'Podcast', project: 'Project' },
+      typeLabels: { video: 'Video', photo: "Foto's", text: 'Tekst', podcast: 'Podcast' },
     },
 
     supportLetter: {
@@ -412,9 +411,8 @@ export const strings = {
       catLabels: {
         all: 'All',
         video: 'Videos',
-        foto: 'Photos',
-        tekst: 'Texts',
-        project: 'Projects',
+        photo: 'Photos',
+        text: 'Texts',
         podcast: 'Podcast',
       },
       featuredBadge: 'Featured',
@@ -461,7 +459,7 @@ export const strings = {
       backToMedia: 'Back to media',
       listenNow: 'Listen now',
       openLink: 'Open link',
-      typeLabels: { video: 'Video', photo: 'Photos', text: 'Text', podcast: 'Podcast', project: 'Project' },
+      typeLabels: { video: 'Video', photo: 'Photos', text: 'Text', podcast: 'Podcast' },
     },
 
     supportLetter: {
