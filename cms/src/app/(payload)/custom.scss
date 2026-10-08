@@ -1,59 +1,71 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Source+Sans+3:wght@300;400;600&display=swap');
 
-// ─── Force dark theme ─────────────────────────────────────────────────────────
+// ─── Black and white theme ────────────────────────────────────────────────────
+// Plain black on white, neutral greys in between, for maximum contrast while
+// editing. The only colours left are the functional ones: red for errors and amber
+// for warnings. Payload's elevation scale runs from the page background (0) to the
+// strongest text (1000), so in a light theme it goes white -> black.
 :root,
 html,
 html[data-theme='light'],
 html[data-theme='dark'] {
-  // Backgrounds — navy depth scale
-  --theme-bg:           #0f2238;
-  --theme-input-bg:     #112640;
-  --theme-border-color: rgba(193, 154, 82, 0.2);
-  --theme-text:         #f4ede1;
+  --theme-bg:           #ffffff;
+  --theme-input-bg:     #ffffff;
+  --theme-border-color: #d4d4d4;
+  --theme-text:         #000000;
 
-  --theme-elevation-0:    #0a1a2e;
-  --theme-elevation-50:   #0f2238;
-  --theme-elevation-100:  #112640;
-  --theme-elevation-150:  #132944;
-  --theme-elevation-200:  #162d4a;
-  --theme-elevation-250:  #1a3252;
-  --theme-elevation-300:  #1e3759;
-  --theme-elevation-350:  #223c61;
-  --theme-elevation-400:  #26416a;
-  --theme-elevation-500:  #2e4d7a;
-  --theme-elevation-800:  #3d6193;
-  --theme-elevation-1000: #4d74a8;
+  --theme-elevation-0:    #ffffff;
+  --theme-elevation-50:   #f5f5f5;
+  --theme-elevation-100:  #ebebeb;
+  --theme-elevation-150:  #dedede;
+  --theme-elevation-200:  #d4d4d4;
+  --theme-elevation-250:  #c4c4c4;
+  --theme-elevation-300:  #b0b0b0;
+  --theme-elevation-350:  #9c9c9c;
+  --theme-elevation-400:  #8a8a8a;
+  --theme-elevation-450:  #767676;
+  --theme-elevation-500:  #636363;
+  --theme-elevation-550:  #555555;
+  --theme-elevation-600:  #474747;
+  --theme-elevation-650:  #3b3b3b;
+  --theme-elevation-700:  #2e2e2e;
+  --theme-elevation-750:  #242424;
+  --theme-elevation-800:  #1a1a1a;
+  --theme-elevation-850:  #121212;
+  --theme-elevation-900:  #0a0a0a;
+  --theme-elevation-950:  #050505;
+  --theme-elevation-1000: #000000;
 
-  // Gold accent — replaces Payload's default blue
-  --theme-success-50:  rgba(193, 154, 82, 0.08);
-  --theme-success-100: rgba(193, 154, 82, 0.15);
-  --theme-success-250: rgba(193, 154, 82, 0.3);
-  --theme-success-500: #c19a52;
-  --theme-success-600: #a8843e;
-  --theme-success-750: #8c6e30;
-  --theme-success-850: #755b24;
+  // "Success" is what Payload uses for its primary accent: make it black.
+  --theme-success-50:  #f5f5f5;
+  --theme-success-100: #ebebeb;
+  --theme-success-150: #dedede;
+  --theme-success-250: #c4c4c4;
+  --theme-success-500: #000000;
+  --theme-success-600: #1a1a1a;
+  --theme-success-750: #2e2e2e;
+  --theme-success-850: #121212;
 
-  // Keep error red, soften warning
-  --theme-error-50:    rgba(220, 80, 80, 0.08);
-  --theme-error-100:   rgba(220, 80, 80, 0.15);
-  --theme-error-500:   #dc5050;
-  --theme-error-600:   #c23c3c;
+  --theme-error-50:    #fdecec;
+  --theme-error-100:   #fbd5d5;
+  --theme-error-500:   #c62828;
+  --theme-error-600:   #a51f1f;
 
-  --theme-warning-50:  rgba(193, 154, 82, 0.08);
-  --theme-warning-500: #c19a52;
+  --theme-warning-50:  #fff4e0;
+  --theme-warning-100: #ffe6b8;
+  --theme-warning-500: #b26a00;
 
-  // Typography
-  --font-body:    'Source Sans 3', sans-serif;
-  --font-mono:    'Source Code Pro', 'Fira Mono', monospace;
+  --font-body: 'Source Sans 3', sans-serif;
+  --font-mono: 'Source Code Pro', 'Fira Mono', monospace;
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 // ─── Global base ──────────────────────────────────────────────────────────────
 html,
 body {
-  background-color: #0a1a2e !important;
-  color: #f4ede1 !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
   font-family: 'Source Sans 3', sans-serif !important;
   -webkit-font-smoothing: antialiased;
 }
@@ -71,45 +83,43 @@ h1, h2, h3, h4, h5,
 
 // ─── Nav / sidebar ────────────────────────────────────────────────────────────
 .nav {
-  background: #0a1a2e !important;
-  border-right: 1px solid rgba(193, 154, 82, 0.15) !important;
+  background: #ffffff !important;
+  border-right: 1px solid #d4d4d4 !important;
 }
 
 .nav__header {
-  border-bottom: 1px solid rgba(193, 154, 82, 0.15) !important;
+  border-bottom: 1px solid #d4d4d4 !important;
 }
 
 .nav__label {
   font-family: 'Source Sans 3', sans-serif !important;
-  font-size: 10px !important;
+  font-size: 11px !important;
   letter-spacing: 0.12em !important;
   text-transform: uppercase !important;
-  color: rgba(244, 237, 225, 0.4) !important;
+  color: #555555 !important;
 }
 
 .nav__link {
-  color: rgba(244, 237, 225, 0.75) !important;
+  color: #000000 !important;
   border-radius: 2px !important;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s;
 
   &:hover,
   &:focus {
-    background: rgba(193, 154, 82, 0.1) !important;
-    color: #c19a52 !important;
+    background: #ebebeb !important;
   }
 
   &.active,
   &[aria-current] {
-    background: rgba(193, 154, 82, 0.12) !important;
-    color: #c19a52 !important;
-    border-left: 2px solid #c19a52 !important;
+    background: #000000 !important;
+    color: #ffffff !important;
   }
 }
 
 // ─── Top toolbar / app header ─────────────────────────────────────────────────
 .app-header {
-  background: #0a1a2e !important;
-  border-bottom: 1px solid rgba(193, 154, 82, 0.15) !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid #d4d4d4 !important;
 }
 
 // ─── Cards / panels ───────────────────────────────────────────────────────────
@@ -122,14 +132,13 @@ h1, h2, h3, h4, h5,
 }
 
 .dashboard__card {
-  background: #112640 !important;
-  border: 1px solid rgba(193, 154, 82, 0.15) !important;
+  background: #ffffff !important;
+  border: 1px solid #d4d4d4 !important;
   border-radius: 2px !important;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s;
 
   &:hover {
-    border-color: rgba(193, 154, 82, 0.4) !important;
-    box-shadow: 0 0 0 1px rgba(193, 154, 82, 0.15) !important;
+    border-color: #000000 !important;
   }
 }
 
@@ -140,20 +149,20 @@ select,
 .rs__control,
 .field-type--text input,
 .field-type--textarea textarea {
-  background: #112640 !important;
-  border-color: rgba(193, 154, 82, 0.25) !important;
-  color: #f4ede1 !important;
+  background: #ffffff !important;
+  border-color: #8a8a8a !important;
+  color: #000000 !important;
   border-radius: 2px !important;
 
   &:focus,
   &:focus-within {
-    border-color: #c19a52 !important;
+    border-color: #000000 !important;
     outline: none !important;
-    box-shadow: 0 0 0 2px rgba(193, 154, 82, 0.15) !important;
+    box-shadow: 0 0 0 1px #000000 !important;
   }
 
   &::placeholder {
-    color: rgba(244, 237, 225, 0.35) !important;
+    color: #636363 !important;
   }
 }
 
@@ -166,57 +175,58 @@ button.btn {
   letter-spacing: 0.04em !important;
 
   &.btn--style-primary {
-    background: #c19a52 !important;
-    color: #0a1a2e !important;
-    border-color: #c19a52 !important;
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #000000 !important;
 
     &:hover {
-      background: #a8843e !important;
-      border-color: #a8843e !important;
+      background: #2e2e2e !important;
+      border-color: #2e2e2e !important;
     }
   }
 
   &.btn--style-secondary {
-    background: transparent !important;
-    color: #c19a52 !important;
-    border-color: rgba(193, 154, 82, 0.4) !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
 
     &:hover {
-      background: rgba(193, 154, 82, 0.1) !important;
-      border-color: #c19a52 !important;
+      background: #ebebeb !important;
     }
   }
 }
 
 // ─── Table / list view ────────────────────────────────────────────────────────
 .table {
-  background: #0f2238 !important;
+  background: #ffffff !important;
 
   th {
-    background: #0a1a2e !important;
-    color: rgba(244, 237, 225, 0.5) !important;
+    background: #f5f5f5 !important;
+    color: #000000 !important;
     font-family: 'Source Sans 3', sans-serif !important;
-    font-size: 10px !important;
+    font-size: 11px !important;
     letter-spacing: 0.1em !important;
     text-transform: uppercase !important;
-    border-bottom: 1px solid rgba(193, 154, 82, 0.15) !important;
+    border-bottom: 1px solid #000000 !important;
   }
 
   tr {
-    border-bottom: 1px solid rgba(193, 154, 82, 0.08) !important;
+    border-bottom: 1px solid #dedede !important;
 
     &:hover td {
-      background: rgba(193, 154, 82, 0.05) !important;
+      background: #f5f5f5 !important;
     }
   }
 
   td {
-    color: #f4ede1 !important;
+    color: #000000 !important;
   }
 
   .cell-action a,
-  .row-actions a {
-    color: #c19a52 !important;
+  .row-actions a,
+  td a {
+    color: #000000 !important;
+    text-decoration: underline;
   }
 }
 
@@ -224,9 +234,9 @@ button.btn {
 .pagination {
   .btn--active,
   .btn--selected {
-    background: #c19a52 !important;
-    color: #0a1a2e !important;
-    border-color: #c19a52 !important;
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #000000 !important;
   }
 }
 
@@ -235,36 +245,36 @@ button.btn {
   border-radius: 2px !important;
 
   &.pill--style-light {
-    background: rgba(193, 154, 82, 0.12) !important;
-    color: #c19a52 !important;
+    background: #ebebeb !important;
+    color: #000000 !important;
   }
 }
 
 // ─── Status indicator (published / draft) ─────────────────────────────────────
 .status-indicator--published,
 .doc-controls__status .pill--has-background {
-  background: rgba(193, 154, 82, 0.15) !important;
-  color: #c19a52 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
 }
 
 // ─── Tooltip ──────────────────────────────────────────────────────────────────
 .tooltip {
-  background: #0a1a2e !important;
-  border: 1px solid rgba(193, 154, 82, 0.3) !important;
-  color: #f4ede1 !important;
+  background: #000000 !important;
+  border: 1px solid #000000 !important;
+  color: #ffffff !important;
   border-radius: 2px !important;
 }
 
 // ─── Modal / drawer ───────────────────────────────────────────────────────────
 .modal-item,
 .drawer__content {
-  background: #112640 !important;
-  border: 1px solid rgba(193, 154, 82, 0.2) !important;
+  background: #ffffff !important;
+  border: 1px solid #d4d4d4 !important;
   border-radius: 2px !important;
 }
 
 .drawer__header {
-  border-bottom: 1px solid rgba(193, 154, 82, 0.15) !important;
+  border-bottom: 1px solid #d4d4d4 !important;
 
   h2 {
     font-family: 'Playfair Display', Georgia, serif !important;
@@ -275,98 +285,95 @@ button.btn {
 .rich-text--read-only,
 .rich-text .ContentEditable__root {
   font-family: 'Source Sans 3', sans-serif !important;
-  color: #f4ede1 !important;
+  color: #000000 !important;
 }
 
 .lexical-editor-theme__code {
-  background: #0a1a2e !important;
-  border: 1px solid rgba(193, 154, 82, 0.2) !important;
+  background: #f5f5f5 !important;
+  border: 1px solid #d4d4d4 !important;
   border-radius: 2px !important;
 }
 
 // ─── Upload / drop zone ───────────────────────────────────────────────────────
 .file-details,
 .upload__dropzone {
-  background: #112640 !important;
-  border: 2px dashed rgba(193, 154, 82, 0.3) !important;
+  background: #ffffff !important;
+  border: 2px dashed #8a8a8a !important;
   border-radius: 2px !important;
 
   &:hover {
-    border-color: #c19a52 !important;
-    background: rgba(193, 154, 82, 0.05) !important;
+    border-color: #000000 !important;
+    background: #f5f5f5 !important;
   }
 }
 
 // ─── Scrollbar ────────────────────────────────────────────────────────────────
 * {
   scrollbar-width: thin;
-  scrollbar-color: #c19a52 #0a1a2e;
+  scrollbar-color: #8a8a8a #f5f5f5;
 }
 
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: #0a1a2e; }
-::-webkit-scrollbar-thumb { background: #c19a52; border-radius: 3px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f5f5f5; }
+::-webkit-scrollbar-thumb { background: #8a8a8a; border-radius: 3px; }
 
 // ─── Logo placeholder text ────────────────────────────────────────────────────
 .nav__brand,
 .payload-branding {
   font-family: 'Playfair Display', Georgia, serif !important;
-  color: #c19a52 !important;
+  color: #000000 !important;
   letter-spacing: 0.05em;
 }
 
 // ─── Focus ring ───────────────────────────────────────────────────────────────
 :focus-visible {
-  outline: 2px solid rgba(193, 154, 82, 0.6) !important;
+  outline: 2px solid #000000 !important;
   outline-offset: 2px !important;
 }
 
 // ─── Checkbox & radio ─────────────────────────────────────────────────────────
 .checkbox-input input[type='checkbox']:checked + .checkbox-input__indicator,
 .radio-input input[type='radio']:checked + .radio-input__indicator {
-  background: #c19a52 !important;
-  border-color: #c19a52 !important;
+  background: #000000 !important;
+  border-color: #000000 !important;
+  color: #ffffff !important;
 }
 
 .checkbox-input__indicator,
 .radio-input__indicator {
-  border-color: rgba(193, 154, 82, 0.35) !important;
-  background: #112640 !important;
+  border-color: #636363 !important;
+  background: #ffffff !important;
   border-radius: 2px !important;
 }
 
 // ─── Select / react-select ────────────────────────────────────────────────────
 .rs__menu {
-  background: #112640 !important;
-  border: 1px solid rgba(193, 154, 82, 0.25) !important;
+  background: #ffffff !important;
+  border: 1px solid #000000 !important;
   border-radius: 2px !important;
 }
 
 .rs__option {
-  color: #f4ede1 !important;
+  color: #000000 !important;
 
   &.rs__option--is-focused {
-    background: rgba(193, 154, 82, 0.1) !important;
+    background: #ebebeb !important;
   }
 
   &.rs__option--is-selected {
-    background: rgba(193, 154, 82, 0.2) !important;
-    color: #c19a52 !important;
+    background: #000000 !important;
+    color: #ffffff !important;
   }
 }
 
 .rs__single-value {
-  color: #f4ede1 !important;
+  color: #000000 !important;
 }
 
 .rs__placeholder {
-  color: rgba(244, 237, 225, 0.35) !important;
+  color: #636363 !important;
 }
 
 .rs__indicator {
-  color: rgba(193, 154, 82, 0.6) !important;
-
-  &:hover {
-    color: #c19a52 !important;
-  }
+  color: #000000 !important;
 }
