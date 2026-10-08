@@ -551,6 +551,9 @@ export default function HomePage({ navigate }) {
           .hero-chapter { padding: 40px 24px !important; min-height: 52vh !important; }
           .hero-shipcount { top: 12px !important; right: 12px !important; padding: 8px 12px !important; }
           .hero-clickhint { display: none !important; }
+          /* The pinned globe's bottom edge runs over the intro text as it scrolls, so
+             the map credits (i) move to the free top-left corner. */
+          .hero-globe .maplibregl-ctrl-bottom-right { top: 0; bottom: auto; right: auto; left: 0; }
           .hero-scrollhint { left: 24px !important; bottom: 24px !important; }
 
           .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
