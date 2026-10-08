@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { STYLE_URL, loadMapLibre } from '../components/globe/useMapEngine.js'
+import { loadMapLibre } from '../components/globe/useMapEngine.js'
+import { mapStyleUrl } from '../components/globe/mapStyles.js'
 import { HARBOURS, INFO_BOARDS_PAGE } from '../data/content.js'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useLanguage } from '../context/LanguageContext.jsx'
@@ -55,7 +56,7 @@ export default function InformatiebPage() {
       // the whole thing fits inside the Netherlands.
       const map = new maplibregl.Map({
         container: mapRef.current,
-        style: STYLE_URL,
+        style: mapStyleUrl(),
         center: [5.3, 52.5],
         zoom: 7,
         minZoom: 7,

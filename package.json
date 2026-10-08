@@ -6,6 +6,7 @@
     "dev": "./scripts/dev.sh",
     "verify": "./scripts/verify.sh",
     "rehearse": "./scripts/rehearse-release.sh",
+    "globe-styles": "node scripts/globe-styles.mjs",
     "test": "cd cms && node --test \"tests/**/*.test.mjs\" && cd ../site && node --test \"tests/**/*.test.js\"",
     "e2e": "playwright test"
   },
