@@ -3,9 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Per-route at build time: scripts/seo-plugin.mjs rewrites this block for every
+         page, and App.jsx keeps it in step while navigating. -->
+    <!-- seo:start -->
     <title>Stichting Zeilschipper — Bruine Vloot · UNESCO-erfgoed</title>
     <meta name="description" content="Stichting Zeilschipper werkt aan UNESCO-erkenning van het ambacht van de schipper Bruine Vloot als immaterieel cultureel erfgoed van de mensheid." />
+    <link rel="canonical" href="https://stichtingzeilschipper.nl/" />
+    <!-- seo:end -->
+    <meta name="theme-color" content="#0f2238" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Stichting Zeilschipper",
+        "alternateName": "Stichting Zeilschipper — Bruine Vloot",
+        "url": "https://stichtingzeilschipper.nl/",
+        "logo": "https://stichtingzeilschipper.nl/icon-512.png",
+        "description": "Stichting Zeilschipper werkt aan UNESCO-erkenning van het ambacht van de schipper Bruine Vloot als immaterieel cultureel erfgoed van de mensheid.",
+        "knowsAbout": ["Bruine Vloot", "UNESCO erfgoed", "Immaterieel cultureel erfgoed", "Traditionele zeilschepen"]
+      }
+    </script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -1,0 +1,14 @@
+{
+  "name": "Stichting Zeilschipper — Bruine Vloot",
+  "short_name": "Zeilschipper",
+  "description": "UNESCO-erkenning voor het ambacht van de schipper Bruine Vloot.",
+  "lang": "nl",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#f4ede1",
+  "theme_color": "#0f2238",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
