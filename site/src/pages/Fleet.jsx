@@ -29,7 +29,8 @@ const OTHER = 'Overig'
 // bottoms out into the picker list instead. Note the globe flattens into Mercator
 // around zoom 12, so the deepest part of a dive lands on a flat map — which is the
 // right reading of a harbour anyway.
-const MIN_ZOOM = 1.1        // the whole planet in the pane
+// Low enough for the whole planet to fit a phone's tall, narrow pane (about 0.6).
+const MIN_ZOOM = 0.3
 const MAX_ZOOM = 14
 // Selecting a ship frames its harbour rather than slamming to the zoom floor — at
 // ~25 km up you can still see where in the country you are.
@@ -44,11 +45,11 @@ const CARD_MAX_RESERVE = 0.45
 // short of filling it, leaving room on stubbier windows.
 const DEFAULT_VIEW = { lat: 52.5, lng: 5.0, zoom: 1.8, ms: 1500 }
 
-// On a desktop the pane is much wider than it is tall, so the opening shot zooms in from
-// DEFAULT_VIEW until the globe spans 95% of the pane's width. The top and bottom of the
-// planet run off the pane — fine on a map you can drag — but no more than 30% of the
-// pane's height in all. Phones already fill their pane at DEFAULT_VIEW. Either way the
-// opening shot is then drawn at OPENING_GLOBE_SCALE of that size.
+// The opening shot is sized from the pane: the globe spans 95% of its width, and on a
+// desktop — much wider than tall — may run off the top and bottom by no more than 30%
+// of the pane's height in all, which is fine on a map you can drag. On a phone the
+// width is the limit, so the whole planet fits. Either way it is then drawn at
+// OPENING_GLOBE_SCALE of that size.
 const FLEET_FILL_WIDTH = 0.95
 const FLEET_MAX_HEIGHT = 1.3
 
@@ -217,7 +218,7 @@ export default function FleetPage() {
     const { clientWidth: w, clientHeight: h } = mapRef.current ?? {}
     if (!w || !h) return
     const fit = zoomForGlobeDiameter(Math.min(w * FLEET_FILL_WIDTH, h * FLEET_MAX_HEIGHT), DEFAULT_VIEW.lat, h)
-    const zoom = scaleGlobeZoom(Math.max(DEFAULT_VIEW.zoom, fit), DEFAULT_VIEW.lat, h, OPENING_GLOBE_SCALE)
+    const zoom = scaleGlobeZoom(fit, DEFAULT_VIEW.lat, h, OPENING_GLOBE_SCALE)
     setView({ ...DEFAULT_VIEW, zoom, ms: 0 })
   }, [])
 
