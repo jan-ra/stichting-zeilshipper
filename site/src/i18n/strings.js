@@ -133,7 +133,7 @@ export const strings = {
     unesco: {
       badge: 'Road to UNESCO',
       criteriaBadge: 'Nomineringscriteria',
-      criteriaTitle: 'De vijf UNESCO-criteria',
+      criteriaTitle: 'De UNESCO-criteria',
       evidenceLabel: 'Bewijs & bronnen',
       timelineBadge: 'Tijdlijn',
       timelineTitle: 'Van 2020 tot UNESCO-besluit',
@@ -386,7 +386,7 @@ export const strings = {
     unesco: {
       badge: 'Road to UNESCO',
       criteriaBadge: 'Nomination criteria',
-      criteriaTitle: 'The five UNESCO criteria',
+      criteriaTitle: 'The UNESCO criteria',
       evidenceLabel: 'Evidence & sources',
       timelineBadge: 'Timeline',
       timelineTitle: 'From 2020 to UNESCO decision',
