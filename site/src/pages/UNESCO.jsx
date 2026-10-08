@@ -44,21 +44,13 @@ export default function UNESCOPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {criteria.map((c, i) => (
               <div key={c.code} style={{ background: '#fff', border: '1px solid rgba(15,34,56,0.08)' }}>
-                <button onClick={() => setOpenCrit(openCrit === i ? null : i)} style={{
-                  width: '100%', background: 'none', border: 'none', cursor: 'pointer',
-                  padding: '24px 28px', textAlign: 'left',
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 20, flex: 1 }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#c19a52', letterSpacing: '0.05em', fontFamily: 'monospace', flexShrink: 0 }}>{c.code}</span>
-                    <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: '#0f2238', textAlign: 'left' }}>{c.title}</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
-                    <span style={{ fontSize: 11, color: statusColor(c.status), border: `1px solid ${statusColor(c.status)}`, padding: '3px 10px', borderRadius: 2, letterSpacing: '0.08em' }} className="hide-mobile">
-                      {statusLabels[c.status]}
-                    </span>
-                    <span style={{ color: '#c19a52', fontSize: 18, transform: openCrit === i ? 'rotate(180deg)' : 'none', transition: 'transform 0.25s', display: 'inline-block' }}>▾</span>
-                  </div>
+                <button className="crit-row" aria-expanded={openCrit === i} onClick={() => setOpenCrit(openCrit === i ? null : i)}>
+                  <span className="crit-row__code" style={{ fontSize: 13, fontWeight: 700, color: '#c19a52', letterSpacing: '0.05em', fontFamily: 'monospace' }}>{c.code}</span>
+                  <span className="crit-row__title" style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: '#0f2238' }}>{c.title}</span>
+                  <span className="crit-row__badge" style={{ fontSize: 11, color: statusColor(c.status), border: `1px solid ${statusColor(c.status)}`, padding: '3px 10px', borderRadius: 2, letterSpacing: '0.08em' }}>
+                    {statusLabels[c.status]}
+                  </span>
+                  <span className="crit-row__chev" style={{ color: '#c19a52', fontSize: 18, transform: openCrit === i ? 'rotate(180deg)' : 'none', transition: 'transform 0.25s', display: 'inline-block' }}>▾</span>
                 </button>
                 {openCrit === i && (
                   <div style={{ padding: '0 28px 28px', borderTop: '1px solid rgba(15,34,56,0.06)' }}>
@@ -144,6 +136,35 @@ export default function UNESCOPage() {
           </div>
         </div>
       </div>
+      <style>{`
+        /* Criteria row: code, title, status and chevron on one line on wide screens. */
+        .crit-row {
+          width: 100%;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 24px 28px;
+          text-align: left;
+          display: grid;
+          grid-template-columns: auto 1fr auto auto;
+          grid-template-areas: "code title badge chev";
+          align-items: center;
+          column-gap: 20px;
+          row-gap: 8px;
+        }
+        .crit-row__code  { grid-area: code; }
+        .crit-row__title { grid-area: title; min-width: 0; }
+        .crit-row__badge { grid-area: badge; justify-self: start; white-space: nowrap; }
+        .crit-row__chev  { grid-area: chev; }
+        /* Phones: the title gets the full width, the status goes under it. */
+        @media (max-width: 768px) {
+          .crit-row {
+            padding: 18px 20px;
+            grid-template-columns: 1fr auto;
+            grid-template-areas: "code chev" "title title" "badge badge";
+          }
+        }
+      `}</style>
     </div>
   )
 }
