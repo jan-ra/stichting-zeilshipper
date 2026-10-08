@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { MEDIA_ITEMS, MEDIA_PAGE } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
-import { asset } from '../utils/asset.js'
+import { asset, assetSrcSet } from '../utils/asset.js'
 import { youtubeEmbedUrl } from '../utils/youtube.js'
 
 // Spotify's show embed only ever plays the newest episode — there is no embed that lists
@@ -10,9 +10,12 @@ const PODCAST_SHOW_ID = '53OFpNfrF8cWpgZPOH1zgS'
 const PODCAST_SHOW_URL = `https://open.spotify.com/show/${PODCAST_SHOW_ID}`
 const PODCAST_ITEM = MEDIA_ITEMS.find(i => i.type === 'podcast')
 
-const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉', project: '◈' }
+const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉' }
 const FORMAT_COLORS = { YouTube: '#c4302b', ZIP: '#6b4a2b', PDF: '#9e4a4a', MP3: '#4a9e6a', Spotify: '#1db954' }
-const CATEGORIES = ['all', 'video', 'foto', 'tekst', 'project', 'podcast']
+// Filter on the item's type (a fixed select in the CMS), and only offer the types that
+// currently have at least one item, in this order.
+const TYPE_ORDER = ['video', 'photo', 'text', 'podcast']
+const CATEGORIES = ['all', ...TYPE_ORDER.filter(type => MEDIA_ITEMS.some(i => i.type === type))]
 
 export default function MediaPage({ navigate }) {
   const [filter, setFilter] = useState('all')
@@ -20,7 +23,7 @@ export default function MediaPage({ navigate }) {
 
   const catLabels = t('media.catLabels')
   const featuredEmbed = youtubeEmbedUrl(MEDIA_PAGE.featuredYoutubeUrl)
-  const filtered = filter === 'all' ? MEDIA_ITEMS : MEDIA_ITEMS.filter(i => i.category === filter)
+  const filtered = filter === 'all' ? MEDIA_ITEMS : MEDIA_ITEMS.filter(i => i.type === filter)
 
   return (
     <div style={{ paddingTop: 68 }}>
@@ -111,6 +114,18 @@ export default function MediaPage({ navigate }) {
               onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(193,154,82,0.4)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(15,34,56,0.08)'}
               >
+                {item.coverImage && (
+                  <div style={{ margin: '-24px -24px 0', height: 160, overflow: 'hidden' }}>
+                    <img
+                      src={asset(item.coverImage.src)}
+                      srcSet={assetSrcSet(item.coverImage.srcSet)}
+                      sizes="320px"
+                      alt=""
+                      loading="lazy"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  </div>
+                )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <span style={{ fontSize: 22, color: '#c19a52', opacity: 0.7 }}>{TYPE_ICONS[item.type]}</span>
                   <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', background: FORMAT_COLORS[item.format] || '#3a4f65', color: '#fff', padding: '3px 8px', borderRadius: 2 }}>

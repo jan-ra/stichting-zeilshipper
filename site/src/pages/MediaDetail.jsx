@@ -1,8 +1,9 @@
 import { MEDIA_ITEMS } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
 import { youtubeEmbedUrl } from '../utils/youtube.js'
+import { asset, assetSrcSet } from '../utils/asset.js'
 
-const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉', project: '◈' }
+const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉' }
 
 // Turn a public Spotify show/episode link into its embeddable player URL.
 function spotifyEmbedUrl(url) {
@@ -30,6 +31,10 @@ export default function MediaDetailPage({ navigate, mediaItemId }) {
   const youtubeEmbed = youtubeEmbedUrl(item.youtubeUrl || item.url)
   const isVideo   = item.type === 'video' && Boolean(youtubeEmbed)
   const isPodcast = item.type === 'podcast'
+  // A text item introduces a book or article; it gets its own layout once it has an
+  // introduction or a cover, and falls back to the generic link card otherwise.
+  const body = tc(item, 'body') || []
+  const isText = item.type === 'text' && (body.length > 0 || Boolean(item.coverImage))
   const typeLabel = t('mediaDetail.typeLabels')[item.type] || item.type
   const spotifyEmbed = spotifyEmbedUrl(item.url)
 
@@ -101,7 +106,51 @@ export default function MediaDetailPage({ navigate, mediaItemId }) {
             </div>
           )}
 
-          {!isVideo && (
+          {isText && (
+            <div className="media-text" style={{ display: 'grid', gridTemplateColumns: item.coverImage ? '300px 1fr' : '1fr', gap: '3rem', alignItems: 'start' }}>
+              {item.coverImage && (
+                <img
+                  src={asset(item.coverImage.src)}
+                  srcSet={assetSrcSet(item.coverImage.srcSet)}
+                  sizes="(max-width: 768px) 100vw, 300px"
+                  alt={item.coverImage.alt || tc(item, 'title')}
+                  style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', display: 'block', borderRadius: 2, boxShadow: '0 8px 40px rgba(0,0,0,0.5)' }}
+                />
+              )}
+              <div>
+                <div style={{ fontSize: 11, color: '#c19a52', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 20 }}>
+                  {t('mediaDetail.introduction')}
+                </div>
+                {body.map((paragraph, i) => (
+                  <p key={i} style={{ fontSize: 16, color: 'rgba(244,237,225,0.8)', lineHeight: 1.85, marginBottom: 20 }}>
+                    {paragraph}
+                  </p>
+                ))}
+                {tc(item, 'source') && (
+                  <div style={{ fontSize: 12, color: 'rgba(244,237,225,0.45)', fontStyle: 'italic', marginBottom: 28 }}>
+                    {tc(item, 'source')}
+                  </div>
+                )}
+                {item.url && (
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      background: '#c19a52', color: '#0f2238',
+                      fontSize: 13, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase',
+                      padding: '13px 28px', borderRadius: 2, textDecoration: 'none',
+                      display: 'inline-block',
+                    }}
+                  >
+                    {t('mediaDetail.readFull')} &rarr;
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+
+          {!isVideo && !isText && (
             <div style={{
               border: '1px solid rgba(193,154,82,0.2)', borderRadius: 2,
               padding: '56px 48px', display: 'flex', flexDirection: 'column',
@@ -180,6 +229,12 @@ export default function MediaDetailPage({ navigate, mediaItemId }) {
         </div>
       </div>
 
+      <style>{`
+        @media (max-width: 768px) {
+          .media-text { grid-template-columns: 1fr !important; }
+          .media-text img { max-width: 320px; }
+        }
+      `}</style>
     </div>
   )
 }

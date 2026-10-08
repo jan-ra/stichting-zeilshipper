@@ -98,6 +98,21 @@
 
 .sz-shipcard__factValue { color: #f4ede1; }
 
+.sz-shipcard__website {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 7px 14px;
+  border: 1px solid rgba(193, 154, 82, 0.5);
+  border-radius: 2px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #c19a52;
+  text-decoration: none;
+}
+
+.sz-shipcard__website:hover { background: rgba(193, 154, 82, 0.12); }
+
 .sz-shipcard__meta {
   margin-top: 10px;
   font-size: 11px;

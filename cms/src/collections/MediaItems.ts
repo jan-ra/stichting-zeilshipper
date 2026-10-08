@@ -21,7 +21,6 @@ export const MediaItems: CollectionConfig = {
         { label: 'Photo', value: 'photo' },
         { label: 'Text', value: 'text' },
         { label: 'Podcast', value: 'podcast' },
-        { label: 'Project', value: 'project' },
       ],
     },
     { name: 'title', type: 'text', required: true, localized: true },
@@ -50,6 +49,37 @@ export const MediaItems: CollectionConfig = {
       admin: {
         condition: (_, siblingData) => siblingData?.type !== 'video',
         description: 'Upload to the Media library. Not used for videos — those live on YouTube.',
+      },
+    },
+    // Text items introduce a book or article: a cover, a few paragraphs, and a link
+    // (externalUrl or an uploaded PDF) to the full piece.
+    {
+      name: 'coverImage',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        condition: (_, siblingData) => siblingData?.type === 'text',
+        description: 'Book cover or article photo, shown next to the introduction.',
+      },
+    },
+    {
+      name: 'source',
+      type: 'text',
+      localized: true,
+      admin: {
+        condition: (_, siblingData) => siblingData?.type === 'text',
+        description: 'Where the piece appeared, e.g. "Trouw, 12 maart 2026" or the book title and author.',
+      },
+    },
+    {
+      name: 'body',
+      type: 'textarea',
+      localized: true,
+      label: 'Introduction',
+      admin: {
+        condition: (_, siblingData) => siblingData?.type === 'text',
+        description: 'The introduction shown on the detail page. Separate paragraphs with an empty line.',
+        rows: 10,
       },
     },
     { name: 'externalUrl', type: 'text', label: 'External URL', admin: { condition: (_, siblingData) => siblingData?.type !== 'video', description: 'Use this when the asset lives off-platform (Spotify, R2…).' } },
