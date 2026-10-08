@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath } from 'node:url'
 import seo from './scripts/seo-plugin.mjs'
+import { SHARE_IMAGE } from './src/seo.js'
 
 // Where the browser fetches live ship positions from. Derived from MEDIA_BASE_URL —
 // which every environment already sets for the media bucket — so there is no separate
@@ -21,7 +22,7 @@ const releaseMeta = {
 }
 
 export default defineConfig({
-  plugins: [react(), releaseMeta, seo({ generatedDir: fileURLToPath(new URL('./src/data/generated', import.meta.url)) })],
+  plugins: [react(), releaseMeta, seo({ generatedDir: fileURLToPath(new URL('./src/data/generated', import.meta.url)), defaultImage: SHARE_IMAGE })],
   base: '/',
   // MapLibre v6 spawns its tile-parsing worker with `{ type: 'module' }`, so the worker
   // bundle Vite builds for it has to be an ES module too — the default IIFE output is

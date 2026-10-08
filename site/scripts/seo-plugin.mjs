@@ -17,9 +17,11 @@ const END = '<!-- seo:end -->'
 
 const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
+// `defaultImage`: { url, width, height, alt } for pages without an image of their own.
 export function headTags(route, defaultImage) {
   const url = canonicalUrl(route.path)
-  const image = route.image || defaultImage
+  const fallback = !route.image && defaultImage ? defaultImage : null
+  const image = route.image || fallback?.url || null
   return [
     `<title>${esc(route.title)}</title>`,
     `<meta name="description" content="${esc(route.description)}" />`,
@@ -34,10 +36,14 @@ export function headTags(route, defaultImage) {
     '<meta property="og:locale" content="nl_NL" />',
     '<meta property="og:locale:alternate" content="en_GB" />',
     image ? `<meta property="og:image" content="${esc(image)}" />` : '',
+    fallback ? `<meta property="og:image:width" content="${fallback.width}" />` : '',
+    fallback ? `<meta property="og:image:height" content="${fallback.height}" />` : '',
+    fallback ? `<meta property="og:image:alt" content="${esc(fallback.alt)}" />` : '',
     `<meta name="twitter:card" content="${image ? 'summary_large_image' : 'summary'}" />`,
     `<meta name="twitter:title" content="${esc(route.title)}" />`,
     `<meta name="twitter:description" content="${esc(route.description)}" />`,
     image ? `<meta name="twitter:image" content="${esc(image)}" />` : '',
+    fallback ? `<meta name="twitter:image:alt" content="${esc(fallback.alt)}" />` : '',
   ].filter(Boolean).join('\n    ')
 }
 
@@ -57,7 +63,6 @@ const readJson = (dir, file) => {
   return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : []
 }
 
-// `defaultImage`: absolute URL of the share image for pages without their own.
 export default function seo({ generatedDir, defaultImage = null }) {
   let outDir
   return {
