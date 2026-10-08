@@ -6,12 +6,12 @@ import { useState, useEffect, useRef } from 'react'
 // bundles it with its shared chunk and returns a URL that works in both modes.
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { CAMERA_K, globeRadiusPx as globeRadiusAt } from './globeSize.js'
+import { mapStyleUrl } from './mapStyles.js'
 
-// OpenFreeMap: OpenStreetMap data on the OpenMapTiles schema, no key, no domain
-// allowlist, commercial use explicitly allowed. Attribution is required, and the style
-// carries its own — hence the plain AttributionControl below rather than a custom
-// string, which would render it twice.
-export const STYLE_URL = 'https://tiles.openfreemap.org/styles/dark'
+// The base map comes from mapStyles.js: OpenFreeMap's dark style in production, others
+// on localhost for comparison. Attribution is required, and every style carries its
+// own — hence the plain AttributionControl below rather than a custom string, which
+// would render it twice.
 
 const rad = deg => (deg * Math.PI) / 180
 
@@ -126,7 +126,7 @@ export function useMapEngine(containerRef, { minZoom, maxZoom, initialView, labe
         if (map) return
         map = new maplibregl.Map({
           container,
-          style: STYLE_URL,
+          style: mapStyleUrl(),
           center: [initialView.lng, initialView.lat],
           zoom: initialView.zoom,
           minZoom,
