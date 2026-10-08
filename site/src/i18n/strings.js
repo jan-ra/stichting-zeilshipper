@@ -210,6 +210,8 @@ export const strings = {
       backToMedia: 'Terug naar media',
       listenNow: 'Luister nu',
       openLink: 'Open link',
+      readFull: 'Lees het volledige stuk',
+      introduction: 'Introductie',
       typeLabels: { video: 'Video', photo: "Foto's", text: 'Tekst', podcast: 'Podcast' },
     },
 
@@ -455,6 +457,8 @@ export const strings = {
       backToMedia: 'Back to media',
       listenNow: 'Listen now',
       openLink: 'Open link',
+      readFull: 'Read the full piece',
+      introduction: 'Introduction',
       typeLabels: { video: 'Video', photo: 'Photos', text: 'Text', podcast: 'Podcast' },
     },
 

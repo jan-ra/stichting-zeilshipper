@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { MEDIA_ITEMS, MEDIA_PAGE } from '../data/content.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
-import { asset } from '../utils/asset.js'
+import { asset, assetSrcSet } from '../utils/asset.js'
 import { youtubeEmbedUrl } from '../utils/youtube.js'
 
 const TYPE_ICONS = { video: '▶', photo: '◼', text: '≡', podcast: '◉' }
@@ -108,6 +108,18 @@ export default function MediaPage({ navigate }) {
               onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(193,154,82,0.4)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(15,34,56,0.08)'}
               >
+                {item.coverImage && (
+                  <div style={{ margin: '-24px -24px 0', height: 160, overflow: 'hidden' }}>
+                    <img
+                      src={asset(item.coverImage.src)}
+                      srcSet={assetSrcSet(item.coverImage.srcSet)}
+                      sizes="320px"
+                      alt=""
+                      loading="lazy"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  </div>
+                )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <span style={{ fontSize: 22, color: '#c19a52', opacity: 0.7 }}>{TYPE_ICONS[item.type]}</span>
                   <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', background: FORMAT_COLORS[item.format] || '#3a4f65', color: '#fff', padding: '3px 8px', borderRadius: 2 }}>
