@@ -82,7 +82,6 @@ export const strings = {
         yearBuilt: 'Bouwjaar',
         crew: 'Bemanning',
         region: 'Regio',
-        positionUpdated: 'Positie bijgewerkt',
       },
     },
 
@@ -337,7 +336,6 @@ export const strings = {
         yearBuilt: 'Year built',
         crew: 'Crew',
         region: 'Region',
-        positionUpdated: 'Position updated',
       },
     },
 
