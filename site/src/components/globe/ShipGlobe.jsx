@@ -191,7 +191,6 @@ export default function ShipGlobe({
   }, [mapRef, onUserInteract, minZoom, maxZoom])
 
   const labels = useMemo(() => ({
-    positionUpdated: t('fleet.positionUpdated'),
     shipsHere: t('fleet.shipsHere'),
     pickShip: t('fleet.pickShip'),
     zoomToSplit: t('fleet.zoomToSplit'),

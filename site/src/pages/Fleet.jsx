@@ -374,26 +374,10 @@ export default function FleetPage() {
                     <img src={asset(item.image)} alt={item.name} style={{ width: 52, height: 52, objectFit: 'cover', borderRadius: 2, flexShrink: 0 }} />
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <div style={{ fontSize: 10, color: '#a07d33', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>{item.type} · {item.year}</div>
-                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 15, color: '#0f2238' }}>{item.name}</div>
-                      </div>
-                      {item.lat != null ? (
-                        <div title={t('fleet.positionUpdated')} style={{ width: 7, height: 7, borderRadius: '50%', background: '#c19a52', boxShadow: '0 0 5px rgba(193,154,82,0.6)', flexShrink: 0, animation: 'pulse 2.5s ease-in-out infinite' }} />
-                      ) : (
-                        <div title={t('fleet.noPosition')} style={{ width: 7, height: 7, borderRadius: '50%', border: '1px solid rgba(15,34,56,0.25)', flexShrink: 0 }} />
-                      )}
-                    </div>
+                    <div style={{ fontSize: 10, color: '#a07d33', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>{item.type} · {item.year}</div>
+                    <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 15, color: '#0f2238' }}>{item.name}</div>
                     <div style={{ marginTop: 6, fontSize: 11, color: 'rgba(15,34,56,0.5)', display: 'flex', gap: 14 }}>
                       {item.port && <span>{item.port}</span>}
-                    </div>
-                    <div style={{ marginTop: 4, fontSize: 10, color: 'rgba(15,34,56,0.55)' }}>
-                      {item.lat == null
-                        ? t('fleet.noPosition')
-                        : item.positionUpdatedAt
-                          ? `${t('fleet.positionUpdated')}: ${new Date(item.positionUpdatedAt).toLocaleString()}`
-                          : null}
                     </div>
                   </div>
                 </div>

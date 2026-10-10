@@ -557,7 +557,7 @@ export default function ShipMarkers({
                       {canZoom && <div className="sz-tip__hint">{labels.zoomToSplit}</div>}
                     </>
                   ) : (
-                    <ShipTip ship={c.ships[0]} labels={labels} />
+                    <ShipTip ship={c.ships[0]} />
                   )}
                 </div>
               )}
@@ -611,18 +611,13 @@ export default function ShipMarkers({
   )
 }
 
-function ShipTip({ ship, labels }) {
+function ShipTip({ ship }) {
   return (
     <>
       {ship.image && <img className="sz-tip__img" src={asset(ship.image)} alt="" />}
       <div className="sz-tip__title">{ship.name}</div>
       <div className="sz-tip__type">{ship.type}</div>
       <div className="sz-tip__meta">{ship.port}</div>
-      {ship.positionUpdatedAt && (
-        <div className="sz-tip__meta">
-          {labels.positionUpdated}: {new Date(ship.positionUpdatedAt).toLocaleString()}
-        </div>
-      )}
     </>
   )
 }
