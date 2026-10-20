@@ -190,9 +190,13 @@
   animation: sz-ring 2.2s ease-out infinite;
 }
 
+/* Grows the box rather than scale()-ing it: a transform animation is rasterised once at
+   the start size and then stretched, which blew the 16px ring up into a blocky outline
+   that stays crisp only on the axes and reads as a cross. Resizing redraws it each
+   frame; it is one absolutely positioned pseudo-element, so the layout cost is nil. */
 @keyframes sz-ring {
-  0%   { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 0;    transform: translate(-50%, -50%) scale(4); }
+  0%   { opacity: 0.85; width: 16px; height: 16px; }
+  100% { opacity: 0;    width: 64px; height: 64px; }
 }
 
 /* Filtered out: visible for context, but not hoverable or clickable. */
