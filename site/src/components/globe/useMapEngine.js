@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react'
 // bundles it with its shared chunk and returns a URL that works in both modes.
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { CAMERA_K, globeRadiusPx as globeRadiusAt } from './globeSize.js'
-import { mapStyleUrl } from './mapStyles.js'
+import { applyStylePaint, mapStyleUrl } from './mapStyles.js'
 
 // The base map comes from mapStyles.js: OpenFreeMap's dark style in production, others
 // on localhost for comparison. Attribution is required, and every style carries its
@@ -153,8 +153,9 @@ export function useMapEngine(containerRef, { minZoom, maxZoom, initialView, labe
 
         map.on('style.load', () => {
           map.setProjection({ type: 'globe' })
+          applyStylePaint(map)
 
-          // The dark style carries place and road labels; on the globe the ship markers
+          // The base style carries place and road labels; on the globe the ship markers
           // are the only text that should be there. Informatieborden keeps them.
           if (!labels) {
             for (const layer of map.getStyle().layers) {
@@ -166,14 +167,14 @@ export function useMapEngine(containerRef, { minZoom, maxZoom, initialView, labe
           // itself, not the space around it. The canvas is already transparent outside
           // the sphere, so the page's own gradient shows through there regardless.
 
-          // Stands in for globe.gl's atmosphere (#3a7abd at 0.22 altitude). The globe
-          // sits on the site's sand background, so this has to stay a narrow navy rim:
-          // MapLibre's default blend throws a broad halo that reads as a white wash
-          // against the page. Site palette — navy #0f2238, atmosphere blue #3a7abd.
+          // Stands in for globe.gl's atmosphere. The globe sits on the site's sand
+          // background, so this has to stay a narrow rim: MapLibre's default blend throws
+          // a broad halo that reads as a wash against the page. A cool blue-grey, one step
+          // darker than the light grey sea, so the sphere's edge still separates from sand.
           map.setSky({
-            'sky-color': '#0f2238',
-            'horizon-color': '#3a7abd',
-            'fog-color': '#0f2238',
+            'sky-color': '#9fb0bc',
+            'horizon-color': '#b7c4cd',
+            'fog-color': '#9fb0bc',
             'sky-horizon-blend': 0.35,
             'horizon-fog-blend': 0.5,
             'fog-ground-blend': 0.1,

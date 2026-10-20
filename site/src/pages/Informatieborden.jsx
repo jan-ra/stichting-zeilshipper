@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { loadMapLibre } from '../components/globe/useMapEngine.js'
-import { mapStyleUrl } from '../components/globe/mapStyles.js'
+import { applyStylePaint, mapStyleUrl } from '../components/globe/mapStyles.js'
 import { HARBOURS, INFO_BOARDS_PAGE } from '../data/content.js'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useLanguage } from '../context/LanguageContext.jsx'
@@ -67,6 +67,7 @@ export default function InformatiebPage() {
         pitchWithRotate: false,
         touchPitch: false,
       })
+      map.on('style.load', () => applyStylePaint(map))
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-left')
       map.addControl(new maplibregl.AttributionControl({ compact: true }))
       // As on the globes: on a phone, start the credits folded to their (i) button.

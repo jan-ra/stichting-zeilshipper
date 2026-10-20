@@ -92,7 +92,7 @@ try {
 <header><h1>Globe map styles</h1>
 <p>The current globe on the home and fleet pages in each free base-map style, 1440&times;900.
 To try one live: <code>npm run globe-styles -- --serve</code>, or open any local page with <code>?mapStyle=&lt;name&gt;</code>.
-The atmosphere and marker colours are tuned for <code>dark</code>; picking another style may mean retuning those.</p></header>
+The atmosphere and marker colours are tuned for the current style; picking another may mean retuning those.</p></header>
 ${cards}
 </main></body></html>
 `)
