@@ -477,7 +477,7 @@ export default function FleetPage() {
           left: 50%;
           transform: translateX(-50%);
           font-size: 10px;
-          color: rgba(193,154,82,0.7);
+          color: #6b5428;
           letter-spacing: 0.15em;
           text-transform: uppercase;
           pointer-events: none;

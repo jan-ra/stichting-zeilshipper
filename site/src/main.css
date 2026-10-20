@@ -32,21 +32,18 @@ img { max-width: 100%; display: block; }
   }
 }
 
-/* MapLibre overrides */
+/* MapLibre overrides — light controls on the light grey basemap. */
 .maplibregl-map { font-family: 'Source Sans 3', sans-serif !important; }
 .maplibregl-ctrl-group {
-  background: rgba(10,22,40,0.92) !important;
-  border: 1px solid rgba(193,154,82,0.3) !important;
-  box-shadow: none !important;
+  background: rgba(250,246,238,0.95) !important;
+  border: 1px solid rgba(193,154,82,0.5) !important;
+  box-shadow: 0 2px 10px rgba(15,34,56,0.15) !important;
 }
 .maplibregl-ctrl-group button + button { border-top-color: rgba(193,154,82,0.3) !important; }
 .maplibregl-ctrl-group button:hover { background: rgba(193,154,82,0.15) !important; }
-/* The control icons ship as black SVGs; invert them onto the dark basemap. */
-.maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: invert(1) sepia(1) saturate(3) hue-rotate(5deg); }
 .maplibregl-ctrl-attrib {
-  background: rgba(10,22,40,0.7) !important;
-  color: rgba(244,237,225,0.3) !important;
+  background: rgba(250,246,238,0.8) !important;
+  color: rgba(15,34,56,0.5) !important;
   font-size: 9px !important;
 }
-.maplibregl-ctrl-attrib a { color: rgba(244,237,225,0.45) !important; }
-.maplibregl-ctrl-attrib-button { filter: invert(1); }
+.maplibregl-ctrl-attrib a { color: rgba(15,34,56,0.7) !important; }
